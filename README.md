@@ -1,5 +1,4 @@
-# symc
-
+# symc ![Go](https://github.com/kita127/symc/workflows/Go/badge.svg)
 symc is a library that extracts identifiers
 
 ### Input
