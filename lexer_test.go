@@ -267,7 +267,7 @@ func TestLexicalize(t *testing.T) {
 		},
 		{
 			"test7",
-			`123`,
+			`   123   `,
 			[]*Token{
 				{
 					integer,
