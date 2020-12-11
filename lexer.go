@@ -158,7 +158,11 @@ func (l *Lexer) nextToken() *Token {
 		tk = &Token{tokenType: doublequot, literal: "\""}
 		l.pos++
 	default:
-		tk = l.readWord()
+		if isLetter(c) {
+			tk = l.readWord()
+		} else if isDigit(c) {
+			tk = l.readNumber()
+		}
 	}
 	return tk
 }
@@ -174,4 +178,25 @@ func (l *Lexer) readWord() *Token {
 	w := l.input[l.pos:next]
 	l.pos = next
 	return &Token{tokenType: word, literal: w}
+}
+
+func (l *Lexer) readNumber() *Token {
+	// ワードの終わりの次まで pos を進める
+	var next int
+	for next = l.pos; next < len(l.input); next++ {
+		if l.input[next] == ' ' || l.input[next] == '\t' {
+			break
+		}
+	}
+	w := l.input[l.pos:next]
+	l.pos = next
+	return &Token{tokenType: integer, literal: w}
+}
+
+func isLetter(c byte) bool {
+	return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || c == '_'
+}
+
+func isDigit(c byte) bool {
+	return '0' <= c && c <= '9'
 }

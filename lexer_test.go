@@ -265,6 +265,20 @@ func TestLexicalize(t *testing.T) {
 				},
 			},
 		},
+		{
+			"test7",
+			`123`,
+			[]*Token{
+				{
+					integer,
+					"123",
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
