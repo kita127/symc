@@ -13,6 +13,21 @@ type Token struct {
 const (
 	word = iota
 	assign
+	plus
+	minus
+	bang
+	asterisk
+	slash
+	lt
+	gt
+	semicolon
+	lparen
+	rparen
+	comma
+	lbrace
+	rbrace
+	lbracket
+	rbracket
 	eof
 )
 
@@ -54,7 +69,52 @@ func (l *Lexer) nextToken() *Token {
 	c := l.input[l.position]
 	switch c {
 	case '=':
-		tk = &Token{tokenType: assign, literal: "+"}
+		tk = &Token{tokenType: assign, literal: "="}
+		l.position++
+	case '+':
+		tk = &Token{tokenType: plus, literal: "+"}
+		l.position++
+	case '-':
+		tk = &Token{tokenType: minus, literal: "-"}
+		l.position++
+	case '!':
+		tk = &Token{tokenType: bang, literal: "!"}
+		l.position++
+	case '*':
+		tk = &Token{tokenType: asterisk, literal: "*"}
+		l.position++
+	case '/':
+		tk = &Token{tokenType: slash, literal: "/"}
+		l.position++
+	case '<':
+		tk = &Token{tokenType: lt, literal: "<"}
+		l.position++
+	case '>':
+		tk = &Token{tokenType: gt, literal: ">"}
+		l.position++
+	case ';':
+		tk = &Token{tokenType: semicolon, literal: ";"}
+		l.position++
+	case '(':
+		tk = &Token{tokenType: lparen, literal: "("}
+		l.position++
+	case ')':
+		tk = &Token{tokenType: rparen, literal: ")"}
+		l.position++
+	case ',':
+		tk = &Token{tokenType: comma, literal: ","}
+		l.position++
+	case '{':
+		tk = &Token{tokenType: lbrace, literal: "{"}
+		l.position++
+	case '}':
+		tk = &Token{tokenType: rbrace, literal: "}"}
+		l.position++
+	case '[':
+		tk = &Token{tokenType: lbracket, literal: "["}
+		l.position++
+	case ']':
+		tk = &Token{tokenType: rbracket, literal: "]"}
 		l.position++
 	default:
 		tk = l.readWord()
