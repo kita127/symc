@@ -19,6 +19,10 @@ func TestLexicalize(t *testing.T) {
 					word,
 					"char",
 				},
+				{
+					eof,
+					"eof",
+				},
 			},
 		},
 		//		{
