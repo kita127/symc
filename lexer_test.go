@@ -12,6 +12,16 @@ func TestLexicalize(t *testing.T) {
 		expect  []*Token
 	}{
 		{
+			"test0",
+			``,
+			[]*Token{
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
+		{
 			"test1",
 			`   char   `,
 			[]*Token{
@@ -25,24 +35,38 @@ func TestLexicalize(t *testing.T) {
 				},
 			},
 		},
-		{
-			"test2",
-			`   char		hoge   `,
-			[]*Token{
-				{
-					word,
-					"char",
-				},
-				{
-					word,
-					"hoge",
-				},
-				{
-					eof,
-					"eof",
-				},
-			},
-		},
+//		{
+//			"test2",
+//			`   char		hoge   `,
+//			[]*Token{
+//				{
+//					word,
+//					"char",
+//				},
+//				{
+//					word,
+//					"hoge",
+//				},
+//				{
+//					eof,
+//					"eof",
+//				},
+//			},
+//		},
+//		{
+//			"test3",
+//			`=`,
+//			[]*Token{
+//				{
+//					assign,
+//					"=",
+//				},
+//				{
+//					eof,
+//					"eof",
+//				},
+//			},
+//		},
 	}
 
 	for _, tt := range testTbl {

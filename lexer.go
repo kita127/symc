@@ -12,6 +12,7 @@ type Token struct {
 
 const (
 	word = iota
+	assign
 	eof
 )
 
@@ -33,18 +34,35 @@ func (l *Lexer) lexicalize(src string) []*Token {
 
 func (l *Lexer) nextToken() *Token {
 	// スペースをとばす
-	for i := l.position; i < len(l.input); i++ {
-		l.position = i
+	for {
+		i := l.position
+		if i >= len(l.input) {
+			break
+		}
 		if l.input[i] != ' ' && l.input[i] != '\t' {
 			break
 		}
+		l.position++
 	}
 
 	// ソースの終端
-	if l.position >= len(l.input)-1 {
+	if l.position >= len(l.input) {
 		return &Token{tokenType: eof, literal: "eof"}
 	}
 
+	var tk *Token
+	c := l.input[l.position]
+	switch c {
+	case '=':
+		tk = &Token{tokenType: assign, literal: "+"}
+		l.position++
+	default:
+		tk = l.readWord()
+	}
+	return tk
+}
+
+func (l *Lexer) readWord() *Token {
 	// ワードの終わりの次まで position を進める
 	var next int
 	for next = l.position; next < len(l.input); next++ {
