@@ -1,8 +1,8 @@
 package symc
 
 type Lexer struct {
-	input    string
-	position int
+	input string
+	pos   int
 }
 
 type Token struct {
@@ -11,7 +11,9 @@ type Token struct {
 }
 
 const (
-	word = iota
+	eof = iota
+	word
+	integer
 	assign
 	plus
 	minus
@@ -38,11 +40,10 @@ const (
 	period
 	backslash
 	doublequot
-	eof
 )
 
 func NewLexer(src string) *Lexer {
-	return &Lexer{input: src, position: 0}
+	return &Lexer{input: src, pos: 0}
 }
 
 func (l *Lexer) lexicalize(src string) []*Token {
@@ -60,102 +61,102 @@ func (l *Lexer) lexicalize(src string) []*Token {
 func (l *Lexer) nextToken() *Token {
 	// スペースをとばす
 	for {
-		i := l.position
+		i := l.pos
 		if i >= len(l.input) {
 			break
 		}
 		if l.input[i] != ' ' && l.input[i] != '\t' {
 			break
 		}
-		l.position++
+		l.pos++
 	}
 
 	// ソースの終端
-	if l.position >= len(l.input) {
+	if l.pos >= len(l.input) {
 		return &Token{tokenType: eof, literal: "eof"}
 	}
 
 	var tk *Token
-	c := l.input[l.position]
+	c := l.input[l.pos]
 	switch c {
 	case '=':
 		tk = &Token{tokenType: assign, literal: "="}
-		l.position++
+		l.pos++
 	case '+':
 		tk = &Token{tokenType: plus, literal: "+"}
-		l.position++
+		l.pos++
 	case '-':
 		tk = &Token{tokenType: minus, literal: "-"}
-		l.position++
+		l.pos++
 	case '!':
 		tk = &Token{tokenType: bang, literal: "!"}
-		l.position++
+		l.pos++
 	case '*':
 		tk = &Token{tokenType: asterisk, literal: "*"}
-		l.position++
+		l.pos++
 	case '/':
 		tk = &Token{tokenType: slash, literal: "/"}
-		l.position++
+		l.pos++
 	case '<':
 		tk = &Token{tokenType: lt, literal: "<"}
-		l.position++
+		l.pos++
 	case '>':
 		tk = &Token{tokenType: gt, literal: ">"}
-		l.position++
+		l.pos++
 	case ';':
 		tk = &Token{tokenType: semicolon, literal: ";"}
-		l.position++
+		l.pos++
 	case '(':
 		tk = &Token{tokenType: lparen, literal: "("}
-		l.position++
+		l.pos++
 	case ')':
 		tk = &Token{tokenType: rparen, literal: ")"}
-		l.position++
+		l.pos++
 	case ',':
 		tk = &Token{tokenType: comma, literal: ","}
-		l.position++
+		l.pos++
 	case '{':
 		tk = &Token{tokenType: lbrace, literal: "{"}
-		l.position++
+		l.pos++
 	case '}':
 		tk = &Token{tokenType: rbrace, literal: "}"}
-		l.position++
+		l.pos++
 	case '[':
 		tk = &Token{tokenType: lbracket, literal: "["}
-		l.position++
+		l.pos++
 	case ']':
 		tk = &Token{tokenType: rbracket, literal: "]"}
-		l.position++
+		l.pos++
 	case '#':
 		tk = &Token{tokenType: hash, literal: "#"}
-		l.position++
+		l.pos++
 	case '&':
 		tk = &Token{tokenType: ampersand, literal: "&"}
-		l.position++
+		l.pos++
 	case '~':
 		tk = &Token{tokenType: tilde, literal: "~"}
-		l.position++
+		l.pos++
 	case '^':
 		tk = &Token{tokenType: caret, literal: "^"}
-		l.position++
+		l.pos++
 	case '|':
 		tk = &Token{tokenType: vertical, literal: "|"}
-		l.position++
+		l.pos++
 	case ':':
 		tk = &Token{tokenType: colon, literal: ":"}
-		l.position++
+		l.pos++
 	case '?':
 		tk = &Token{tokenType: question, literal: "?"}
-		l.position++
+		l.pos++
 	case '.':
 		tk = &Token{tokenType: period, literal: "."}
-		l.position++
+		l.pos++
 	case '\\':
 		tk = &Token{tokenType: backslash, literal: "\\"}
-		l.position++
+		l.pos++
 	case '"':
 		tk = &Token{tokenType: doublequot, literal: "\""}
-		l.position++
+		l.pos++
 	default:
 		tk = l.readWord()
 	}
@@ -163,14 +164,14 @@ func (l *Lexer) nextToken() *Token {
 }
 
 func (l *Lexer) readWord() *Token {
-	// ワードの終わりの次まで position を進める
+	// ワードの終わりの次まで pos を進める
 	var next int
-	for next = l.position; next < len(l.input); next++ {
+	for next = l.pos; next < len(l.input); next++ {
 		if l.input[next] == ' ' || l.input[next] == '\t' {
 			break
 		}
 	}
-	w := l.input[l.position:next]
-	l.position = next
+	w := l.input[l.pos:next]
+	l.pos = next
 	return &Token{tokenType: word, literal: w}
 }
