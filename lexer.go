@@ -35,12 +35,12 @@ func (l *Lexer) nextToken() *Token {
 	// スペースをとばす
 	for i := l.position; i < len(l.input); i++ {
 		l.position = i
-		if l.input[i] != ' ' {
+		if l.input[i] != ' ' && l.input[i] != '\t' {
 			break
 		}
 	}
 
-    // ソースの終端
+	// ソースの終端
 	if l.position >= len(l.input)-1 {
 		return &Token{tokenType: eof, literal: "eof"}
 	}
@@ -48,7 +48,7 @@ func (l *Lexer) nextToken() *Token {
 	// ワードの終わりの次まで position を進める
 	var next int
 	for next = l.position; next < len(l.input); next++ {
-		if l.input[next] == ' ' {
+		if l.input[next] == ' ' || l.input[next] == '\t' {
 			break
 		}
 	}

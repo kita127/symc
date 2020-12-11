@@ -25,20 +25,24 @@ func TestLexicalize(t *testing.T) {
 				},
 			},
 		},
-		//		{
-		//			"test2",
-		//			`char hoge`,
-		//			[]*Token{
-		//				{
-		//					word,
-		//					"char",
-		//				},
-		//				{
-		//					word,
-		//					"hoge",
-		//				},
-		//			},
-		//		},
+		{
+			"test2",
+			`   char		hoge   `,
+			[]*Token{
+				{
+					word,
+					"char",
+				},
+				{
+					word,
+					"hoge",
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
