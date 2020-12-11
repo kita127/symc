@@ -171,7 +171,8 @@ func (l *Lexer) readWord() *Token {
 	// ワードの終わりの次まで pos を進める
 	var next int
 	for next = l.pos; next < len(l.input); next++ {
-		if l.input[next] == ' ' || l.input[next] == '\t' {
+		c := l.input[next]
+		if !isLetter(c) && !isDigit(c) {
 			break
 		}
 	}
@@ -184,7 +185,8 @@ func (l *Lexer) readNumber() *Token {
 	// ワードの終わりの次まで pos を進める
 	var next int
 	for next = l.pos; next < len(l.input); next++ {
-		if l.input[next] == ' ' || l.input[next] == '\t' {
+		c := l.input[next]
+		if !isDigit(c) {
 			break
 		}
 	}

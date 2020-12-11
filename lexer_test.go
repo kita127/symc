@@ -279,6 +279,32 @@ func TestLexicalize(t *testing.T) {
 				},
 			},
 		},
+		{
+			"test8",
+			`   ident00+123;   `,
+			[]*Token{
+				{
+					word,
+					"ident00",
+				},
+				{
+					plus,
+					"+",
+				},
+				{
+					integer,
+					"123",
+				},
+				{
+					semicolon,
+					";",
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
