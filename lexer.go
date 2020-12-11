@@ -37,6 +37,7 @@ const (
 	question
 	period
 	backslash
+	doublequot
 	eof
 )
 
@@ -151,6 +152,9 @@ func (l *Lexer) nextToken() *Token {
 		l.position++
 	case '\\':
 		tk = &Token{tokenType: backslash, literal: "\\"}
+		l.position++
+	case '"':
+		tk = &Token{tokenType: doublequot, literal: "\""}
 		l.position++
 	default:
 		tk = l.readWord()

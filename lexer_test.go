@@ -217,7 +217,7 @@ func TestLexicalize(t *testing.T) {
 		},
 		{
 			"test6",
-			`#&~^|:?.\`,
+			`#&~^|:?.\"`,
 			[]*Token{
 				{
 					hash,
@@ -254,6 +254,10 @@ func TestLexicalize(t *testing.T) {
 				{
 					backslash,
 					"\\",
+				},
+				{
+					doublequot,
+					"\"",
 				},
 				{
 					eof,
