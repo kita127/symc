@@ -15,5 +15,6 @@ type VariableDef struct {
 func (v *VariableDef) statementNode() {}
 
 func ParseModule(src string) *Module {
+	//lexicalize(src)
 	return &Module{[]Statement{&VariableDef{"hoge"}}}
 }
