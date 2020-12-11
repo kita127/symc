@@ -28,6 +28,15 @@ const (
 	rbrace
 	lbracket
 	rbracket
+	hash
+	ampersand
+	tilde
+	caret
+	vertical
+	colon
+	question
+	period
+	backslash
 	eof
 )
 
@@ -115,6 +124,33 @@ func (l *Lexer) nextToken() *Token {
 		l.position++
 	case ']':
 		tk = &Token{tokenType: rbracket, literal: "]"}
+		l.position++
+	case '#':
+		tk = &Token{tokenType: hash, literal: "#"}
+		l.position++
+	case '&':
+		tk = &Token{tokenType: ampersand, literal: "&"}
+		l.position++
+	case '~':
+		tk = &Token{tokenType: tilde, literal: "~"}
+		l.position++
+	case '^':
+		tk = &Token{tokenType: caret, literal: "^"}
+		l.position++
+	case '|':
+		tk = &Token{tokenType: vertical, literal: "|"}
+		l.position++
+	case ':':
+		tk = &Token{tokenType: colon, literal: ":"}
+		l.position++
+	case '?':
+		tk = &Token{tokenType: question, literal: "?"}
+		l.position++
+	case '.':
+		tk = &Token{tokenType: period, literal: "."}
+		l.position++
+	case '\\':
+		tk = &Token{tokenType: backslash, literal: "\\"}
 		l.position++
 	default:
 		tk = l.readWord()
