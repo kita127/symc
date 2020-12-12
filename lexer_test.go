@@ -322,7 +322,7 @@ func TestLexicalize(t *testing.T) {
 		},
 		{
 			"test11",
-			`123 0xA1c 0765 0b0110`,
+			`123 0xA1c 0765 0b0110 567u 567U 567l 567L 567lu 567UL`,
 			[]*Token{
 				{
 					integer,
@@ -339,6 +339,30 @@ func TestLexicalize(t *testing.T) {
 				{
 					integer,
 					"0b0110",
+				},
+				{
+					integer,
+					"567u",
+				},
+				{
+					integer,
+					"567U",
+				},
+				{
+					integer,
+					"567l",
+				},
+				{
+					integer,
+					"567L",
+				},
+				{
+					integer,
+					"567lu",
+				},
+				{
+					integer,
+					"567UL",
 				},
 				{
 					eof,

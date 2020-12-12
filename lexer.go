@@ -191,7 +191,7 @@ func (l *Lexer) readNumber() *Token {
 	c := l.input[next]
 	if c == '0' {
 		next++
-		c := l.input[next]
+		c = l.input[next]
 		switch c {
 		case 'x':
 			// 16進数
@@ -216,15 +216,18 @@ func (l *Lexer) readNumber() *Token {
 
 	// ワードの終わりの次まで pos を進める
 	for ; next < len(l.input); next++ {
-		c := l.input[next]
+		c = l.input[next]
 		if c == '.' {
 			isFloat = true
+		} else if c == 'u' || c == 'U' || c == 'l' || c == 'L' {
+			continue
 		} else if !isHex(c) {
 			break
 		}
 	}
 	w := l.input[l.pos:next]
 	l.pos = next
+
 	var tk *Token
 	if isFloat {
 		tk = &Token{tokenType: float, literal: w}
