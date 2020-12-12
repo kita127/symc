@@ -127,9 +127,6 @@ func (l *Lexer) nextToken() *Token {
 	case ']':
 		tk = &Token{tokenType: rbracket, literal: "]"}
 		l.pos++
-	case '#':
-		tk = l.readHashComment()
-		l.pos++
 	case '&':
 		tk = &Token{tokenType: ampersand, literal: "&"}
 		l.pos++
@@ -156,6 +153,9 @@ func (l *Lexer) nextToken() *Token {
 		l.pos++
 	case '"':
 		tk = &Token{tokenType: doublequot, literal: "\""}
+		l.pos++
+	case '#':
+		tk = l.readHashComment()
 		l.pos++
 	default:
 		if isLetter(c) {
