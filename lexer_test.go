@@ -217,12 +217,8 @@ func TestLexicalize(t *testing.T) {
 		},
 		{
 			"test6",
-			`#&~^|:?.\"`,
+			`&~^|:?.\"`,
 			[]*Token{
-				{
-					hash,
-					"#",
-				},
 				{
 					ampersand,
 					"&",
@@ -298,6 +294,20 @@ func TestLexicalize(t *testing.T) {
 				{
 					semicolon,
 					";",
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
+		{
+			"test9",
+			`# 1 "hoge.c"`,
+			[]*Token{
+				{
+					comment,
+					" 1 \"hoge.c\"",
 				},
 				{
 					eof,

@@ -30,7 +30,6 @@ const (
 	rbrace
 	lbracket
 	rbracket
-	hash
 	ampersand
 	tilde
 	caret
@@ -40,6 +39,7 @@ const (
 	period
 	backslash
 	doublequot
+	comment
 )
 
 func NewLexer(src string) *Lexer {
@@ -128,7 +128,7 @@ func (l *Lexer) nextToken() *Token {
 		tk = &Token{tokenType: rbracket, literal: "]"}
 		l.pos++
 	case '#':
-		tk = &Token{tokenType: hash, literal: "#"}
+		tk = l.readHashComment()
 		l.pos++
 	case '&':
 		tk = &Token{tokenType: ampersand, literal: "&"}
@@ -193,6 +193,13 @@ func (l *Lexer) readNumber() *Token {
 	w := l.input[l.pos:next]
 	l.pos = next
 	return &Token{tokenType: integer, literal: w}
+}
+
+func (l *Lexer) readHashComment() *Token {
+	l.pos++
+	tk := &Token{tokenType: comment, literal: l.input[l.pos:]}
+	l.pos = len(l.input)
+	return tk
 }
 
 func isLetter(c byte) bool {
