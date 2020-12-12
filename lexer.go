@@ -161,7 +161,7 @@ func (l *Lexer) nextToken() *Token {
 	default:
 		if isLetter(c) {
 			tk = l.readWord()
-		} else if isDigit(c) {
+		} else if isDec(c) {
 			tk = l.readNumber()
 		}
 	}
@@ -173,7 +173,7 @@ func (l *Lexer) readWord() *Token {
 	var next int
 	for next = l.pos; next < len(l.input); next++ {
 		c := l.input[next]
-		if !isLetter(c) && !isDigit(c) {
+		if !isLetter(c) && !isDec(c) {
 			break
 		}
 	}
@@ -192,17 +192,23 @@ func (l *Lexer) readNumber() *Token {
 		c := l.input[next]
 		switch c {
 		case 'x':
+			// 16進数
 			next++
 		default:
-			// エラー
-			return &Token{tokenType: illegal, literal: l.input[next:]}
+			if isDec(c) {
+				// 8進数
+				next++
+			} else {
+				// エラー
+				return l.newIllegal()
+			}
 		}
 	}
 
 	// ワードの終わりの次まで pos を進める
 	for ; next < len(l.input); next++ {
 		c := l.input[next]
-		if !isDigit(c) {
+		if !isHex(c) {
 			break
 		}
 	}
@@ -230,10 +236,20 @@ func (l *Lexer) readHashComment() *Token {
 	return tk
 }
 
+func (l *Lexer) newIllegal() *Token {
+	tk := &Token{tokenType: illegal, literal: l.input[l.pos:]}
+	l.pos = len(l.input)
+	return tk
+}
+
 func isLetter(c byte) bool {
 	return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || c == '_'
 }
 
-func isDigit(c byte) bool {
+func isHex(c byte) bool {
 	return '0' <= c && c <= '9' || 'a' <= c && c <= 'f' || 'A' <= c && c <= 'F'
+}
+
+func isDec(c byte) bool {
+	return '0' <= c && c <= '9'
 }
