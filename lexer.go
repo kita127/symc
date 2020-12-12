@@ -40,6 +40,7 @@ const (
 	backslash
 	doublequot
 	comment
+	illegal
 )
 
 func NewLexer(src string) *Lexer {
@@ -194,6 +195,7 @@ func (l *Lexer) readNumber() *Token {
 			next++
 		default:
 			// エラー
+			return &Token{tokenType: illegal, literal: l.input[next:]}
 		}
 	}
 
