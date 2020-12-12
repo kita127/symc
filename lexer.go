@@ -14,6 +14,7 @@ const (
 	eof = iota
 	word
 	integer
+	float
 	assign
 	plus
 	minus
@@ -184,6 +185,7 @@ func (l *Lexer) readWord() *Token {
 
 func (l *Lexer) readNumber() *Token {
 	var next int
+	isFloat := false
 
 	next = l.pos
 	c := l.input[next]
@@ -197,6 +199,10 @@ func (l *Lexer) readNumber() *Token {
 		case 'b':
 			// 2進数
 			next++
+		case '.':
+			// 小数
+			next++
+			isFloat = true
 		default:
 			if isDec(c) {
 				// 8進数
@@ -211,13 +217,21 @@ func (l *Lexer) readNumber() *Token {
 	// ワードの終わりの次まで pos を進める
 	for ; next < len(l.input); next++ {
 		c := l.input[next]
-		if !isHex(c) {
+		if c == '.' {
+			isFloat = true
+		} else if !isHex(c) {
 			break
 		}
 	}
 	w := l.input[l.pos:next]
 	l.pos = next
-	return &Token{tokenType: integer, literal: w}
+	var tk *Token
+	if isFloat {
+		tk = &Token{tokenType: float, literal: w}
+	} else {
+		tk = &Token{tokenType: integer, literal: w}
+	}
+	return tk
 }
 
 func (l *Lexer) readHashComment() *Token {

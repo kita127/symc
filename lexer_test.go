@@ -262,20 +262,6 @@ func TestLexicalize(t *testing.T) {
 			},
 		},
 		{
-			"test7",
-			`   123   `,
-			[]*Token{
-				{
-					integer,
-					"123",
-				},
-				{
-					eof,
-					"eof",
-				},
-			},
-		},
-		{
 			"test8",
 			`   ident00+123;   `,
 			[]*Token{
@@ -353,6 +339,24 @@ func TestLexicalize(t *testing.T) {
 				{
 					integer,
 					"0b0110",
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
+		{
+			"test12",
+			`0.123 987.123`,
+			[]*Token{
+				{
+					float,
+					"0.123",
+				},
+				{
+					float,
+					"987.123",
 				},
 				{
 					eof,
