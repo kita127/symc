@@ -182,9 +182,23 @@ func (l *Lexer) readWord() *Token {
 }
 
 func (l *Lexer) readNumber() *Token {
-	// ワードの終わりの次まで pos を進める
 	var next int
-	for next = l.pos; next < len(l.input); next++ {
+
+	next = l.pos
+	c := l.input[next]
+	if c == '0' {
+		next++
+		c := l.input[next]
+		switch c {
+		case 'x':
+			next++
+		default:
+			// エラー
+		}
+	}
+
+	// ワードの終わりの次まで pos を進める
+	for ; next < len(l.input); next++ {
 		c := l.input[next]
 		if !isDigit(c) {
 			break

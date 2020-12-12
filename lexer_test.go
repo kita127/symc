@@ -334,6 +334,24 @@ func TestLexicalize(t *testing.T) {
 				},
 			},
 		},
+		{
+			"test11",
+			`123 0x123`,
+			[]*Token{
+				{
+					integer,
+					"123",
+				},
+				{
+					integer,
+					"0x123",
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
