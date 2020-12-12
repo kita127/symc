@@ -196,9 +196,21 @@ func (l *Lexer) readNumber() *Token {
 }
 
 func (l *Lexer) readHashComment() *Token {
+	// # の次の文字に移動
 	l.pos++
-	tk := &Token{tokenType: comment, literal: l.input[l.pos:]}
-	l.pos = len(l.input)
+	var next int
+	for i := l.pos; i <= len(l.input); i++ {
+		next = i
+		if next >= len(l.input) {
+			break
+		}
+		c := l.input[next]
+		if c == '\n' || c == '\r' {
+			break
+		}
+	}
+	tk := &Token{tokenType: comment, literal: l.input[l.pos:next]}
+	l.pos = next
 	return tk
 }
 

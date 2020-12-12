@@ -315,6 +315,25 @@ func TestLexicalize(t *testing.T) {
 				},
 			},
 		},
+		{
+			"test10",
+			`# 1 "hoge.c"
+# 1 "<built-in>" 1`,
+			[]*Token{
+				{
+					comment,
+					" 1 \"hoge.c\"",
+				},
+				{
+					comment,
+					" 1 \"<built-in>\" 1",
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
