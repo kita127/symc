@@ -194,6 +194,9 @@ func (l *Lexer) readNumber() *Token {
 		case 'x':
 			// 16進数
 			next++
+		case 'b':
+			// 2進数
+			next++
 		default:
 			if isDec(c) {
 				// 8進数
