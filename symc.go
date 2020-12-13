@@ -1,5 +1,7 @@
 package symc
 
+import "fmt"
+
 type Module struct {
 	Statements []Statement
 }
@@ -15,6 +17,8 @@ type VariableDef struct {
 func (v *VariableDef) statementNode() {}
 
 func ParseModule(src string) *Module {
-	//lexicalize(src)
+	l := NewLexer(src)
+	res := l.lexicalize(src)
+	fmt.Println(res)
 	return &Module{[]Statement{&VariableDef{"hoge"}}}
 }

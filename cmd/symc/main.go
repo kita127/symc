@@ -2,10 +2,14 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 
-	_ "github.com/kita127/symc"
+	"github.com/kita127/symc"
 )
 
 func main() {
-	fmt.Println("This is main module.")
+	input, _ := ioutil.ReadAll(os.Stdin)
+	res := symc.ParseModule(string(input))
+	fmt.Println(res)
 }

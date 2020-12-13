@@ -1,5 +1,10 @@
 package symc
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Lexer struct {
 	input string
 	pos   int
@@ -40,9 +45,14 @@ const (
 	period
 	backslash
 	doublequot
+	keyReturn
 	comment
 	illegal
 )
+
+func (t *Token) String() string {
+	return fmt.Sprintf("tokenType:%v, literal:%s", t.tokenType, t.literal)
+}
 
 func NewLexer(src string) *Lexer {
 	return &Lexer{input: src, pos: 0}
@@ -67,7 +77,8 @@ func (l *Lexer) nextToken() *Token {
 		if i >= len(l.input) {
 			break
 		}
-		if l.input[i] != ' ' && l.input[i] != '\t' {
+		c := l.input[i]
+		if c != ' ' && c != '\t' && c != '\n' && c != '\r' {
 			break
 		}
 		l.pos++
@@ -179,8 +190,9 @@ func (l *Lexer) readWord() *Token {
 		}
 	}
 	w := l.input[l.pos:next]
+	tk := l.determineKeyword(w)
 	l.pos = next
-	return &Token{tokenType: word, literal: w}
+	return tk
 }
 
 func (l *Lexer) readNumber() *Token {
@@ -260,6 +272,14 @@ func (l *Lexer) newIllegal() *Token {
 	tk := &Token{tokenType: illegal, literal: l.input[l.pos:]}
 	l.pos = len(l.input)
 	return tk
+}
+
+func (l *Lexer) determineKeyword(w string) *Token {
+	if strings.Compare("return", w) == 0 {
+		return &Token{tokenType: keyReturn, literal: w}
+	} else {
+		return &Token{tokenType: word, literal: w}
+	}
 }
 
 func isLetter(c byte) bool {

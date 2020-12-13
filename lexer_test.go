@@ -392,6 +392,103 @@ func TestLexicalize(t *testing.T) {
 				},
 			},
 		},
+		{
+			"test13",
+			`
+# 1 "hoge.c"
+
+int func(int a) {
+      a = a + (10);
+        return a;
+    }
+`,
+			[]*Token{
+				{
+					comment,
+					` 1 "hoge.c"`,
+				},
+				{
+					word,
+					`int`,
+				},
+				{
+					word,
+					`func`,
+				},
+				{
+					lparen,
+					`(`,
+				},
+				{
+					word,
+					`int`,
+				},
+				{
+					word,
+					`a`,
+				},
+				{
+					rparen,
+					`)`,
+				},
+				{
+					lbrace,
+					`{`,
+				},
+				{
+					word,
+					`a`,
+				},
+				{
+					assign,
+					`=`,
+				},
+				{
+					word,
+					`a`,
+				},
+				{
+					plus,
+					`+`,
+				},
+				{
+					lparen,
+					`(`,
+				},
+				{
+					integer,
+					`10`,
+				},
+				{
+					rparen,
+					`)`,
+				},
+				{
+					semicolon,
+					`;`,
+				},
+				{
+					keyReturn,
+					`return`,
+				},
+				{
+					word,
+					`a`,
+				},
+				{
+					semicolon,
+					`;`,
+				},
+				{
+					rbrace,
+					`}`,
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
