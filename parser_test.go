@@ -55,6 +55,17 @@ extern const int *hoge;
 			},
 		},
 		{
+			"test5",
+			`
+int hoge = 100;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
 			"testx",
 			`
 int hoge;
@@ -77,7 +88,7 @@ extern long piyo;
 		p := NewParser(l)
 		got := p.Parse()
 		if !reflect.DeepEqual(got, tt.expect) {
-			t.Errorf("got=%v, expect=%v", got, tt.expect)
+			t.Errorf("got=%#v, expect=%#v", got, tt.expect)
 		}
 	}
 }
