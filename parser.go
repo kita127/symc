@@ -14,13 +14,26 @@ type VariableDef struct {
 func (v *VariableDef) statementNode() {}
 
 type Parser struct {
-	lexer *Lexer
+	lexer  *Lexer
+	tokens []*Token
+	pos    int
 }
 
 func NewParser(l *Lexer) *Parser {
-	return &Parser{lexer: l}
+	tks := l.lexicalize()
+	return &Parser{lexer: l, tokens: tks, pos: 0}
 }
 
 func (p *Parser) Parse() *Module {
-	return &Module{Statements: []Statement{&VariableDef{Name: "hoge"}}}
+	ast := p.parseModule()
+	return ast
+}
+
+func (p *Parser) parseModule() *Module {
+	p.pos++
+	id := p.tokens[p.pos].literal
+	p.pos++ // semicolon
+	p.pos++ // next
+	m := &Module{[]Statement{&VariableDef{Name: id}}}
+	return m
 }

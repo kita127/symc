@@ -4,7 +4,8 @@ import "fmt"
 
 func ParseModule(src string) *Module {
 	l := NewLexer(src)
-	res := l.lexicalize()
-	fmt.Println(res)
+	p := NewParser(l)
+	ast := p.Parse()
+	fmt.Println(ast)
 	return &Module{[]Statement{&VariableDef{"hoge"}}}
 }
