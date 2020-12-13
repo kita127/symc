@@ -71,10 +71,11 @@ func (p *Parser) parseVariableDef() Statement {
 }
 
 func (p *Parser) parseVariableDecl() Statement {
-	// extern
-	p.pos++
-	// type
-	p.pos++
+	// セミコロンの手前まで pos を進める
+	for p.peekToken().tokenType != semicolon {
+		p.pos++
+	}
+	// Name
 	id := p.tokens[p.pos].literal
 	p.pos++
 	// semicolon

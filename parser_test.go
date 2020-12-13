@@ -44,6 +44,17 @@ const int hoge;
 			},
 		},
 		{
+			"test4",
+			`
+extern const int hoge;
+`,
+			&Module{
+				[]Statement{
+					&VariableDecl{Name: "hoge"},
+				},
+			},
+		},
+		{
 			"testx",
 			`
 int hoge;
