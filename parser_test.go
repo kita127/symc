@@ -35,7 +35,7 @@ extern char fuga;`,
 		{
 			"test3",
 			`
-const int hoge;
+const int *hoge;
 `,
 			&Module{
 				[]Statement{
@@ -46,7 +46,7 @@ const int hoge;
 		{
 			"test4",
 			`
-extern const int hoge;
+extern const int *hoge;
 `,
 			&Module{
 				[]Statement{
