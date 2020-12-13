@@ -372,7 +372,7 @@ func TestLexicalize(t *testing.T) {
 		},
 		{
 			"test12",
-			`0.123 987.123`,
+			`0.123 987.123 123.`,
 			[]*Token{
 				{
 					float,
@@ -381,6 +381,10 @@ func TestLexicalize(t *testing.T) {
 				{
 					float,
 					"987.123",
+				},
+				{
+					float,
+					"123.",
 				},
 				{
 					eof,
