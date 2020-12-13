@@ -48,9 +48,9 @@ func (p *Parser) Parse() *Module {
 func (p *Parser) parseModule() *Module {
 	ss := []Statement{}
 	occurredInvalid := false
-	for p.currentToken().tokenType != eof && !occurredInvalid {
+	for p.curToken().tokenType != eof && !occurredInvalid {
 		var s Statement
-		switch p.currentToken().tokenType {
+		switch p.curToken().tokenType {
 		case keyExtern:
 			s = p.parseVariableDecl()
 		default:
@@ -83,14 +83,14 @@ func (p *Parser) parseVariableDef() Statement {
 	id := p.tokens[p.pos].literal
 	p.pos++
 	// semicolon or assign or lbracket
-	switch p.currentToken().tokenType {
+	switch p.curToken().tokenType {
 	case semicolon:
 		fallthrough
 	case assign:
 		fallthrough
 	case lbracket:
 		// semicolon まで進める
-		for p.currentToken().tokenType != semicolon {
+		for p.curToken().tokenType != semicolon {
 			p.pos++
 		}
 		p.pos++
@@ -108,7 +108,7 @@ func (p *Parser) parseVariableDecl() Statement {
 		p.pos++
 	}
 	// Name
-	id := p.currentToken().literal
+	id := p.curToken().literal
 	p.pos++
 	// semicolon
 	p.pos++
@@ -118,12 +118,12 @@ func (p *Parser) parseVariableDecl() Statement {
 
 func (p *Parser) peekToken() *Token {
 	// 現在位置が EOF
-	if p.currentToken().tokenType == eof {
-		return p.currentToken()
+	if p.curToken().tokenType == eof {
+		return p.curToken()
 	}
 	return p.tokens[p.pos+1]
 }
 
-func (p *Parser) currentToken() *Token {
+func (p *Parser) curToken() *Token {
 	return p.tokens[p.pos]
 }
