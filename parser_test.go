@@ -15,7 +15,7 @@ func TestParse(t *testing.T) {
 			"test1",
 			`
 int hoge;
-extern char fuga;`,
+`,
 			&Module{
 				[]Statement{
 					&VariableDef{Name: "hoge"},
@@ -29,6 +29,21 @@ extern char fuga;`,
 			&Module{
 				[]Statement{
 					&VariableDecl{Name: "fuga"},
+				},
+			},
+		},
+		{
+			"test3",
+			`
+int hoge;
+char fuga;
+extern long piyo;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+					&VariableDef{Name: "fuga"},
+					&VariableDecl{Name: "piyo"},
 				},
 			},
 		},

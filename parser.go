@@ -1,5 +1,7 @@
 package symc
 
+import _ "fmt"
+
 type Module struct {
 	Statements []Statement
 }
@@ -36,15 +38,20 @@ func (p *Parser) Parse() *Module {
 }
 
 func (p *Parser) parseModule() *Module {
+	ss := []Statement{}
 	t := p.tokens[p.pos]
-	var s Statement
-	switch t.tokenType {
-	case keyExtern:
-		s = p.parseVariableDecl()
-	default:
-		s = p.parseVariableDef()
+	for t.tokenType != eof {
+		var s Statement
+		switch t.tokenType {
+		case keyExtern:
+			s = p.parseVariableDecl()
+		default:
+			s = p.parseVariableDef()
+		}
+		ss = append(ss, s)
+		t = p.tokens[p.pos]
 	}
-	m := &Module{[]Statement{s}}
+	m := &Module{ss}
 	return m
 }
 
