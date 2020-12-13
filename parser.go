@@ -57,26 +57,28 @@ func (p *Parser) parseModule() *Module {
 
 func (p *Parser) parseVariableDef() Statement {
 
-	// semicolon or assign の手前まで pos を進める
+	// semicolon or assign or lbracket の手前まで pos を進める
 	t := p.peekToken()
-	for t.tokenType != semicolon && t.tokenType != assign {
+	for t.tokenType != semicolon && t.tokenType != assign && t.tokenType != lbracket {
 		p.pos++
 		t = p.peekToken()
 	}
 	// Name
 	id := p.tokens[p.pos].literal
 	p.pos++
-	// semicolon or assign
+	// semicolon or assign or lbracket
 	t = p.tokens[p.pos]
 	switch t.tokenType {
 	case semicolon:
-		p.pos++
-		// next
+		fallthrough
 	case assign:
-		p.pos++
-		// value
-		p.pos++
-		// semicolon
+		fallthrough
+	case lbracket:
+		// semicolon まで進める
+		for t.tokenType != semicolon {
+			p.pos++
+			t = p.tokens[p.pos]
+		}
 		p.pos++
 		// next
 	}
