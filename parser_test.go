@@ -91,6 +91,15 @@ extern long piyo;
 				},
 			},
 		},
+		{
+			"test err1",
+			`int hoge`,
+			&Module{
+				[]Statement{
+					&InvalidStatement{Contents: "err parse variable def"},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

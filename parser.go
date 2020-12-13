@@ -1,6 +1,8 @@
 package symc
 
-import _ "fmt"
+import (
+	_ "fmt"
+)
 
 type Module struct {
 	Statements []Statement
@@ -8,6 +10,12 @@ type Module struct {
 type Statement interface {
 	statementNode()
 }
+
+type InvalidStatement struct {
+	Contents string
+}
+
+func (v *InvalidStatement) statementNode() {}
 
 type VariableDef struct {
 	Name string
@@ -39,8 +47,9 @@ func (p *Parser) Parse() *Module {
 
 func (p *Parser) parseModule() *Module {
 	ss := []Statement{}
+	occurredInvalid := false
 	t := p.tokens[p.pos]
-	for t.tokenType != eof {
+	for t.tokenType != eof && !occurredInvalid {
 		var s Statement
 		switch t.tokenType {
 		case keyExtern:
@@ -49,6 +58,10 @@ func (p *Parser) parseModule() *Module {
 			s = p.parseVariableDef()
 		}
 		ss = append(ss, s)
+		switch s.(type) {
+		case *InvalidStatement:
+			occurredInvalid = true
+		}
 		t = p.tokens[p.pos]
 	}
 	m := &Module{ss}
@@ -57,17 +70,22 @@ func (p *Parser) parseModule() *Module {
 
 func (p *Parser) parseVariableDef() Statement {
 
-	// semicolon or assign or lbracket の手前まで pos を進める
-	t := p.peekToken()
-	for t.tokenType != semicolon && t.tokenType != assign && t.tokenType != lbracket {
+	// semicolon or assign or lbracket or eof の手前まで pos を進める
+	n := p.peekToken()
+	for n.tokenType != semicolon && n.tokenType != assign && n.tokenType != lbracket && n.tokenType != eof {
 		p.pos++
-		t = p.peekToken()
+		n = p.peekToken()
+	}
+
+	if n.tokenType == eof {
+		s := "err parse variable def"
+		return &InvalidStatement{Contents: s}
 	}
 	// Name
 	id := p.tokens[p.pos].literal
 	p.pos++
 	// semicolon or assign or lbracket
-	t = p.tokens[p.pos]
+	t := p.tokens[p.pos]
 	switch t.tokenType {
 	case semicolon:
 		fallthrough
@@ -81,6 +99,9 @@ func (p *Parser) parseVariableDef() Statement {
 		}
 		p.pos++
 		// next
+	default:
+		s := "err parse variable def"
+		return &InvalidStatement{Contents: s}
 	}
 	return &VariableDef{Name: id}
 }
@@ -105,10 +126,9 @@ func (p *Parser) peekToken() *Token {
 	if t.tokenType == eof {
 		return t
 	}
-	// 次の位置が EOF
-	n := p.tokens[p.pos+1]
-	if n.tokenType == eof {
-		return n
-	}
-	return n
+	return p.tokens[p.pos+1]
+}
+
+func (p *Parser) currentToken() *Token {
+	return p.tokens[p.pos]
 }
