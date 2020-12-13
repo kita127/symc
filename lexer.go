@@ -46,6 +46,17 @@ const (
 	backslash
 	doublequot
 	keyReturn
+	keyIf
+	keyElse
+	keyWhile
+	keyDo
+	keyGoto
+	keyFor
+	keyBreak
+	keyContinue
+	keySwitch
+	keyCase
+	keyDefault
 	comment
 	illegal
 )
@@ -277,6 +288,28 @@ func (l *Lexer) newIllegal() *Token {
 func (l *Lexer) determineKeyword(w string) *Token {
 	if strings.Compare("return", w) == 0 {
 		return &Token{tokenType: keyReturn, literal: w}
+	} else if strings.Compare("if", w) == 0 {
+		return &Token{tokenType: keyIf, literal: w}
+	} else if strings.Compare("else", w) == 0 {
+		return &Token{tokenType: keyElse, literal: w}
+	} else if strings.Compare("while", w) == 0 {
+		return &Token{tokenType: keyWhile, literal: w}
+	} else if strings.Compare("do", w) == 0 {
+		return &Token{tokenType: keyDo, literal: w}
+	} else if strings.Compare("goto", w) == 0 {
+		return &Token{tokenType: keyGoto, literal: w}
+	} else if strings.Compare("for", w) == 0 {
+		return &Token{tokenType: keyFor, literal: w}
+	} else if strings.Compare("break", w) == 0 {
+		return &Token{tokenType: keyBreak, literal: w}
+	} else if strings.Compare("continue", w) == 0 {
+		return &Token{tokenType: keyContinue, literal: w}
+	} else if strings.Compare("switch", w) == 0 {
+		return &Token{tokenType: keySwitch, literal: w}
+	} else if strings.Compare("case", w) == 0 {
+		return &Token{tokenType: keyCase, literal: w}
+	} else if strings.Compare("default", w) == 0 {
+		return &Token{tokenType: keyDefault, literal: w}
 	} else {
 		return &Token{tokenType: word, literal: w}
 	}

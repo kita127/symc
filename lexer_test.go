@@ -394,6 +394,64 @@ func TestLexicalize(t *testing.T) {
 		},
 		{
 			"test13",
+			`return if else while do goto for break continue switch case default`,
+			[]*Token{
+				{
+					keyReturn,
+					"return",
+				},
+				{
+					keyIf,
+					"if",
+				},
+				{
+					keyElse,
+					"else",
+				},
+				{
+					keyWhile,
+					"while",
+				},
+				{
+					keyDo,
+					"do",
+				},
+				{
+					keyGoto,
+					"goto",
+				},
+				{
+					keyFor,
+					"for",
+				},
+				{
+					keyBreak,
+					"break",
+				},
+				{
+					keyContinue,
+					"continue",
+				},
+				{
+					keySwitch,
+					"switch",
+				},
+				{
+					keyCase,
+					"case",
+				},
+				{
+					keyDefault,
+					"default",
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
+		{
+			"testx",
 			`
 # 1 "hoge.c"
 
