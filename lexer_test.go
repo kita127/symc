@@ -394,7 +394,8 @@ func TestLexicalize(t *testing.T) {
 		},
 		{
 			"test13",
-			`return if else while do goto for break continue switch case default`,
+			`return if else while do goto for break continue switch case default
+ extern volatile const`,
 			[]*Token{
 				{
 					keyReturn,
@@ -443,6 +444,18 @@ func TestLexicalize(t *testing.T) {
 				{
 					keyDefault,
 					"default",
+				},
+				{
+					keyExtern,
+					"extern",
+				},
+				{
+					keyVolatile,
+					"volatile",
+				},
+				{
+					keyConst,
+					"const",
 				},
 				{
 					eof,

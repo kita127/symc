@@ -57,6 +57,9 @@ const (
 	keySwitch
 	keyCase
 	keyDefault
+	keyExtern
+	keyVolatile
+	keyConst
 	comment
 	illegal
 )
@@ -310,6 +313,12 @@ func (l *Lexer) determineKeyword(w string) *Token {
 		return &Token{tokenType: keyCase, literal: w}
 	} else if strings.Compare("default", w) == 0 {
 		return &Token{tokenType: keyDefault, literal: w}
+	} else if strings.Compare("extern", w) == 0 {
+		return &Token{tokenType: keyExtern, literal: w}
+	} else if strings.Compare("volatile", w) == 0 {
+		return &Token{tokenType: keyVolatile, literal: w}
+	} else if strings.Compare("const", w) == 0 {
+		return &Token{tokenType: keyConst, literal: w}
 	} else {
 		return &Token{tokenType: word, literal: w}
 	}
