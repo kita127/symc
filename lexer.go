@@ -69,7 +69,7 @@ func NewLexer(src string) *Lexer {
 	return &Lexer{input: src, pos: 0}
 }
 
-func (l *Lexer) lexicalize(src string) []*Token {
+func (l *Lexer) lexicalize() []*Token {
 	ts := []*Token{}
 	for {
 		t := l.nextToken()

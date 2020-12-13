@@ -552,7 +552,7 @@ int func(int a) {
 	for _, tt := range testTbl {
 		t.Logf("%s", tt.comment)
 		l := NewLexer(tt.src)
-		got := l.lexicalize(tt.src)
+		got := l.lexicalize()
 		if len(got) != len(tt.expect) {
 			t.Fatalf("got len=%v, expect len=%v", len(got), len(tt.expect))
 		}
