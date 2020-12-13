@@ -217,7 +217,7 @@ func TestLexicalize(t *testing.T) {
 		},
 		{
 			"test6",
-			`&~^|:?.\"`,
+			`&~^|:?.\`,
 			[]*Token{
 				{
 					ampersand,
@@ -250,10 +250,6 @@ func TestLexicalize(t *testing.T) {
 				{
 					backslash,
 					"\\",
-				},
-				{
-					doublequot,
-					"\"",
 				},
 				{
 					eof,
@@ -456,6 +452,44 @@ func TestLexicalize(t *testing.T) {
 				{
 					keyConst,
 					"const",
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
+		{
+			"test13",
+			`char hoge[] = "hello";`,
+			[]*Token{
+				{
+					word,
+					"char",
+				},
+				{
+					word,
+					"hoge",
+				},
+				{
+					lbracket,
+					"[",
+				},
+				{
+					rbracket,
+					"]",
+				},
+				{
+					assign,
+					"=",
+				},
+				{
+					str,
+					"\"hello\"",
+				},
+				{
+					semicolon,
+					";",
 				},
 				{
 					eof,

@@ -44,7 +44,7 @@ const (
 	question
 	period
 	backslash
-	doublequot
+	str
 	keyReturn
 	keyIf
 	keyElse
@@ -179,8 +179,7 @@ func (l *Lexer) nextToken() *Token {
 		tk = &Token{tokenType: backslash, literal: "\\"}
 		l.pos++
 	case '"':
-		tk = &Token{tokenType: doublequot, literal: "\""}
-		l.pos++
+		tk = l.readString()
 	case '#':
 		tk = l.readHashComment()
 		l.pos++
@@ -261,6 +260,22 @@ func (l *Lexer) readNumber() *Token {
 		tk = &Token{tokenType: integer, literal: w}
 	}
 	return tk
+}
+
+func (l *Lexer) readString() *Token {
+	var next int
+
+	// 次の " を探す
+	for next = l.pos + 1; next < len(l.input); next++ {
+		if l.input[next] == '"' {
+			break
+		}
+	}
+	// 次の pos に進める
+	next++
+	w := l.input[l.pos:next]
+	l.pos = next
+	return &Token{tokenType: str, literal: w}
 }
 
 func (l *Lexer) readHashComment() *Token {
