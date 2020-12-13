@@ -56,8 +56,12 @@ func (p *Parser) parseModule() *Module {
 }
 
 func (p *Parser) parseVariableDef() Statement {
-	// type
-	p.pos++
+
+	// セミコロンの手前まで pos を進める
+	for p.peekToken().tokenType != semicolon {
+		p.pos++
+	}
+	// Name
 	id := p.tokens[p.pos].literal
 	p.pos++
 	// semicolon
@@ -77,4 +81,18 @@ func (p *Parser) parseVariableDecl() Statement {
 	p.pos++
 	// next
 	return &VariableDecl{Name: id}
+}
+
+func (p *Parser) peekToken() *Token {
+	// 現在位置が EOF
+	t := p.tokens[p.pos]
+	if t.tokenType == eof {
+		return t
+	}
+	// 次の位置が EOF
+	n := p.tokens[p.pos+1]
+	if n.tokenType == eof {
+		return n
+	}
+	return n
 }

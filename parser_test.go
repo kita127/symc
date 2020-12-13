@@ -35,6 +35,17 @@ extern char fuga;`,
 		{
 			"test3",
 			`
+const int hoge;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"testx",
+			`
 int hoge;
 char fuga;
 extern long piyo;
