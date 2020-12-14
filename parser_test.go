@@ -121,6 +121,17 @@ extern void func_a( void );
 			},
 		},
 		{
+			"function def 1",
+			`
+void func_a( void ){}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func_a"},
+				},
+			},
+		},
+		{
 			"testx",
 			`
 int hoge;

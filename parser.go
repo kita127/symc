@@ -61,6 +61,15 @@ func (v *PrototypeDecl) String() string {
 	return fmt.Sprintf("PrototypeDecl : Name=%s", v.Name)
 }
 
+type FunctionDef struct {
+	Name string
+}
+
+func (v *FunctionDef) statementNode() {}
+func (v *FunctionDef) String() string {
+	return fmt.Sprintf("FunctionDef : Name=%s", v.Name)
+}
+
 // 構文解析器
 type Parser struct {
 	lexer   *Lexer
@@ -89,6 +98,7 @@ func (p *Parser) parseModule() *Module {
 			s = p.parsePrototypeDecl(s)
 			s = p.parseVariableDecl(s)
 		default:
+			s = p.parseFunctionDef(s)
 			s = p.parsePrototypeDecl(s)
 			s = p.parseVariableDef(s)
 		}
@@ -177,7 +187,7 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 
 	if n.tokenType == eof {
 		p.pos = p.prevPos
-		return &InvalidStatement{Contents: "err parse  prototype decl"}
+		return &InvalidStatement{Contents: "err parse prototype decl"}
 	}
 
 	// Name
@@ -191,20 +201,63 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 	}
 	if n.tokenType == eof {
 		p.pos = p.prevPos
-		return &InvalidStatement{Contents: "err parse  prototype decl"}
+		return &InvalidStatement{Contents: "err parse prototype decl"}
 	}
 	p.pos++
 	// rparen
 	p.pos++
 	if p.curToken().tokenType != semicolon {
 		p.pos = p.prevPos
-		return &InvalidStatement{Contents: "err parse  prototype decl"}
+		return &InvalidStatement{Contents: "err parse prototype decl"}
 	}
 	p.pos++
 	// next
 	p.prevPos = p.pos
 	return &PrototypeDecl{Name: id}
 
+}
+
+func (p *Parser) parseFunctionDef(s Statement) Statement {
+	if _, invalid := s.(*InvalidStatement); !invalid {
+		// 既に解析済みの場合はリターン
+		return s
+	}
+	errMsg := "err parse function def"
+
+	// lparen or eof の手前まで pos を進める
+	p.progUntilPrev(lparen)
+	if p.peekToken().tokenType == eof {
+		p.posReset()
+		return &InvalidStatement{Contents: errMsg}
+	}
+
+	// Name
+	id := p.curToken().literal
+
+	// rparen or eof まで pos を進める
+	p.progUntil(rparen)
+	if p.curToken().tokenType == eof {
+		p.posReset()
+		return &InvalidStatement{Contents: errMsg}
+	}
+
+	// lbrace or eof まで pos を進める
+	p.progUntil(lbrace)
+	if p.curToken().tokenType == eof {
+		p.posReset()
+		return &InvalidStatement{Contents: errMsg}
+	}
+
+	// rbrace or eof まで pos を進める
+	p.progUntil(rbrace)
+	if p.curToken().tokenType == eof {
+		p.posReset()
+		return &InvalidStatement{Contents: errMsg}
+	}
+	p.pos++
+	// next
+
+	return &FunctionDef{Name: id}
 }
 
 func (p *Parser) peekToken() *Token {
@@ -217,4 +270,24 @@ func (p *Parser) peekToken() *Token {
 
 func (p *Parser) curToken() *Token {
 	return p.tokens[p.pos]
+}
+
+func (p *Parser) progUntil(tkType int) {
+	t := p.curToken()
+	for t.tokenType != tkType && t.tokenType != eof {
+		p.pos++
+		t = p.curToken()
+	}
+}
+
+func (p *Parser) progUntilPrev(tkType int) {
+	n := p.peekToken()
+	for n.tokenType != tkType && n.tokenType != eof {
+		p.pos++
+		n = p.peekToken()
+	}
+}
+
+func (p *Parser) posReset() {
+	p.pos = p.prevPos
 }
