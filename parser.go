@@ -72,16 +72,15 @@ func (p *Parser) parseModule() *Module {
 	ss := []Statement{}
 	occurredInvalid := false
 	for p.curToken().tokenType != eof && !occurredInvalid {
-		var s Statement
+		var s Statement = &InvalidStatement{Contents: "unknown syntax"}
 		switch p.curToken().tokenType {
 		case keyExtern:
-			s = p.parseVariableDecl()
+			s = p.parseVariableDecl(s)
 		default:
-			s = p.parseVariableDef()
+			s = p.parseVariableDef(s)
 		}
 		ss = append(ss, s)
-		switch s.(type) {
-		case *InvalidStatement:
+		if _, invalid := s.(*InvalidStatement); invalid {
 			occurredInvalid = true
 		}
 	}
@@ -89,7 +88,11 @@ func (p *Parser) parseModule() *Module {
 	return m
 }
 
-func (p *Parser) parseVariableDef() Statement {
+func (p *Parser) parseVariableDef(s Statement) Statement {
+	if _, invalid := s.(*InvalidStatement); !invalid {
+		// 既に解析済みの場合はリターン
+		return s
+	}
 
 	// semicolon or assign or lbracket or eof の手前まで pos を進める
 	n := p.peekToken()
@@ -125,7 +128,11 @@ func (p *Parser) parseVariableDef() Statement {
 	return &VariableDef{Name: id}
 }
 
-func (p *Parser) parseVariableDecl() Statement {
+func (p *Parser) parseVariableDecl(s Statement) Statement {
+	if _, invalid := s.(*InvalidStatement); !invalid {
+		// 既に解析済みの場合はリターン
+		return s
+	}
 	// セミコロンの手前まで pos を進める
 	for p.peekToken().tokenType != semicolon {
 		p.pos++
