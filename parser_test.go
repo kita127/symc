@@ -110,6 +110,17 @@ void func_a( void );
 			},
 		},
 		{
+			"prototype dec 2",
+			`
+extern void func_a( void );
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "func_a"},
+				},
+			},
+		},
+		{
 			"testx",
 			`
 int hoge;
@@ -141,7 +152,7 @@ extern long piyo;
 		p := NewParser(l)
 		got := p.Parse()
 		if !reflect.DeepEqual(got, tt.expect) {
-			t.Errorf("got=%#v, expect=%#v", got, tt.expect)
+			t.Errorf("got=%v, expect=%v", got, tt.expect)
 		}
 	}
 }

@@ -86,6 +86,7 @@ func (p *Parser) parseModule() *Module {
 		var s Statement = &InvalidStatement{Contents: "unknown syntax"}
 		switch p.curToken().tokenType {
 		case keyExtern:
+			s = p.parsePrototypeDecl(s)
 			s = p.parseVariableDecl(s)
 		default:
 			s = p.parsePrototypeDecl(s)
