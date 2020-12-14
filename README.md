@@ -1,11 +1,11 @@
 # symc ![Go](https://github.com/kita127/symc/workflows/Go/badge.svg)
 symc is a library that extracts identifiers
 
-### Input
+## Input
 
 プリプロ展開済みのCソース
 
-### Description
+## Description
 
 * ライブラリとして機能を提供する
 * プリプロ展開済みのCソースを入力とする
@@ -19,7 +19,7 @@ symc is a library that extracts identifiers
         * 関数が参照する関数
 
 
-### Usage
+## Usage
 
 ```go
 
@@ -33,3 +33,16 @@ int main(void){
 data := ModName.Parse(src)
 
 ```
+
+
+## フォルダ構成
+
+symc
+    外部公開用
+
+lexer
+parser
+
+cmd
+    symc
+        Cソースをパースする
