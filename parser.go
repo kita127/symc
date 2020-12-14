@@ -123,7 +123,6 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 		p.pos++
 		n = p.peekToken()
 	}
-
 	if n.tokenType == eof {
 		p.pos = p.prevPos
 		return &InvalidStatement{Contents: "err parse variable def"}
@@ -177,38 +176,28 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 		// 既に解析済みの場合はリターン
 		return s
 	}
+	errMsg := "err parse prototype decl"
 
 	// lparen or eof の手前まで pos を進める
-	n := p.peekToken()
-	for n.tokenType != lparen && n.tokenType != eof {
-		p.pos++
-		n = p.peekToken()
-	}
-
-	if n.tokenType == eof {
+	p.progUntilPrev(lparen)
+	if p.peekToken().tokenType == eof {
 		p.pos = p.prevPos
-		return &InvalidStatement{Contents: "err parse prototype decl"}
+		return &InvalidStatement{Contents: errMsg}
 	}
 
 	// Name
 	id := p.curToken().literal
 
-	// rparen or eof の手前まで pos を進める
-	n = p.peekToken()
-	for n.tokenType != rparen && n.tokenType != eof {
-		p.pos++
-		n = p.peekToken()
-	}
-	if n.tokenType == eof {
+	// rparen or eof まで pos を進める
+	p.progUntil(rparen)
+	if p.curToken().tokenType == eof {
 		p.pos = p.prevPos
-		return &InvalidStatement{Contents: "err parse prototype decl"}
+		return &InvalidStatement{Contents: errMsg}
 	}
-	p.pos++
-	// rparen
 	p.pos++
 	if p.curToken().tokenType != semicolon {
 		p.pos = p.prevPos
-		return &InvalidStatement{Contents: "err parse prototype decl"}
+		return &InvalidStatement{Contents: errMsg}
 	}
 	p.pos++
 	// next
@@ -257,6 +246,7 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 	p.pos++
 	// next
 
+	p.prevPos = p.pos
 	return &FunctionDef{Name: id}
 }
 
