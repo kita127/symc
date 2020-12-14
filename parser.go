@@ -1,14 +1,28 @@
 package symc
 
 import (
-	_ "fmt"
+	"fmt"
 )
 
 type Module struct {
 	Statements []Statement
 }
+
+func (m *Module) String() string {
+	s := "Module : Statements={ "
+	sep := ""
+	for _, v := range m.Statements {
+		s += sep
+		sep = ", "
+		s += v.String()
+	}
+	s += " }"
+	return s
+}
+
 type Statement interface {
 	statementNode()
+	fmt.Stringer
 }
 
 type InvalidStatement struct {
@@ -16,18 +30,27 @@ type InvalidStatement struct {
 }
 
 func (v *InvalidStatement) statementNode() {}
+func (v *InvalidStatement) String() string {
+	return fmt.Sprintf("InvalidStatement : Contents=%s", v.Contents)
+}
 
 type VariableDef struct {
 	Name string
 }
 
 func (v *VariableDef) statementNode() {}
+func (v *VariableDef) String() string {
+	return fmt.Sprintf("VariableDef : Name=%s", v.Name)
+}
 
 type VariableDecl struct {
 	Name string
 }
 
 func (v *VariableDecl) statementNode() {}
+func (v *VariableDecl) String() string {
+	return fmt.Sprintf("VariableDecl : Name=%s", v.Name)
+}
 
 type Parser struct {
 	lexer  *Lexer
