@@ -52,15 +52,26 @@ func (v *VariableDecl) String() string {
 	return fmt.Sprintf("VariableDecl : Name=%s", v.Name)
 }
 
+type PrototypeDecl struct {
+	Name string
+}
+
+func (v *PrototypeDecl) statementNode() {}
+func (v *PrototypeDecl) String() string {
+	return fmt.Sprintf("PrototypeDecl : Name=%s", v.Name)
+}
+
+// 構文解析器
 type Parser struct {
-	lexer  *Lexer
-	tokens []*Token
-	pos    int
+	lexer   *Lexer
+	tokens  []*Token
+	pos     int
+	prevPos int
 }
 
 func NewParser(l *Lexer) *Parser {
 	tks := l.lexicalize()
-	return &Parser{lexer: l, tokens: tks, pos: 0}
+	return &Parser{lexer: l, tokens: tks, pos: 0, prevPos: 0}
 }
 
 func (p *Parser) Parse() *Module {
@@ -77,6 +88,7 @@ func (p *Parser) parseModule() *Module {
 		case keyExtern:
 			s = p.parseVariableDecl(s)
 		default:
+			s = p.parsePrototypeDecl(s)
 			s = p.parseVariableDef(s)
 		}
 		ss = append(ss, s)
@@ -102,8 +114,8 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 	}
 
 	if n.tokenType == eof {
-		s := "err parse variable def"
-		return &InvalidStatement{Contents: s}
+		p.pos = p.prevPos
+		return &InvalidStatement{Contents: "err parse variable def"}
 	}
 	// Name
 	id := p.tokens[p.pos].literal
@@ -122,9 +134,10 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 		p.pos++
 		// next
 	default:
-		s := "err parse variable def"
-		return &InvalidStatement{Contents: s}
+		p.pos = p.prevPos
+		return &InvalidStatement{Contents: "err parse variable def"}
 	}
+	p.prevPos = p.pos
 	return &VariableDef{Name: id}
 }
 
@@ -143,7 +156,54 @@ func (p *Parser) parseVariableDecl(s Statement) Statement {
 	// semicolon
 	p.pos++
 	// next
+
+	p.prevPos = p.pos
 	return &VariableDecl{Name: id}
+}
+
+func (p *Parser) parsePrototypeDecl(s Statement) Statement {
+	if _, invalid := s.(*InvalidStatement); !invalid {
+		// 既に解析済みの場合はリターン
+		return s
+	}
+
+	// lparen or eof の手前まで pos を進める
+	n := p.peekToken()
+	for n.tokenType != lparen && n.tokenType != eof {
+		p.pos++
+		n = p.peekToken()
+	}
+
+	if n.tokenType == eof {
+		p.pos = p.prevPos
+		return &InvalidStatement{Contents: "err parse  prototype decl"}
+	}
+
+	// Name
+	id := p.curToken().literal
+
+	// rparen or eof の手前まで pos を進める
+	n = p.peekToken()
+	for n.tokenType != rparen && n.tokenType != eof {
+		p.pos++
+		n = p.peekToken()
+	}
+	if n.tokenType == eof {
+		p.pos = p.prevPos
+		return &InvalidStatement{Contents: "err parse  prototype decl"}
+	}
+	p.pos++
+	// rparen
+	p.pos++
+	if p.curToken().tokenType != semicolon {
+		p.pos = p.prevPos
+		return &InvalidStatement{Contents: "err parse  prototype decl"}
+	}
+	p.pos++
+	// next
+	p.prevPos = p.pos
+	return &PrototypeDecl{Name: id}
+
 }
 
 func (p *Parser) peekToken() *Token {

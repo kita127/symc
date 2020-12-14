@@ -99,6 +99,17 @@ char hoge[] = "hello";
 			},
 		},
 		{
+			"prototype dec 1",
+			`
+void func_a( void );
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "func_a"},
+				},
+			},
+		},
+		{
 			"testx",
 			`
 int hoge;
