@@ -88,6 +88,17 @@ int hoge[3] = {0x00, 0x01, 0x02};
 			},
 		},
 		{
+			"test8",
+			`
+char hoge[] = "hello";
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
 			"testx",
 			`
 int hoge;
