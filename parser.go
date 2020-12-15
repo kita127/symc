@@ -91,16 +91,7 @@ func (p *Parser) Parse() *Module {
 func (p *Parser) parseModule() *Module {
 	ss := []Statement{}
 	for p.curToken().tokenType != eof {
-		var s Statement = &InvalidStatement{Contents: "unknown syntax"}
-		switch p.curToken().tokenType {
-		case keyExtern:
-			s = p.parsePrototypeDecl(s)
-			s = p.parseVariableDecl(s)
-		default:
-			s = p.parseFunctionDef(s)
-			s = p.parsePrototypeDecl(s)
-			s = p.parseVariableDef(s)
-		}
+		s := p.parseStatement()
 		ss = append(ss, s)
 		if _, invalid := s.(*InvalidStatement); invalid {
 			break
@@ -108,6 +99,20 @@ func (p *Parser) parseModule() *Module {
 	}
 	m := &Module{ss}
 	return m
+}
+
+func (p *Parser) parseStatement() Statement {
+	var s Statement = &InvalidStatement{Contents: "unknown syntax"}
+	switch p.curToken().tokenType {
+	case keyExtern:
+		s = p.parsePrototypeDecl(s)
+		s = p.parseVariableDecl(s)
+	default:
+		s = p.parseFunctionDef(s)
+		s = p.parsePrototypeDecl(s)
+		s = p.parseVariableDef(s)
+	}
+	return s
 }
 
 func (p *Parser) parseVariableDef(s Statement) Statement {
