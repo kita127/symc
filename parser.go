@@ -90,8 +90,7 @@ func (p *Parser) Parse() *Module {
 
 func (p *Parser) parseModule() *Module {
 	ss := []Statement{}
-	occurredInvalid := false
-	for p.curToken().tokenType != eof && !occurredInvalid {
+	for p.curToken().tokenType != eof {
 		var s Statement = &InvalidStatement{Contents: "unknown syntax"}
 		switch p.curToken().tokenType {
 		case keyExtern:
@@ -104,7 +103,7 @@ func (p *Parser) parseModule() *Module {
 		}
 		ss = append(ss, s)
 		if _, invalid := s.(*InvalidStatement); invalid {
-			occurredInvalid = true
+			break
 		}
 	}
 	m := &Module{ss}
