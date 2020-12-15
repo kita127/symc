@@ -151,7 +151,7 @@ extern long piyo;
 			`int hoge`,
 			&Module{
 				[]Statement{
-					&InvalidStatement{Contents: "err parse variable def"},
+					&InvalidStatement{Contents: "parse, err parse function def, err parse prototype decl, err parse variable def"},
 				},
 			},
 		},

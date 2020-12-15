@@ -102,7 +102,7 @@ func (p *Parser) parseModule() *Module {
 }
 
 func (p *Parser) parseStatement() Statement {
-	var s Statement = &InvalidStatement{Contents: "unknown syntax"}
+	var s Statement = &InvalidStatement{Contents: "parse"}
 	switch p.curToken().tokenType {
 	case keyExtern:
 		s = p.parsePrototypeDecl(s)
@@ -120,6 +120,7 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 		// 既に解析済みの場合はリターン
 		return s
 	}
+	errMsg := "err parse variable def"
 
 	// semicolon or assign or lbracket or eof の手前まで pos を進める
 	n := p.peekToken()
@@ -129,7 +130,7 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 	}
 	if n.tokenType == eof {
 		p.pos = p.prevPos
-		return &InvalidStatement{Contents: "err parse variable def"}
+		return p.updateInvalid(s, errMsg)
 	}
 	// Name
 	id := p.tokens[p.pos].literal
@@ -149,7 +150,7 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 		// next
 	default:
 		p.pos = p.prevPos
-		return &InvalidStatement{Contents: "err parse variable def"}
+		return p.updateInvalid(s, errMsg)
 	}
 	p.prevPos = p.pos
 	return &VariableDef{Name: id}
@@ -186,7 +187,7 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 	p.progUntilPrev(lparen)
 	if p.peekToken().tokenType == eof {
 		p.pos = p.prevPos
-		return &InvalidStatement{Contents: errMsg}
+		return p.updateInvalid(s, errMsg)
 	}
 
 	// Name
@@ -196,12 +197,12 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 	p.progUntil(rparen)
 	if p.curToken().tokenType == eof {
 		p.pos = p.prevPos
-		return &InvalidStatement{Contents: errMsg}
+		return p.updateInvalid(s, errMsg)
 	}
 	p.pos++
 	if p.curToken().tokenType != semicolon {
 		p.pos = p.prevPos
-		return &InvalidStatement{Contents: errMsg}
+		return p.updateInvalid(s, errMsg)
 	}
 	p.pos++
 	// next
@@ -221,7 +222,7 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 	p.progUntilPrev(lparen)
 	if p.peekToken().tokenType == eof {
 		p.posReset()
-		return &InvalidStatement{Contents: errMsg}
+		return p.updateInvalid(s, errMsg)
 	}
 
 	// Name
@@ -231,21 +232,21 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 	p.progUntil(rparen)
 	if p.curToken().tokenType == eof {
 		p.posReset()
-		return &InvalidStatement{Contents: errMsg}
+		return p.updateInvalid(s, errMsg)
 	}
 
 	// lbrace or eof まで pos を進める
 	p.progUntil(lbrace)
 	if p.curToken().tokenType == eof {
 		p.posReset()
-		return &InvalidStatement{Contents: errMsg}
+		return p.updateInvalid(s, errMsg)
 	}
 
 	// rbrace or eof まで pos を進める
 	p.progUntil(rbrace)
 	if p.curToken().tokenType == eof {
 		p.posReset()
-		return &InvalidStatement{Contents: errMsg}
+		return p.updateInvalid(s, errMsg)
 	}
 	p.pos++
 	// next
@@ -284,4 +285,14 @@ func (p *Parser) progUntilPrev(tkType int) {
 
 func (p *Parser) posReset() {
 	p.pos = p.prevPos
+}
+
+func (p *Parser) updateInvalid(s Statement, msg string) Statement {
+	var invs *InvalidStatement
+	var b bool
+	if invs, b = s.(*InvalidStatement); b {
+		invs.Contents += ", " + msg
+		return invs
+	}
+	return &InvalidStatement{Contents: "updateInvalid err"}
 }
