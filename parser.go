@@ -276,17 +276,19 @@ func (p *Parser) parseBlockStatement(s Statement) Statement {
 		// 既に解析済みの場合はリターン
 		return s
 	}
+	errMsg := "err parse block"
 	// lbrace の次へ
 	p.pos++
 
 	ss := []Statement{}
-	//	for p.curToken().tokenType != rbrace {
-	//		s := p.parseStatement()
-	//		ss = append(ss, s)
-	//		if _, invalid := s.(*InvalidStatement); invalid {
-	//			break
-	//		}
-	//	}
+	for p.curToken().tokenType != rbrace {
+		s := p.parseStatement()
+		ss = append(ss, s)
+		if _, invalid := s.(*InvalidStatement); invalid {
+			p.posReset()
+			return p.updateInvalid(s, errMsg)
+		}
+	}
 	p.pos++
 	//next
 

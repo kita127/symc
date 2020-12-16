@@ -123,11 +123,18 @@ extern void func_a( void );
 		{
 			"function def 1",
 			`
-void func_a( void ){}
+void func_a( void )
+{
+    int hoge;
+}
 `,
 			&Module{
 				[]Statement{
-					&FunctionDef{Name: "func_a", Block: &BlockStatement{Statements: []Statement{}}},
+					&FunctionDef{Name: "func_a", Block: &BlockStatement{Statements: []Statement{
+						&VariableDef{Name: "hoge"},
+					},
+					},
+					},
 				},
 			},
 		},
