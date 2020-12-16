@@ -127,7 +127,7 @@ void func_a( void ){}
 `,
 			&Module{
 				[]Statement{
-					&FunctionDef{Name: "func_a"},
+					&FunctionDef{Name: "func_a", Block: &BlockStatement{Statements: []Statement{}}},
 				},
 			},
 		},
