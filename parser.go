@@ -62,12 +62,30 @@ func (v *PrototypeDecl) String() string {
 }
 
 type FunctionDef struct {
-	Name string
+	Name  string
+	Block *BlockStatement
 }
 
 func (v *FunctionDef) statementNode() {}
 func (v *FunctionDef) String() string {
-	return fmt.Sprintf("FunctionDef : Name=%s", v.Name)
+	return fmt.Sprintf("FunctionDef : Name=%s, Block=%v", v.Name, v.Block)
+}
+
+type BlockStatement struct {
+	Statements []Statement
+}
+
+func (v *BlockStatement) statementNode() {}
+func (v *BlockStatement) String() string {
+	s := fmt.Sprintf("BlockStatement={")
+	sep := ""
+	for _, v2 := range v.Statements {
+		s += sep
+		s = ", "
+		s += v2.String()
+	}
+	s += " }"
+	return s
 }
 
 // 構文解析器
@@ -242,17 +260,41 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 		return p.updateInvalid(s, errMsg)
 	}
 
-	// rbrace or eof まで pos を進める
-	p.progUntil(rbrace)
-	if p.curToken().tokenType == eof {
+	x := p.parseBlockStatement(&InvalidStatement{Contents: "parse"})
+
+	if b, ok := x.(*BlockStatement); ok {
+		p.prevPos = p.pos
+		return &FunctionDef{Name: id, Block: b}
+	} else {
 		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
+}
+
+func (p *Parser) parseBlockStatement(s Statement) Statement {
+	if _, invalid := s.(*InvalidStatement); !invalid {
+		// 既に解析済みの場合はリターン
+		return s
+	}
+	errMsg := "err parse block"
+	// lbrace の次へ
 	p.pos++
-	// next
+
+	ss := []Statement{}
+	for p.curToken().tokenType != rbrace {
+		s := p.parseStatement()
+		ss = append(ss, s)
+		if _, invalid := s.(*InvalidStatement); invalid {
+			p.posReset()
+			return p.updateInvalid(s, errMsg)
+		}
+	}
+	p.pos++
+	//next
 
 	p.prevPos = p.pos
-	return &FunctionDef{Name: id}
+	b := &BlockStatement{ss}
+	return b
 }
 
 func (p *Parser) peekToken() *Token {
