@@ -260,19 +260,39 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 		return p.updateInvalid(s, errMsg)
 	}
 
-	b := p.parseBlockStatement(&InvalidStatement{Contents: "parse"})
+	x := p.parseBlockStatement(&InvalidStatement{Contents: "parse"})
 
-	// rbrace or eof まで pos を進める
-	p.progUntil(rbrace)
-	if p.curToken().tokenType == eof {
+	if b, ok := x.(*BlockStatement); ok {
+		p.prevPos = p.pos
+		return &FunctionDef{Name: id, Block: b}
+	} else {
 		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
+}
+
+func (p *Parser) parseBlockStatement(s Statement) Statement {
+	if _, invalid := s.(*InvalidStatement); !invalid {
+		// 既に解析済みの場合はリターン
+		return s
+	}
+	// lbrace の次へ
 	p.pos++
-	// next
+
+	ss := []Statement{}
+	//	for p.curToken().tokenType != rbrace {
+	//		s := p.parseStatement()
+	//		ss = append(ss, s)
+	//		if _, invalid := s.(*InvalidStatement); invalid {
+	//			break
+	//		}
+	//	}
+	p.pos++
+	//next
 
 	p.prevPos = p.pos
-	return &FunctionDef{Name: id}
+	b := &BlockStatement{ss}
+	return b
 }
 
 func (p *Parser) peekToken() *Token {
