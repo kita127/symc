@@ -61,6 +61,9 @@ const (
 	keyVolatile
 	keyConst
 	keyTypedef
+	keyUnion
+	keyStruct
+	keyEnum
 	comment
 	illegal
 )
@@ -337,6 +340,12 @@ func (l *Lexer) determineKeyword(w string) *Token {
 		return &Token{tokenType: keyConst, literal: w}
 	} else if strings.Compare("typedef", w) == 0 {
 		return &Token{tokenType: keyTypedef, literal: w}
+	} else if strings.Compare("union", w) == 0 {
+		return &Token{tokenType: keyUnion, literal: w}
+	} else if strings.Compare("struct", w) == 0 {
+		return &Token{tokenType: keyStruct, literal: w}
+	} else if strings.Compare("enum", w) == 0 {
+		return &Token{tokenType: keyEnum, literal: w}
 	} else {
 		return &Token{tokenType: word, literal: w}
 	}
