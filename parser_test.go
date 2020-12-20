@@ -133,6 +133,17 @@ extern void func_a( void );
 			},
 		},
 		{
+			"prototype dec 3",
+			`
+int renameat(int, const char *, int, const char *) __attribute__((availability(macosx,introduced=10.10)));
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "renameat"},
+				},
+			},
+		},
+		{
 			"typedef 1",
 			`
 typedef unsigned char __uint8_t;
@@ -161,6 +172,75 @@ struct __darwin_pthread_handler_rec {
  void *__arg;
  struct __darwin_pthread_handler_rec *__next;
 };
+`,
+			&Module{
+				[]Statement{},
+			},
+		},
+		{
+			"struct 2",
+			`
+struct __sFILEX;
+# 126 "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h" 3 4
+typedef struct __sFILE {
+ unsigned char *_p;
+ int _r;
+ int _w;
+ short _flags;
+ short _file;
+ struct __sbuf _bf;
+ int _lbfsize;
+
+
+ void *_cookie;
+ int (* _Nullable _close)(void *);
+ int (* _Nullable _read) (void *, char *, int);
+ fpos_t (* _Nullable _seek) (void *, fpos_t, int);
+ int (* _Nullable _write)(void *, const char *, int);
+
+
+ struct __sbuf _ub;
+ struct __sFILEX *_extra;
+ int _ur;
+
+
+ unsigned char _ubuf[3];
+ unsigned char _nbuf[1];
+
+
+ struct __sbuf _lb;
+
+
+ int _blksize;
+ fpos_t _offset;
+} FILE;
+`,
+			&Module{
+				[]Statement{},
+			},
+		},
+		{
+			"attribute 1",
+			`
+__attribute__()
+`,
+			&Module{
+				[]Statement{},
+			},
+		},
+		{
+			"attribute 2",
+			`
+__attribute__((()))
+`,
+			&Module{
+				[]Statement{},
+			},
+		},
+		{
+			"attribute 3",
+			`
+__attribute__((__availability__(swift, unavailable, message="Use mkstemp(3) instead.")))
 `,
 			&Module{
 				[]Statement{},

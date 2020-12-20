@@ -399,7 +399,7 @@ func TestLexicalize(t *testing.T) {
 		{
 			"test13",
 			`return if else while do goto for break continue switch case default
- extern volatile const typedef union struct enum`,
+ extern volatile const typedef union struct enum __attribute__`,
 			[]*Token{
 				{
 					keyReturn,
@@ -476,6 +476,10 @@ func TestLexicalize(t *testing.T) {
 				{
 					keyEnum,
 					"enum",
+				},
+				{
+					keyAttribute,
+					"__attribute__",
 				},
 				{
 					eof,

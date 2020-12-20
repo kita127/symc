@@ -165,6 +165,10 @@ func (p *Parser) parseStatement() Statement {
 	case keyStruct:
 		p.skipStruct()
 		s = nil
+	case keyAttribute:
+		p.pos++
+		p.skipParen()
+		s = nil
 	default:
 		s = p.parseFunctionDef(s)
 		s = p.parsePrototypeDecl(s)
@@ -287,15 +291,8 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 	// Name
 	id := p.curToken().literal
 
-	// rparen or eof まで pos を進める
-	p.progUntil(rparen)
-	if p.curToken().tokenType == eof {
-		return p.updateInvalid(s, errMsg)
-	}
-	p.pos++
-	if p.curToken().tokenType != semicolon {
-		return p.updateInvalid(s, errMsg)
-	}
+	// semicolon まで進める
+	p.progUntil(semicolon)
 	p.pos++
 	// next
 	return &PrototypeDecl{Name: id}
@@ -480,4 +477,20 @@ func (p *Parser) skipStruct() {
 	p.progUntil(rbrace)
 	p.progUntil(semicolon)
 	p.pos++
+}
+
+func (p *Parser) skipParen() {
+	for {
+		if p.curToken().tokenType == lparen {
+			p.pos++
+			p.skipParen()
+		} else if p.curToken().tokenType == rparen {
+			p.pos++
+			return
+		} else if p.curToken().tokenType == eof {
+			return
+		} else {
+			p.pos++
+		}
+	}
 }

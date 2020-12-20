@@ -64,6 +64,7 @@ const (
 	keyUnion
 	keyStruct
 	keyEnum
+    keyAttribute
 	comment
 	illegal
 )
@@ -346,6 +347,8 @@ func (l *Lexer) determineKeyword(w string) *Token {
 		return &Token{tokenType: keyStruct, literal: w}
 	} else if strings.Compare("enum", w) == 0 {
 		return &Token{tokenType: keyEnum, literal: w}
+	} else if strings.Compare("__attribute__", w) == 0 {
+		return &Token{tokenType: keyAttribute, literal: w}
 	} else {
 		return &Token{tokenType: word, literal: w}
 	}
