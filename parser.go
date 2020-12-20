@@ -147,14 +147,12 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 	for n.tokenType != semicolon && n.tokenType != assign && n.tokenType != lbracket && n.tokenType != eof {
 		// 現在トークンが識別子もしくは型に関するかチェック
 		if !p.curToken().IsTypeToken() {
-			p.posReset()
 			return p.updateInvalid(s, errMsg)
 		}
 		p.pos++
 		n = p.peekToken()
 	}
 	if n.tokenType == eof {
-		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 	// Name
@@ -174,7 +172,6 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 		p.pos++
 		// next
 	default:
-		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 	return &VariableDef{Name: id}
@@ -209,7 +206,6 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 	// lparen or eof の手前まで pos を進める
 	p.progUntilPrev(lparen)
 	if p.peekToken().tokenType == eof {
-		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 
@@ -219,12 +215,10 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 	// rparen or eof まで pos を進める
 	p.progUntil(rparen)
 	if p.curToken().tokenType == eof {
-		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 	p.pos++
 	if p.curToken().tokenType != semicolon {
-		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 	p.pos++
@@ -247,7 +241,6 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 		n = p.peekToken()
 	}
 	if n.tokenType != lparen {
-		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 
@@ -257,14 +250,12 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 	// rparen or eof まで pos を進める
 	p.progUntil(rparen)
 	if p.curToken().tokenType == eof {
-		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 
 	// lbrace かチェック
 	p.pos++
 	if p.curToken().tokenType != lbrace {
-		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 
@@ -276,10 +267,8 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 		return &FunctionDef{Name: id, Block: b}
 	case *InvalidStatement:
 		v, _ := x.(*InvalidStatement)
-		p.posReset()
 		return p.updateInvalid(s, errMsg+v.Contents)
 	default:
-		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 }
@@ -298,7 +287,6 @@ func (p *Parser) parseBlockStatement(s Statement) Statement {
 		s := p.parseStatement()
 		ss = append(ss, s)
 		if _, invalid := s.(*InvalidStatement); invalid {
-			p.posReset()
 			return p.updateInvalid(s, errMsg)
 		}
 	}
@@ -344,10 +332,13 @@ func (p *Parser) posReset() {
 func (p *Parser) updateInvalid(s Statement, msg string) Statement {
 	var invs *InvalidStatement
 	var b bool
+
+	i := &InvalidStatement{Contents: "updateInvalid err"}
 	if invs, b = s.(*InvalidStatement); b {
 		invs.Contents += ", " + msg
 		invs.Tk = p.curToken()
-		return invs
+		i = invs
 	}
-	return &InvalidStatement{Contents: "updateInvalid err"}
+	p.posReset()
+	return i
 }
