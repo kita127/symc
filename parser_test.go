@@ -158,6 +158,20 @@ typedef union {
 			},
 		},
 		{
+			"struct 1",
+			`
+struct __darwin_pthread_handler_rec {
+ void (*__routine)(void *);
+ void *__arg;
+ struct __darwin_pthread_handler_rec *__next;
+};
+`,
+			&Module{
+				[]Statement{
+				},
+			},
+		},
+		{
 			"function def 1",
 			`
 void func_a( void ) {}

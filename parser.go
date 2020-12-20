@@ -141,10 +141,11 @@ func (p *Parser) parseModule() *Module {
 			p.pos++
 			continue
 		}
-		s := p.parseStatement()
-		ss = append(ss, s)
-		if _, invalid := s.(*InvalidStatement); invalid {
-			break
+		if s := p.parseStatement(); s != nil {
+			ss = append(ss, s)
+			if _, invalid := s.(*InvalidStatement); invalid {
+				break
+			}
 		}
 	}
 	m := &Module{ss}
@@ -160,6 +161,9 @@ func (p *Parser) parseStatement() Statement {
 	case keyExtern:
 		s = p.parsePrototypeDecl(s)
 		s = p.parseVariableDecl(s)
+	case keyStruct:
+		p.skipStruct()
+		s = nil
 	default:
 		s = p.parseFunctionDef(s)
 		s = p.parsePrototypeDecl(s)
@@ -493,4 +497,10 @@ func (p *Parser) updateInvalid(s Statement, msg string) Statement {
 	}
 	p.posReset()
 	return i
+}
+
+func (p *Parser) skipStruct() {
+	p.progUntil(rbrace)
+	p.progUntil(semicolon)
+	p.pos++
 }
