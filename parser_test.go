@@ -99,6 +99,18 @@ char hoge[] = "hello";
 			},
 		},
 		{
+			"variable definition 9",
+			`
+int hoge = 0;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+
+		{
 			"prototype dec 1",
 			`
 void func_a( void );
@@ -136,7 +148,7 @@ void func_a( void ) {}
 			`
 int func_a( void )
 {
-    char hoge;
+    int hoge = 0;
     hoge;
 }
 `,

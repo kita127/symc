@@ -318,8 +318,16 @@ func TestLexicalize(t *testing.T) {
 		},
 		{
 			"test11",
-			`123 0xA1c 0765 0b0110 567u 567U 567l 567L 567lu 567UL`,
+			`0 0U 123 0xA1c 0765 0b0110 567u 567U 567l 567L 567lu 567UL`,
 			[]*Token{
+				{
+					integer,
+					"0",
+				},
+				{
+					integer,
+					"0U",
+				},
 				{
 					integer,
 					"123",
@@ -497,6 +505,37 @@ func TestLexicalize(t *testing.T) {
 				},
 			},
 		},
+		{
+			"test14",
+			`int hoge = 0;`,
+			[]*Token{
+				{
+					word,
+					"int",
+				},
+				{
+					word,
+					"hoge",
+				},
+				{
+					assign,
+					"=",
+				},
+				{
+					integer,
+					"0",
+				},
+				{
+					semicolon,
+					";",
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
+
 		{
 			"testx",
 			`

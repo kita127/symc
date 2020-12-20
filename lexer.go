@@ -233,8 +233,8 @@ func (l *Lexer) readNumber() *Token {
 				// 8進数
 				next++
 			} else {
-				// エラー
-				return l.newIllegal()
+				// ゼロ
+				
 			}
 		}
 	}
