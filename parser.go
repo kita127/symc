@@ -27,11 +27,12 @@ type Statement interface {
 
 type InvalidStatement struct {
 	Contents string
+	Tk       *Token
 }
 
 func (v *InvalidStatement) statementNode() {}
 func (v *InvalidStatement) String() string {
-	return fmt.Sprintf("InvalidStatement : Contents=%s", v.Contents)
+	return fmt.Sprintf("InvalidStatement : Contents=%s, Tk=%s", v.Contents, v.Tk.literal)
 }
 
 type VariableDef struct {
@@ -121,6 +122,7 @@ func (p *Parser) parseModule() *Module {
 
 func (p *Parser) parseStatement() Statement {
 	var s Statement = &InvalidStatement{Contents: "parse"}
+	p.prevPos = p.pos
 	switch p.curToken().tokenType {
 	case keyExtern:
 		s = p.parsePrototypeDecl(s)
@@ -144,7 +146,7 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 	n := p.peekToken()
 	for n.tokenType != semicolon && n.tokenType != assign && n.tokenType != lbracket && n.tokenType != eof {
 		// 現在トークンが識別子もしくは型に関するかチェック
-		if !p.isTypeToken() {
+		if !p.curToken().IsTypeToken() {
 			p.pos = p.prevPos
 			return p.updateInvalid(s, errMsg)
 		}
@@ -175,7 +177,6 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 		p.pos = p.prevPos
 		return p.updateInvalid(s, errMsg)
 	}
-	p.prevPos = p.pos
 	return &VariableDef{Name: id}
 }
 
@@ -195,7 +196,6 @@ func (p *Parser) parseVariableDecl(s Statement) Statement {
 	p.pos++
 	// next
 
-	p.prevPos = p.pos
 	return &VariableDecl{Name: id}
 }
 
@@ -229,7 +229,6 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 	}
 	p.pos++
 	// next
-	p.prevPos = p.pos
 	return &PrototypeDecl{Name: id}
 
 }
@@ -242,8 +241,12 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 	errMsg := "err parse function def"
 
 	// lparen or eof の手前まで pos を進める
-	p.progUntilPrev(lparen)
-	if p.peekToken().tokenType == eof {
+	n := p.peekToken()
+	for n.IsTypeToken() {
+		p.pos++
+		n = p.peekToken()
+	}
+	if n.tokenType != lparen {
 		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
@@ -258,19 +261,24 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 		return p.updateInvalid(s, errMsg)
 	}
 
-	// lbrace or eof まで pos を進める
-	p.progUntil(lbrace)
-	if p.curToken().tokenType == eof {
+	// lbrace かチェック
+	p.pos++
+	if p.curToken().tokenType != lbrace {
 		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 
 	x := p.parseBlockStatement(&InvalidStatement{Contents: "parse"})
 
-	if b, ok := x.(*BlockStatement); ok {
-		p.prevPos = p.pos
+	switch x.(type) {
+	case *BlockStatement:
+		b, _ := x.(*BlockStatement)
 		return &FunctionDef{Name: id, Block: b}
-	} else {
+	case *InvalidStatement:
+		v, _ := x.(*InvalidStatement)
+		p.posReset()
+		return p.updateInvalid(s, errMsg+v.Contents)
+	default:
 		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
@@ -297,7 +305,6 @@ func (p *Parser) parseBlockStatement(s Statement) Statement {
 	p.pos++
 	//next
 
-	p.prevPos = p.pos
 	b := &BlockStatement{ss}
 	return b
 }
@@ -339,12 +346,8 @@ func (p *Parser) updateInvalid(s Statement, msg string) Statement {
 	var b bool
 	if invs, b = s.(*InvalidStatement); b {
 		invs.Contents += ", " + msg
+		invs.Tk = p.curToken()
 		return invs
 	}
 	return &InvalidStatement{Contents: "updateInvalid err"}
-}
-
-func (p *Parser) isTypeToken() bool {
-	t := p.curToken().tokenType
-	return (t == word || t == asterisk || t == keyConst)
 }

@@ -123,9 +123,21 @@ extern void func_a( void );
 		{
 			"function def 1",
 			`
-void func_a( void )
+void func_a( void ) {}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func_a", Block: &BlockStatement{Statements: []Statement{}},
+					},
+				},
+			},
+		},
+		{
+			"function def 2",
+			`
+int func_a( void )
 {
-    int hoge;
+    char hoge;
 }
 `,
 			&Module{
@@ -153,15 +165,15 @@ extern long piyo;
 				},
 			},
 		},
-		{
-			"test err1",
-			`int hoge`,
-			&Module{
-				[]Statement{
-					&InvalidStatement{Contents: "parse, err parse function def, err parse prototype decl, err parse variable def"},
-				},
-			},
-		},
+//		{
+//			"test err1",
+//			`int hoge`,
+//			&Module{
+//				[]Statement{
+//					&InvalidStatement{Contents: "parse, err parse function def, err parse prototype decl, err parse variable def"},
+//				},
+//			},
+//		},
 	}
 
 	for _, tt := range testTbl {

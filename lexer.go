@@ -350,3 +350,7 @@ func isHex(c byte) bool {
 func isDec(c byte) bool {
 	return '0' <= c && c <= '9'
 }
+
+func (t *Token) IsTypeToken() bool {
+	return (t.tokenType == word || t.tokenType == asterisk || t.tokenType == keyConst)
+}
