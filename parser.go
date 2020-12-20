@@ -107,6 +107,15 @@ func (v *AssignVar) String() string {
 	return fmt.Sprintf("AssignVar : Name=%s", v.Name)
 }
 
+type Typedef struct {
+	Name string
+}
+
+func (v *Typedef) statementNode() {}
+func (v *Typedef) String() string {
+	return fmt.Sprintf("Typedef : Name=%s", v.Name)
+}
+
 // 構文解析器
 type Parser struct {
 	lexer   *Lexer
@@ -146,6 +155,8 @@ func (p *Parser) parseStatement() Statement {
 	var s Statement = &InvalidStatement{Contents: "parse"}
 	p.prevPos = p.pos
 	switch p.curToken().tokenType {
+	case keyTypedef:
+		s = p.parseTypedef(s)
 	case keyExtern:
 		s = p.parsePrototypeDecl(s)
 		s = p.parseVariableDecl(s)
@@ -398,6 +409,43 @@ func (p *Parser) parseAssignVar(s Statement) Statement {
 	// next
 
 	return &AssignVar{Name: n}
+}
+
+func (p *Parser) parseTypedef(s Statement) Statement {
+	if _, invalid := s.(*InvalidStatement); !invalid {
+		// 既に解析済みの場合はリターン
+		return s
+	}
+	errMsg := "err parse typedef"
+
+	if p.curToken().tokenType != keyTypedef {
+		return p.updateInvalid(s, errMsg)
+	}
+
+	n := p.peekToken()
+	for n.tokenType != semicolon && n.tokenType != eof {
+		// 現在トークンが識別子もしくは型に関するかチェック
+		if !p.curToken().IsTypeToken() && p.curToken().tokenType != keyTypedef {
+			return p.updateInvalid(s, errMsg)
+		}
+		p.pos++
+		n = p.peekToken()
+	}
+
+	if p.curToken().tokenType != word {
+		return p.updateInvalid(s, errMsg)
+	}
+	id := p.curToken().literal
+
+	p.pos++
+	if p.curToken().tokenType != semicolon {
+		return p.updateInvalid(s, errMsg)
+	}
+
+	p.pos++
+	// next
+
+	return &Typedef{Name: id}
 }
 
 func (p *Parser) peekToken() *Token {

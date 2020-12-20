@@ -133,6 +133,17 @@ extern void func_a( void );
 			},
 		},
 		{
+			"typedef 1",
+			`
+typedef unsigned char __uint8_t;
+`,
+			&Module{
+				[]Statement{
+					&Typedef{Name: "__uint8_t"},
+				},
+			},
+		},
+		{
 			"function def 1",
 			`
 void func_a( void ) {}

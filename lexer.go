@@ -60,6 +60,7 @@ const (
 	keyExtern
 	keyVolatile
 	keyConst
+	keyTypedef
 	comment
 	illegal
 )
@@ -234,7 +235,7 @@ func (l *Lexer) readNumber() *Token {
 				next++
 			} else {
 				// ゼロ
-				
+
 			}
 		}
 	}
@@ -334,6 +335,8 @@ func (l *Lexer) determineKeyword(w string) *Token {
 		return &Token{tokenType: keyVolatile, literal: w}
 	} else if strings.Compare("const", w) == 0 {
 		return &Token{tokenType: keyConst, literal: w}
+	} else if strings.Compare("typedef", w) == 0 {
+		return &Token{tokenType: keyTypedef, literal: w}
 	} else {
 		return &Token{tokenType: word, literal: w}
 	}
