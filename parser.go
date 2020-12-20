@@ -147,14 +147,14 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 	for n.tokenType != semicolon && n.tokenType != assign && n.tokenType != lbracket && n.tokenType != eof {
 		// 現在トークンが識別子もしくは型に関するかチェック
 		if !p.curToken().IsTypeToken() {
-			p.pos = p.prevPos
+			p.posReset()
 			return p.updateInvalid(s, errMsg)
 		}
 		p.pos++
 		n = p.peekToken()
 	}
 	if n.tokenType == eof {
-		p.pos = p.prevPos
+		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 	// Name
@@ -174,7 +174,7 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 		p.pos++
 		// next
 	default:
-		p.pos = p.prevPos
+		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 	return &VariableDef{Name: id}
@@ -209,7 +209,7 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 	// lparen or eof の手前まで pos を進める
 	p.progUntilPrev(lparen)
 	if p.peekToken().tokenType == eof {
-		p.pos = p.prevPos
+		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 
@@ -219,12 +219,12 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 	// rparen or eof まで pos を進める
 	p.progUntil(rparen)
 	if p.curToken().tokenType == eof {
-		p.pos = p.prevPos
+		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 	p.pos++
 	if p.curToken().tokenType != semicolon {
-		p.pos = p.prevPos
+		p.posReset()
 		return p.updateInvalid(s, errMsg)
 	}
 	p.pos++
