@@ -150,7 +150,8 @@ int func(int a)
 {
     int hoge = 0;
     hoge++;
-    a = (10);
+    a = a + (10);
+    return a;
 }
 `,
 			&Module{
@@ -159,6 +160,8 @@ int func(int a)
 						&VariableDef{Name: "hoge"},
 						&RefVar{Name: "hoge"},
 						&AssignVar{Name: "a"},
+						&RefVar{Name: "a"},
+						&RefVar{Name: "a"},
 					},
 					},
 					},
