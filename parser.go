@@ -128,6 +128,10 @@ func (p *Parser) Parse() *Module {
 func (p *Parser) parseModule() *Module {
 	ss := []Statement{}
 	for p.curToken().tokenType != eof {
+		if p.curToken().tokenType == comment {
+			p.pos++
+			continue
+		}
 		s := p.parseStatement()
 		ss = append(ss, s)
 		if _, invalid := s.(*InvalidStatement); invalid {

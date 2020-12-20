@@ -171,15 +171,33 @@ int func(int a)
 		{
 			"testx",
 			`
-int hoge;
-char fuga;
-extern long piyo;
+# 1 "hoge.c"
+# 1 "<built-in>" 1
+# 1 "<built-in>" 3
+# 366 "<built-in>" 3
+# 1 "<command line>" 1
+# 1 "<built-in>" 2
+# 1 "hoge.c" 2
+
+int func(int a)
+{
+    int hoge = 0;
+    hoge++;
+    a = a + (10);
+    return a;
+}
 `,
 			&Module{
 				[]Statement{
-					&VariableDef{Name: "hoge"},
-					&VariableDef{Name: "fuga"},
-					&VariableDecl{Name: "piyo"},
+					&FunctionDef{Name: "func", Block: &BlockStatement{Statements: []Statement{
+						&VariableDef{Name: "hoge"},
+						&RefVar{Name: "hoge"},
+						&AssignVar{Name: "a"},
+						&RefVar{Name: "a"},
+						&RefVar{Name: "a"},
+					},
+					},
+					},
 				},
 			},
 		},
