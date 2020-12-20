@@ -69,7 +69,7 @@ type FunctionDef struct {
 
 func (v *FunctionDef) statementNode() {}
 func (v *FunctionDef) String() string {
-	return fmt.Sprintf("FunctionDef : Name=%s, Block=%v", v.Name, v.Block)
+	return fmt.Sprintf("FunctionDef : Name=%s, Block=%s", v.Name, v.Block)
 }
 
 type BlockStatement struct {
@@ -82,11 +82,20 @@ func (v *BlockStatement) String() string {
 	sep := ""
 	for _, v2 := range v.Statements {
 		s += sep
-		s = ", "
+		sep = ", "
 		s += v2.String()
 	}
 	s += " }"
 	return s
+}
+
+type RefVar struct {
+	Name string
+}
+
+func (v *RefVar) statementNode() {}
+func (v *RefVar) String() string {
+	return fmt.Sprintf("RefVar : Name=%s", v.Name)
 }
 
 // 構文解析器
@@ -135,6 +144,22 @@ func (p *Parser) parseStatement() Statement {
 	return s
 }
 
+func (p *Parser) parseBlockStatementSub() Statement {
+	var s Statement = &InvalidStatement{Contents: "parse"}
+	p.prevPos = p.pos
+	switch p.curToken().tokenType {
+	case keyExtern:
+		s = p.parsePrototypeDecl(s)
+		s = p.parseVariableDecl(s)
+	default:
+		s = p.parseFunctionDef(s)
+		s = p.parsePrototypeDecl(s)
+		s = p.parseVariableDef(s)
+		s = p.parseRefVar(s)
+	}
+	return s
+}
+
 func (p *Parser) parseVariableDef(s Statement) Statement {
 	if _, invalid := s.(*InvalidStatement); !invalid {
 		// 既に解析済みの場合はリターン
@@ -143,18 +168,30 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 	errMsg := "err parse variable def"
 
 	// semicolon or assign or lbracket or eof の手前まで pos を進める
+	typeCnt := 0
 	n := p.peekToken()
 	for n.tokenType != semicolon && n.tokenType != assign && n.tokenType != lbracket && n.tokenType != eof {
 		// 現在トークンが識別子もしくは型に関するかチェック
 		if !p.curToken().IsTypeToken() {
 			return p.updateInvalid(s, errMsg)
 		}
+		typeCnt++
 		p.pos++
 		n = p.peekToken()
 	}
 	if n.tokenType == eof {
 		return p.updateInvalid(s, errMsg)
 	}
+
+	if !p.curToken().IsTypeToken() {
+		return p.updateInvalid(s, errMsg)
+	}
+	typeCnt++
+
+	if typeCnt <= 1 {
+		return p.updateInvalid(s, errMsg)
+	}
+
 	// Name
 	id := p.tokens[p.pos].literal
 	p.pos++
@@ -284,10 +321,14 @@ func (p *Parser) parseBlockStatement(s Statement) Statement {
 
 	ss := []Statement{}
 	for p.curToken().tokenType != rbrace {
-		s := p.parseStatement()
-		ss = append(ss, s)
-		if _, invalid := s.(*InvalidStatement); invalid {
-			return p.updateInvalid(s, errMsg)
+		if p.curToken().IsTypeToken() {
+			s := p.parseBlockStatementSub()
+			ss = append(ss, s)
+			if _, invalid := s.(*InvalidStatement); invalid {
+				return p.updateInvalid(s, errMsg)
+			}
+		} else {
+			p.pos++
 		}
 	}
 	p.pos++
@@ -295,6 +336,22 @@ func (p *Parser) parseBlockStatement(s Statement) Statement {
 
 	b := &BlockStatement{ss}
 	return b
+}
+
+func (p *Parser) parseRefVar(s Statement) Statement {
+	if _, invalid := s.(*InvalidStatement); !invalid {
+		// 既に解析済みの場合はリターン
+		return s
+	}
+	errMsg := "err parse ref var"
+	if p.curToken().tokenType != word {
+		return p.updateInvalid(s, errMsg)
+	}
+	n := p.curToken().literal
+	p.pos++
+	// next
+
+	return &RefVar{Name: n}
 }
 
 func (p *Parser) peekToken() *Token {

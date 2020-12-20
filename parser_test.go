@@ -127,8 +127,7 @@ void func_a( void ) {}
 `,
 			&Module{
 				[]Statement{
-					&FunctionDef{Name: "func_a", Block: &BlockStatement{Statements: []Statement{}},
-					},
+					&FunctionDef{Name: "func_a", Block: &BlockStatement{Statements: []Statement{}}},
 				},
 			},
 		},
@@ -138,12 +137,14 @@ void func_a( void ) {}
 int func_a( void )
 {
     char hoge;
+    hoge;
 }
 `,
 			&Module{
 				[]Statement{
 					&FunctionDef{Name: "func_a", Block: &BlockStatement{Statements: []Statement{
 						&VariableDef{Name: "hoge"},
+						&RefVar{Name: "hoge"},
 					},
 					},
 					},
@@ -165,15 +166,15 @@ extern long piyo;
 				},
 			},
 		},
-//		{
-//			"test err1",
-//			`int hoge`,
-//			&Module{
-//				[]Statement{
-//					&InvalidStatement{Contents: "parse, err parse function def, err parse prototype decl, err parse variable def"},
-//				},
-//			},
-//		},
+		//		{
+		//			"test err1",
+		//			`int hoge`,
+		//			&Module{
+		//				[]Statement{
+		//					&InvalidStatement{Contents: "parse, err parse function def, err parse prototype decl, err parse variable def"},
+		//				},
+		//			},
+		//		},
 	}
 
 	for _, tt := range testTbl {
