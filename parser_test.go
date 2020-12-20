@@ -144,6 +144,20 @@ typedef unsigned char __uint8_t;
 			},
 		},
 		{
+			"typedef 2",
+			`
+typedef union {
+ char __mbstate8[128];
+ long long _mbstateL;
+} __mbstate_t;
+`,
+			&Module{
+				[]Statement{
+					&Typedef{Name: "__mbstate_t"},
+				},
+			},
+		},
+		{
 			"function def 1",
 			`
 void func_a( void ) {}

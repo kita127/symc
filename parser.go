@@ -424,11 +424,12 @@ func (p *Parser) parseTypedef(s Statement) Statement {
 
 	n := p.peekToken()
 	for n.tokenType != semicolon && n.tokenType != eof {
-		// 現在トークンが識別子もしくは型に関するかチェック
-		if !p.curToken().IsTypeToken() && p.curToken().tokenType != keyTypedef {
-			return p.updateInvalid(s, errMsg)
+		if p.curToken().tokenType == lbrace {
+			// { の場合は } まで進める
+			p.progUntil(rbrace)
+		} else {
+			p.pos++
 		}
-		p.pos++
 		n = p.peekToken()
 	}
 
