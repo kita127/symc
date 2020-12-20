@@ -328,14 +328,14 @@ func (p *Parser) parseBlockStatement(s Statement) Statement {
 				return p.updateInvalid(s, errMsg)
 			}
 		} else {
+			// パース対象外のトークンの場合はスキップする
 			p.pos++
 		}
 	}
 	p.pos++
 	//next
 
-	b := &BlockStatement{ss}
-	return b
+	return &BlockStatement{ss}
 }
 
 func (p *Parser) parseRefVar(s Statement) Statement {
