@@ -146,17 +146,19 @@ void func_a( void ) {}
 		{
 			"function def 2",
 			`
-int func_a( void )
+int func(int a)
 {
     int hoge = 0;
-    hoge;
+    hoge++;
+    a = (10);
 }
 `,
 			&Module{
 				[]Statement{
-					&FunctionDef{Name: "func_a", Block: &BlockStatement{Statements: []Statement{
+					&FunctionDef{Name: "func", Block: &BlockStatement{Statements: []Statement{
 						&VariableDef{Name: "hoge"},
 						&RefVar{Name: "hoge"},
+						&AssignVar{Name: "a"},
 					},
 					},
 					},

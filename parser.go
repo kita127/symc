@@ -98,6 +98,15 @@ func (v *RefVar) String() string {
 	return fmt.Sprintf("RefVar : Name=%s", v.Name)
 }
 
+type AssignVar struct {
+	Name string
+}
+
+func (v *AssignVar) statementNode() {}
+func (v *AssignVar) String() string {
+	return fmt.Sprintf("AssignVar : Name=%s", v.Name)
+}
+
 // 構文解析器
 type Parser struct {
 	lexer   *Lexer
@@ -155,6 +164,7 @@ func (p *Parser) parseBlockStatementSub() Statement {
 		s = p.parseFunctionDef(s)
 		s = p.parsePrototypeDecl(s)
 		s = p.parseVariableDef(s)
+		s = p.parseAssignVar(s)
 		s = p.parseRefVar(s)
 	}
 	return s
@@ -240,9 +250,17 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 	}
 	errMsg := "err parse prototype decl"
 
-	// lparen or eof の手前まで pos を進める
-	p.progUntilPrev(lparen)
-	if p.peekToken().tokenType == eof {
+	n := p.peekToken()
+	for n.tokenType != lparen {
+		// 現在トークンが識別子もしくは型に関するかチェック
+		if !p.curToken().IsTypeToken() && p.curToken().tokenType != keyExtern {
+			return p.updateInvalid(s, errMsg)
+		}
+		p.pos++
+		n = p.peekToken()
+	}
+
+	if !p.curToken().IsTypeToken() {
 		return p.updateInvalid(s, errMsg)
 	}
 
@@ -352,6 +370,30 @@ func (p *Parser) parseRefVar(s Statement) Statement {
 	// next
 
 	return &RefVar{Name: n}
+}
+
+func (p *Parser) parseAssignVar(s Statement) Statement {
+	if _, invalid := s.(*InvalidStatement); !invalid {
+		// 既に解析済みの場合はリターン
+		return s
+	}
+	errMsg := "err parse assign var"
+
+	if p.curToken().tokenType != word {
+		return p.updateInvalid(s, errMsg)
+	}
+
+	n := p.curToken().literal
+
+	p.pos++
+	if p.curToken().tokenType != assign {
+		return p.updateInvalid(s, errMsg)
+	}
+
+	p.pos++
+	// next
+
+	return &AssignVar{Name: n}
 }
 
 func (p *Parser) peekToken() *Token {
