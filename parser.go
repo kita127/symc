@@ -143,6 +143,11 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 	// semicolon or assign or lbracket or eof の手前まで pos を進める
 	n := p.peekToken()
 	for n.tokenType != semicolon && n.tokenType != assign && n.tokenType != lbracket && n.tokenType != eof {
+		// 現在トークンが識別子もしくは型に関するかチェック
+		if !p.isTypeToken() {
+			p.pos = p.prevPos
+			return p.updateInvalid(s, errMsg)
+		}
 		p.pos++
 		n = p.peekToken()
 	}
@@ -337,4 +342,9 @@ func (p *Parser) updateInvalid(s Statement, msg string) Statement {
 		return invs
 	}
 	return &InvalidStatement{Contents: "updateInvalid err"}
+}
+
+func (p *Parser) isTypeToken() bool {
+	t := p.curToken().tokenType
+	return (t == word || t == asterisk || t == keyConst)
 }
