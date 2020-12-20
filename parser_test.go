@@ -138,9 +138,7 @@ extern void func_a( void );
 typedef unsigned char __uint8_t;
 `,
 			&Module{
-				[]Statement{
-					&Typedef{Name: "__uint8_t"},
-				},
+				[]Statement{},
 			},
 		},
 		{
@@ -152,9 +150,7 @@ typedef union {
 } __mbstate_t;
 `,
 			&Module{
-				[]Statement{
-					&Typedef{Name: "__mbstate_t"},
-				},
+				[]Statement{},
 			},
 		},
 		{
@@ -167,8 +163,7 @@ struct __darwin_pthread_handler_rec {
 };
 `,
 			&Module{
-				[]Statement{
-				},
+				[]Statement{},
 			},
 		},
 		{

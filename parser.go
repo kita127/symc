@@ -157,7 +157,8 @@ func (p *Parser) parseStatement() Statement {
 	p.prevPos = p.pos
 	switch p.curToken().tokenType {
 	case keyTypedef:
-		s = p.parseTypedef(s)
+		p.skipTypedef()
+		s = nil
 	case keyExtern:
 		s = p.parsePrototypeDecl(s)
 		s = p.parseVariableDecl(s)
@@ -415,42 +416,18 @@ func (p *Parser) parseAssignVar(s Statement) Statement {
 	return &AssignVar{Name: n}
 }
 
-func (p *Parser) parseTypedef(s Statement) Statement {
-	if _, invalid := s.(*InvalidStatement); !invalid {
-		// 既に解析済みの場合はリターン
-		return s
-	}
-	errMsg := "err parse typedef"
+func (p *Parser) skipTypedef() {
 
-	if p.curToken().tokenType != keyTypedef {
-		return p.updateInvalid(s, errMsg)
-	}
-
-	n := p.peekToken()
-	for n.tokenType != semicolon && n.tokenType != eof {
+	for p.curToken().tokenType != semicolon && p.curToken().tokenType != eof {
 		if p.curToken().tokenType == lbrace {
 			// { の場合は } まで進める
 			p.progUntil(rbrace)
 		} else {
 			p.pos++
 		}
-		n = p.peekToken()
 	}
-
-	if p.curToken().tokenType != word {
-		return p.updateInvalid(s, errMsg)
-	}
-	id := p.curToken().literal
-
-	p.pos++
-	if p.curToken().tokenType != semicolon {
-		return p.updateInvalid(s, errMsg)
-	}
-
 	p.pos++
 	// next
-
-	return &Typedef{Name: id}
 }
 
 func (p *Parser) peekToken() *Token {
