@@ -46,6 +46,7 @@ const (
 	backslash
 	str
 	letter
+	arrow
 	keyReturn
 	keyIf
 	keyElse
@@ -120,8 +121,16 @@ func (l *Lexer) nextToken() *Token {
 		tk = &Token{tokenType: plus, literal: "+"}
 		l.pos++
 	case '-':
-		tk = &Token{tokenType: minus, literal: "-"}
-		l.pos++
+		d := l.input[l.pos+1]
+		if d == '>' {
+			// ->
+			tk = &Token{tokenType: arrow, literal: "->"}
+			l.pos++
+			l.pos++
+		} else {
+			tk = &Token{tokenType: minus, literal: "-"}
+			l.pos++
+		}
 	case '!':
 		tk = &Token{tokenType: bang, literal: "!"}
 		l.pos++

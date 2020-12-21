@@ -537,7 +537,7 @@ func (p *Parser) fetchID() string {
 	for {
 		id += p.curToken().literal
 		p.pos++
-		if p.curToken().tokenType != period && p.curToken().tokenType != word {
+		if p.curToken().tokenType != period && p.curToken().tokenType != arrow && p.curToken().tokenType != word {
 			break
 		}
 	}

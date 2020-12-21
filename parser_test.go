@@ -334,8 +334,11 @@ typedef struct {
 
 int muruchi_piyomi(char *s) {
   St purin;
+  St *p;
   purin.aaa = 100;
   purin.bbb.xxx = 'A';
+  p = &purin;
+  p->aaa = 200;
   return (0);
 }
 `,
@@ -345,8 +348,12 @@ int muruchi_piyomi(char *s) {
 						Params: []*VariableDef{{Name: "s"}},
 						Block: &BlockStatement{Statements: []Statement{
 							&VariableDef{Name: "purin"},
+							&VariableDef{Name: "p"},
 							&AssignVar{Name: "purin.aaa"},
 							&AssignVar{Name: "purin.bbb.xxx"},
+							&AssignVar{Name: "p"},
+							&RefVar{Name: "purin"},
+							&AssignVar{Name: "p->aaa"},
 						}}},
 				},
 			},

@@ -217,7 +217,7 @@ func TestLexicalize(t *testing.T) {
 		},
 		{
 			"test6",
-			`&~^|:?.\`,
+			`&~^|:?.\->`,
 			[]*Token{
 				{
 					ampersand,
@@ -250,6 +250,10 @@ func TestLexicalize(t *testing.T) {
 				{
 					backslash,
 					"\\",
+				},
+				{
+					arrow,
+					"->",
 				},
 				{
 					eof,
