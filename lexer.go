@@ -45,6 +45,7 @@ const (
 	period
 	backslash
 	str
+	letter
 	keyReturn
 	keyIf
 	keyElse
@@ -184,6 +185,8 @@ func (l *Lexer) nextToken() *Token {
 	case '\\':
 		tk = &Token{tokenType: backslash, literal: "\\"}
 		l.pos++
+	case '\'':
+		tk = l.readLetter()
 	case '"':
 		tk = l.readString()
 	case '#':
@@ -301,6 +304,16 @@ func (l *Lexer) readHashComment() *Token {
 	tk := &Token{tokenType: comment, literal: l.input[l.pos:next]}
 	l.pos = next
 	return tk
+}
+
+func (l *Lexer) readLetter() *Token {
+
+	l.pos++
+	var s []byte
+	s = append(s, l.input[l.pos])
+	l.pos++
+	l.pos++
+	return &Token{tokenType: letter, literal: string(s)}
 }
 
 func (l *Lexer) newIllegal() *Token {

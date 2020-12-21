@@ -561,7 +561,7 @@ func TestLexicalize(t *testing.T) {
 		},
 
 		{
-			"testx",
+			"test15",
 			`
 # 1 "hoge.c"
 
@@ -650,6 +650,20 @@ int func(int a) {
 				{
 					rbrace,
 					`}`,
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
+		{
+			"test16",
+			`'A'`,
+			[]*Token{
+				{
+					letter,
+					"A",
 				},
 				{
 					eof,

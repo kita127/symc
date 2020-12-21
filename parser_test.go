@@ -323,15 +323,19 @@ inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
 		{
 			"function def 4",
 			`
+typedef struct {
+  char xxx;
+} Gt;
 
 typedef struct {
   int aaa;
-  int bbb;
+  Gt bbb;
 } St;
 
 int muruchi_piyomi(char *s) {
   St purin;
   purin.aaa = 100;
+  purin.bbb.xxx = 'A';
   return (0);
 }
 `,
@@ -342,6 +346,7 @@ int muruchi_piyomi(char *s) {
 						Block: &BlockStatement{Statements: []Statement{
 							&VariableDef{Name: "purin"},
 							&AssignVar{Name: "purin.aaa"},
+							&AssignVar{Name: "purin.bbb.xxx"},
 						}}},
 				},
 			},
