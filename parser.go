@@ -63,13 +63,14 @@ func (v *PrototypeDecl) String() string {
 }
 
 type FunctionDef struct {
-	Name  string
-	Block *BlockStatement
+	Name   string
+	Params []*VariableDef
+	Block  *BlockStatement
 }
 
 func (v *FunctionDef) statementNode() {}
 func (v *FunctionDef) String() string {
-	return fmt.Sprintf("FunctionDef : Name=%s, Block=%s", v.Name, v.Block)
+	return fmt.Sprintf("FunctionDef : Name=%s, Params=%s, Block=%s", v.Name, v.Params, v.Block)
 }
 
 type BlockStatement struct {
@@ -322,14 +323,15 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 	// Name
 	id := p.curToken().literal
 
-	// rparen or eof まで pos を進める
-	p.progUntil(rparen)
-	if p.curToken().tokenType == eof {
+	p.pos++
+
+	// 引数のパース
+	ps := p.parseParameter()
+	if ps == nil {
 		return p.updateInvalid(s, errMsg)
 	}
 
 	// lbrace かチェック
-	p.pos++
 	if p.curToken().tokenType != lbrace {
 		return p.updateInvalid(s, errMsg)
 	}
@@ -339,7 +341,7 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 	switch x.(type) {
 	case *BlockStatement:
 		b, _ := x.(*BlockStatement)
-		return &FunctionDef{Name: id, Block: b}
+		return &FunctionDef{Name: id, Params: ps, Block: b}
 	case *InvalidStatement:
 		v, _ := x.(*InvalidStatement)
 		return p.updateInvalid(s, errMsg+v.Contents)
@@ -414,6 +416,35 @@ func (p *Parser) parseAssignVar(s Statement) Statement {
 	// next
 
 	return &AssignVar{Name: n}
+}
+
+func (p *Parser) parseParameter() []*VariableDef {
+	vs := []*VariableDef{}
+	p.pos++
+	n := p.peekToken()
+	for n.IsTypeToken() {
+		p.pos++
+		n = p.peekToken()
+	}
+
+	if n.tokenType != rparen {
+		return nil
+	}
+
+	if p.curToken().tokenType == word {
+		id := p.curToken().literal
+		vs = append(vs, &VariableDef{Name: id})
+	} else if p.curToken().tokenType == keyVoid {
+		// 何もしない
+	} else {
+		return nil
+	}
+
+	p.pos++
+	p.pos++
+	// next
+
+	return vs
 }
 
 func (p *Parser) skipTypedef() {

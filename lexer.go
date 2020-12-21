@@ -65,6 +65,7 @@ const (
 	keyStruct
 	keyEnum
 	keyAttribute
+	keyVoid
 	comment
 	illegal
 )
@@ -349,6 +350,8 @@ func (l *Lexer) determineKeyword(w string) *Token {
 		return &Token{tokenType: keyEnum, literal: w}
 	} else if strings.Compare("__attribute__", w) == 0 {
 		return &Token{tokenType: keyAttribute, literal: w}
+	} else if strings.Compare("void", w) == 0 {
+		return &Token{tokenType: keyVoid, literal: w}
 	} else {
 		return &Token{tokenType: word, literal: w}
 	}
@@ -367,5 +370,5 @@ func isDec(c byte) bool {
 }
 
 func (t *Token) IsTypeToken() bool {
-	return (t.tokenType == word || t.tokenType == asterisk || t.tokenType == keyConst || t.tokenType == keyAttribute)
+	return (t.tokenType == word || t.tokenType == asterisk || t.tokenType == keyConst || t.tokenType == keyAttribute || t.tokenType == keyVoid)
 }
