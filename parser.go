@@ -327,9 +327,6 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 
 	// 引数のパース
 	ps := p.parseParameter()
-	if ps == nil {
-		return p.updateInvalid(s, errMsg)
-	}
 
 	// lbrace かチェック
 	if p.curToken().tokenType != lbrace {
@@ -421,23 +418,27 @@ func (p *Parser) parseAssignVar(s Statement) Statement {
 func (p *Parser) parseParameter() []*VariableDef {
 	vs := []*VariableDef{}
 	p.pos++
+
 	n := p.peekToken()
-	for n.IsTypeToken() {
-		p.pos++
-		n = p.peekToken()
-	}
+	for {
+		for n.IsTypeToken() {
+			p.pos++
+			n = p.peekToken()
+		}
 
-	if n.tokenType != rparen {
-		return nil
-	}
+		if p.curToken().tokenType == word {
+			id := p.curToken().literal
+			vs = append(vs, &VariableDef{Name: id})
+		} else if p.curToken().tokenType == keyVoid {
+			// 何もしない
+		}
 
-	if p.curToken().tokenType == word {
-		id := p.curToken().literal
-		vs = append(vs, &VariableDef{Name: id})
-	} else if p.curToken().tokenType == keyVoid {
-		// 何もしない
-	} else {
-		return nil
+		if n.tokenType == rparen {
+			break
+		} else if n.tokenType == comma {
+			p.pos++
+			n = p.peekToken()
+		}
 	}
 
 	p.pos++

@@ -353,6 +353,20 @@ void whsxks(int a) {
 				},
 			},
 		},
+		{
+			"function def 6",
+			`
+void haraheri(int a, char *b) {
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "haraheri",
+						Params: []*VariableDef{{Name: "a"}, {Name: "b"}},
+						Block:  &BlockStatement{Statements: []Statement{}}},
+				},
+			},
+		},
 
 		{
 			"testx",
@@ -375,14 +389,16 @@ int func(int a)
 `,
 			&Module{
 				[]Statement{
-					&FunctionDef{Name: "func", Block: &BlockStatement{Statements: []Statement{
-						&VariableDef{Name: "hoge"},
-						&RefVar{Name: "hoge"},
-						&AssignVar{Name: "a"},
-						&RefVar{Name: "a"},
-						&RefVar{Name: "a"},
-					},
-					},
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{{Name: "a"}},
+						Block: &BlockStatement{Statements: []Statement{
+							&VariableDef{Name: "hoge"},
+							&RefVar{Name: "hoge"},
+							&AssignVar{Name: "a"},
+							&RefVar{Name: "a"},
+							&RefVar{Name: "a"},
+						},
+						},
 					},
 				},
 			},
