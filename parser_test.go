@@ -12,7 +12,7 @@ func TestParse(t *testing.T) {
 		expect  *Module
 	}{
 		{
-			"test1",
+			"variable definition 1",
 			`
 int hoge;
 `,
@@ -23,17 +23,7 @@ int hoge;
 			},
 		},
 		{
-			"test2",
-			`
-extern char fuga;`,
-			&Module{
-				[]Statement{
-					&VariableDecl{Name: "fuga"},
-				},
-			},
-		},
-		{
-			"test3",
+			"variable definition 2",
 			`
 const int *hoge;
 `,
@@ -44,18 +34,7 @@ const int *hoge;
 			},
 		},
 		{
-			"test4",
-			`
-extern const int *hoge;
-`,
-			&Module{
-				[]Statement{
-					&VariableDecl{Name: "hoge"},
-				},
-			},
-		},
-		{
-			"test5",
+			"variable definition 3",
 			`
 int hoge = 100;
 `,
@@ -66,7 +45,7 @@ int hoge = 100;
 			},
 		},
 		{
-			"test6",
+			"variable definition 4",
 			`
 int hoge[] = {0x00, 0x01, 0x02};
 `,
@@ -77,7 +56,7 @@ int hoge[] = {0x00, 0x01, 0x02};
 			},
 		},
 		{
-			"test7",
+			"variable definition 5",
 			`
 int hoge[3] = {0x00, 0x01, 0x02};
 `,
@@ -88,7 +67,7 @@ int hoge[3] = {0x00, 0x01, 0x02};
 			},
 		},
 		{
-			"test8",
+			"variable definition 6",
 			`
 char hoge[] = "hello";
 `,
@@ -99,7 +78,7 @@ char hoge[] = "hello";
 			},
 		},
 		{
-			"variable definition 9",
+			"variable definition 7",
 			`
 int hoge = 0;
 `,
@@ -109,7 +88,27 @@ int hoge = 0;
 				},
 			},
 		},
-
+		{
+			"variable decl 1",
+			`
+extern char fuga;`,
+			&Module{
+				[]Statement{
+					&VariableDecl{Name: "fuga"},
+				},
+			},
+		},
+		{
+			"variable decl 2",
+			`
+extern const int *hoge;
+`,
+			&Module{
+				[]Statement{
+					&VariableDecl{Name: "hoge"},
+				},
+			},
+		},
 		{
 			"prototype dec 1",
 			`
