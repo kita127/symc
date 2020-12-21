@@ -338,7 +338,7 @@ int muruchi_piyomi(char *s) {
   purin.aaa = 100;
   purin.bbb.xxx = 'A';
   p = &purin;
-  p->aaa = 200;
+  p->aaa = purin.aaa + 200;
   return (0);
 }
 `,
@@ -354,6 +354,7 @@ int muruchi_piyomi(char *s) {
 							&AssignVar{Name: "p"},
 							&RefVar{Name: "purin"},
 							&AssignVar{Name: "p->aaa"},
+							&RefVar{Name: "purin.aaa"},
 						}}},
 				},
 			},

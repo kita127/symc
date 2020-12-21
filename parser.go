@@ -384,9 +384,7 @@ func (p *Parser) parseRefVar(s Statement) Statement {
 	if p.curToken().tokenType != word {
 		return p.updateInvalid(s, errMsg)
 	}
-	n := p.curToken().literal
-	p.pos++
-	// next
+	n := p.fetchID()
 
 	return &RefVar{Name: n}
 }
