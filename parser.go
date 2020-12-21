@@ -310,6 +310,9 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 	n := p.peekToken()
 	for n.IsTypeToken() {
 		p.pos++
+		if p.curToken().tokenType == keyAttribute {
+			p.skipParen()
+		}
 		n = p.peekToken()
 	}
 	if n.tokenType != lparen {
@@ -484,10 +487,9 @@ func (p *Parser) skipParen() {
 		if p.curToken().tokenType == lparen {
 			p.pos++
 			p.skipParen()
-		} else if p.curToken().tokenType == rparen {
 			p.pos++
 			return
-		} else if p.curToken().tokenType == eof {
+		} else if p.curToken().tokenType == rparen {
 			return
 		} else {
 			p.pos++

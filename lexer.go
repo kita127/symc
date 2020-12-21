@@ -64,7 +64,7 @@ const (
 	keyUnion
 	keyStruct
 	keyEnum
-    keyAttribute
+	keyAttribute
 	comment
 	illegal
 )
@@ -367,5 +367,5 @@ func isDec(c byte) bool {
 }
 
 func (t *Token) IsTypeToken() bool {
-	return (t.tokenType == word || t.tokenType == asterisk || t.tokenType == keyConst)
+	return (t.tokenType == word || t.tokenType == asterisk || t.tokenType == keyConst || t.tokenType == keyAttribute)
 }

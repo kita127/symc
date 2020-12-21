@@ -247,6 +247,26 @@ __attribute__((__availability__(swift, unavailable, message="Use mkstemp(3) inst
 			},
 		},
 		{
+			"attribute 4",
+			`
+__attribute__ ((__always_inline__))
+`,
+			&Module{
+				[]Statement{},
+			},
+		},
+		{
+			"attribute 5",
+			`
+__attribute__ ((__always_inline__)) int hoge;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
 			"function def 1",
 			`
 void func_a( void ) {}
@@ -279,6 +299,18 @@ int func(int a)
 					},
 					},
 					},
+				},
+			},
+		},
+		{
+			"function def 3",
+			`
+inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "__sputc", Block: &BlockStatement{Statements: []Statement{}}},
 				},
 			},
 		},
