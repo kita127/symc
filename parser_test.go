@@ -388,7 +388,27 @@ void haraheri(int a, char *b, unsigned char s[]) {
 				},
 			},
 		},
-
+		{
+			"function def 7",
+			`
+void hoge(void){
+  _p->_p++ = _c;
+  _p->_p-- = _c;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "hoge",
+						Params: []*VariableDef{},
+						Block: &BlockStatement{Statements: []Statement{
+							&AssignVar{Name: "_p->_p"},
+							&RefVar{Name: "_c"},
+							&AssignVar{Name: "_p->_p"},
+							&RefVar{Name: "_c"},
+						}}},
+				},
+			},
+		},
 		{
 			"testx",
 			`

@@ -402,12 +402,37 @@ func (p *Parser) parseAssignVar(s Statement) Statement {
 
 	n := p.fetchID()
 
-	if p.curToken().tokenType != assign {
+	switch p.curToken().tokenType {
+	case plus:
+		if p.peekToken().tokenType == plus {
+			p.pos++
+			p.pos++
+			if p.curToken().tokenType != assign {
+				return p.updateInvalid(s, errMsg)
+			}
+			p.pos++
+			// next
+		} else {
+			return p.updateInvalid(s, errMsg)
+		}
+	case minus:
+		if p.peekToken().tokenType == minus {
+			p.pos++
+			p.pos++
+			if p.curToken().tokenType != assign {
+				return p.updateInvalid(s, errMsg)
+			}
+			p.pos++
+			// next
+		} else {
+			return p.updateInvalid(s, errMsg)
+		}
+	case assign:
+		p.pos++
+		// next
+	default:
 		return p.updateInvalid(s, errMsg)
 	}
-
-	p.pos++
-	// next
 
 	return &AssignVar{Name: n}
 }
