@@ -438,6 +438,9 @@ func (p *Parser) parseParameter() []*VariableDef {
 		} else if n.tokenType == comma {
 			p.pos++
 			n = p.peekToken()
+		} else if n.tokenType == lbracket {
+			p.progUntil(rbracket)
+			n = p.peekToken()
 		}
 	}
 

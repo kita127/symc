@@ -362,13 +362,13 @@ void whsxks(int a) {
 		{
 			"function def 6",
 			`
-void haraheri(int a, char *b) {
+void haraheri(int a, char *b, unsigned char s[]) {
 }
 `,
 			&Module{
 				[]Statement{
 					&FunctionDef{Name: "haraheri",
-						Params: []*VariableDef{{Name: "a"}, {Name: "b"}},
+						Params: []*VariableDef{{Name: "a"}, {Name: "b"}, {Name: "s"}},
 						Block:  &BlockStatement{Statements: []Statement{}}},
 				},
 			},
