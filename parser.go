@@ -402,9 +402,8 @@ func (p *Parser) parseAssignVar(s Statement) Statement {
 		return p.updateInvalid(s, errMsg)
 	}
 
-	n := p.curToken().literal
+	n := p.fetchID()
 
-	p.pos++
 	if p.curToken().tokenType != assign {
 		return p.updateInvalid(s, errMsg)
 	}
@@ -530,4 +529,17 @@ func (p *Parser) skipParen() {
 			p.pos++
 		}
 	}
+}
+
+func (p *Parser) fetchID() string {
+
+	id := ""
+	for {
+		id += p.curToken().literal
+		p.pos++
+		if p.curToken().tokenType != period && p.curToken().tokenType != word {
+			break
+		}
+	}
+	return id
 }

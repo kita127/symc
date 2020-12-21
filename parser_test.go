@@ -331,6 +331,7 @@ typedef struct {
 
 int muruchi_piyomi(char *s) {
   St purin;
+  purin.aaa = 100;
   return (0);
 }
 `,
@@ -340,6 +341,7 @@ int muruchi_piyomi(char *s) {
 						Params: []*VariableDef{{Name: "s"}},
 						Block: &BlockStatement{Statements: []Statement{
 							&VariableDef{Name: "purin"},
+							&AssignVar{Name: "purin.aaa"},
 						}}},
 				},
 			},
