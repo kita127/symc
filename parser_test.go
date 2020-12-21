@@ -314,6 +314,28 @@ inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
 			},
 		},
 		{
+			"function def 4",
+			`
+
+typedef struct {
+  int aaa;
+  int bbb;
+} St;
+
+int muruchi_piyomi(char *s) {
+  St purin;
+  return (0);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "muruchi_piyomi", Block: &BlockStatement{Statements: []Statement{
+						&VariableDef{Name: "purin"},
+					}}},
+				},
+			},
+		},
+		{
 			"testx",
 			`
 # 1 "hoge.c"
