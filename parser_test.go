@@ -279,65 +279,71 @@ void func_a( void ) {}
 				},
 			},
 		},
-		//		{
-		//			"function def 2",
-		//			`
-		//int func(int a)
-		//{
-		//    int hoge = 0;
-		//    hoge++;
-		//    a = a + (10);
-		//    return a;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func", Block: &BlockStatement{Statements: []Statement{
-		//						&VariableDef{Name: "hoge"},
-		//						&RefVar{Name: "hoge"},
-		//						&AssignVar{Name: "a"},
-		//						&RefVar{Name: "a"},
-		//						&RefVar{Name: "a"},
-		//					},
-		//					},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 3",
-		//			`
-		//inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "__sputc", Block: &BlockStatement{Statements: []Statement{}}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 4",
-		//			`
-		//
-		//typedef struct {
-		//  int aaa;
-		//  int bbb;
-		//} St;
-		//
-		//int muruchi_piyomi(char *s) {
-		//  St purin;
-		//  return (0);
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "muruchi_piyomi", Block: &BlockStatement{Statements: []Statement{
-		//						&VariableDef{Name: "purin"},
-		//					}}},
-		//				},
-		//			},
-		//		},
+		{
+			"function def 2",
+			`
+		int func(int a)
+		{
+		    int hoge = 0;
+		    hoge++;
+		    a = a + (10);
+		    return a;
+		}
+		`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{{Name: "a"}},
+						Block: &BlockStatement{Statements: []Statement{
+							&VariableDef{Name: "hoge"},
+							&RefVar{Name: "hoge"},
+							&AssignVar{Name: "a"},
+							&RefVar{Name: "a"},
+							&RefVar{Name: "a"},
+						},
+						},
+					},
+				},
+			},
+		},
+		{
+			"function def 3",
+			`
+		inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
+		}
+		`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "__sputc",
+						Params: []*VariableDef{{Name: "_c"}, {Name: "_p"}},
+						Block:  &BlockStatement{Statements: []Statement{}}},
+				},
+			},
+		},
+		{
+			"function def 4",
+			`
+		
+		typedef struct {
+		  int aaa;
+		  int bbb;
+		} St;
+		
+		int muruchi_piyomi(char *s) {
+		  St purin;
+		  return (0);
+		}
+		`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "muruchi_piyomi",
+						Params: []*VariableDef{{Name: "s"}},
+						Block: &BlockStatement{Statements: []Statement{
+							&VariableDef{Name: "purin"},
+						}}},
+				},
+			},
+		},
 
 		{
 			"function def 5",
