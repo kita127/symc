@@ -173,12 +173,7 @@ func (p *Parser) parseBlockStatementSub() Statement {
 	var s Statement = &InvalidStatement{Contents: "parse"}
 	p.prevPos = p.pos
 	switch p.curToken().tokenType {
-	case keyExtern:
-		s = p.parsePrototypeDecl(s)
-		s = p.parseVariableDecl(s)
 	default:
-		s = p.parseFunctionDef(s)
-		s = p.parsePrototypeDecl(s)
 		s = p.parseVariableDef(s)
 		s = p.parseAccessVar(s)
 	}
