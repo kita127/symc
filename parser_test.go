@@ -306,144 +306,144 @@ int func(int a)
 				},
 			},
 		},
-//		{
-//			"function def 3",
-//			`
-//inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
-//}
-//`,
-//			&Module{
-//				[]Statement{
-//					&FunctionDef{Name: "__sputc",
-//						Params: []*VariableDef{{Name: "_c"}, {Name: "_p"}},
-//						Block:  &BlockStatement{Statements: []Statement{}}},
-//				},
-//			},
-//		},
-//		{
-//			"function def 4",
-//			`
-//typedef struct {
-//  char xxx;
-//} Gt;
-//
-//typedef struct {
-//  int aaa;
-//  Gt bbb;
-//} St;
-//
-//int muruchi_piyomi(char *s) {
-//  St purin;
-//  St *p;
-//  purin.aaa = 100;
-//  purin.bbb.xxx = 'A';
-//  p = &purin;
-//  p->aaa = purin.aaa + 200;
-//  return (0);
-//}
-//`,
-//			&Module{
-//				[]Statement{
-//					&FunctionDef{Name: "muruchi_piyomi",
-//						Params: []*VariableDef{{Name: "s"}},
-//						Block: &BlockStatement{Statements: []Statement{
-//							&VariableDef{Name: "purin"},
-//							&VariableDef{Name: "p"},
-//							&AssignVar{Name: "purin.aaa"},
-//							&AssignVar{Name: "purin.bbb.xxx"},
-//							&AssignVar{Name: "p"},
-//							&RefVar{Name: "purin"},
-//							&AssignVar{Name: "p->aaa"},
-//							&RefVar{Name: "purin.aaa"},
-//						}}},
-//				},
-//			},
-//		},
-//
-//		{
-//			"function def 5",
-//			`
-//void whsxks(int a) {
-//}
-//`,
-//			&Module{
-//				[]Statement{
-//					&FunctionDef{Name: "whsxks",
-//						Params: []*VariableDef{{Name: "a"}},
-//						Block:  &BlockStatement{Statements: []Statement{}}},
-//				},
-//			},
-//		},
-//		{
-//			"function def 6",
-//			`
-//void haraheri(int a, char *b, unsigned char s[]) {
-//}
-//`,
-//			&Module{
-//				[]Statement{
-//					&FunctionDef{Name: "haraheri",
-//						Params: []*VariableDef{{Name: "a"}, {Name: "b"}, {Name: "s"}},
-//						Block:  &BlockStatement{Statements: []Statement{}}},
-//				},
-//			},
-//		},
-//		{
-//			"function def 7",
-//			`
-//void hoge(void){
-//  _p->_p++ = _c;
-//  _p->_p-- = _c;
-//}
-//`,
-//			&Module{
-//				[]Statement{
-//					&FunctionDef{Name: "hoge",
-//						Params: []*VariableDef{},
-//						Block: &BlockStatement{Statements: []Statement{
-//							&AssignVar{Name: "_p->_p"},
-//							&RefVar{Name: "_c"},
-//							&AssignVar{Name: "_p->_p"},
-//							&RefVar{Name: "_c"},
-//						}}},
-//				},
-//			},
-//		},
-//		{
-//			"testx",
-//			`
-//# 1 "hoge.c"
-//# 1 "<built-in>" 1
-//# 1 "<built-in>" 3
-//# 366 "<built-in>" 3
-//# 1 "<command line>" 1
-//# 1 "<built-in>" 2
-//# 1 "hoge.c" 2
-//
-//int func(int a)
-//{
-//    int hoge = 0;
-//    hoge++;
-//    a = a + (10);
-//    return a;
-//}
-//`,
-//			&Module{
-//				[]Statement{
-//					&FunctionDef{Name: "func",
-//						Params: []*VariableDef{{Name: "a"}},
-//						Block: &BlockStatement{Statements: []Statement{
-//							&VariableDef{Name: "hoge"},
-//							&RefVar{Name: "hoge"},
-//							&AssignVar{Name: "a"},
-//							&RefVar{Name: "a"},
-//							&RefVar{Name: "a"},
-//						},
-//						},
-//					},
-//				},
-//			},
-//		},
+		{
+			"function def 3",
+			`
+inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "__sputc",
+						Params: []*VariableDef{{Name: "_c"}, {Name: "_p"}},
+						Block:  &BlockStatement{Statements: []Statement{}}},
+				},
+			},
+		},
+		{
+			"function def 4",
+			`
+typedef struct {
+  char xxx;
+} Gt;
+
+typedef struct {
+  int aaa;
+  Gt bbb;
+} St;
+
+int muruchi_piyomi(char *s) {
+  St purin;
+  St *p;
+  purin.aaa = 100;
+  purin.bbb.xxx = 'A';
+  p = &purin;
+  p->aaa = purin.aaa + 200;
+  return (0);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "muruchi_piyomi",
+						Params: []*VariableDef{{Name: "s"}},
+						Block: &BlockStatement{Statements: []Statement{
+							&VariableDef{Name: "purin"},
+							&VariableDef{Name: "p"},
+							&AccessVar{Name: "purin.aaa"},
+							&AccessVar{Name: "purin.bbb.xxx"},
+							&AccessVar{Name: "p"},
+							&AccessVar{Name: "purin"},
+							&AccessVar{Name: "p->aaa"},
+							&AccessVar{Name: "purin.aaa"},
+						}}},
+				},
+			},
+		},
+
+		{
+			"function def 5",
+			`
+void whsxks(int a) {
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "whsxks",
+						Params: []*VariableDef{{Name: "a"}},
+						Block:  &BlockStatement{Statements: []Statement{}}},
+				},
+			},
+		},
+		{
+			"function def 6",
+			`
+void haraheri(int a, char *b, unsigned char s[]) {
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "haraheri",
+						Params: []*VariableDef{{Name: "a"}, {Name: "b"}, {Name: "s"}},
+						Block:  &BlockStatement{Statements: []Statement{}}},
+				},
+			},
+		},
+		{
+			"function def 7",
+			`
+void hoge(void){
+  _p->_p++ = _c;
+  _p->_p-- = _c;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "hoge",
+						Params: []*VariableDef{},
+						Block: &BlockStatement{Statements: []Statement{
+							&AccessVar{Name: "_p->_p"},
+							&AccessVar{Name: "_c"},
+							&AccessVar{Name: "_p->_p"},
+							&AccessVar{Name: "_c"},
+						}}},
+				},
+			},
+		},
+		{
+			"testx",
+			`
+# 1 "hoge.c"
+# 1 "<built-in>" 1
+# 1 "<built-in>" 3
+# 366 "<built-in>" 3
+# 1 "<command line>" 1
+# 1 "<built-in>" 2
+# 1 "hoge.c" 2
+
+int func(int a)
+{
+    int hoge = 0;
+    hoge++;
+    a = a + (10);
+    return a;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{{Name: "a"}},
+						Block: &BlockStatement{Statements: []Statement{
+							&VariableDef{Name: "hoge"},
+							&AccessVar{Name: "hoge"},
+							&AccessVar{Name: "a"},
+							&AccessVar{Name: "a"},
+							&AccessVar{Name: "a"},
+						},
+						},
+					},
+				},
+			},
+		},
 		//		{
 		//			"test err1",
 		//			`int hoge`,
