@@ -90,22 +90,13 @@ func (v *BlockStatement) String() string {
 	return s
 }
 
-type RefVar struct {
+type AccessVar struct {
 	Name string
 }
 
-func (v *RefVar) statementNode() {}
-func (v *RefVar) String() string {
-	return fmt.Sprintf("RefVar : Name=%s", v.Name)
-}
-
-type AssignVar struct {
-	Name string
-}
-
-func (v *AssignVar) statementNode() {}
-func (v *AssignVar) String() string {
-	return fmt.Sprintf("AssignVar : Name=%s", v.Name)
+func (v *AccessVar) statementNode() {}
+func (v *AccessVar) String() string {
+	return fmt.Sprintf("AccessVar : Name=%s", v.Name)
 }
 
 type Typedef struct {
@@ -189,8 +180,7 @@ func (p *Parser) parseBlockStatementSub() Statement {
 		s = p.parseFunctionDef(s)
 		s = p.parsePrototypeDecl(s)
 		s = p.parseVariableDef(s)
-		s = p.parseAssignVar(s)
-		s = p.parseRefVar(s)
+		s = p.parseAccessVar(s)
 	}
 	return s
 }
@@ -375,66 +365,18 @@ func (p *Parser) parseBlockStatement(s Statement) Statement {
 	return &BlockStatement{ss}
 }
 
-func (p *Parser) parseRefVar(s Statement) Statement {
+func (p *Parser) parseAccessVar(s Statement) Statement {
 	if _, invalid := s.(*InvalidStatement); !invalid {
 		// 既に解析済みの場合はリターン
 		return s
 	}
-	errMsg := "err parse ref var"
+	errMsg := "err parse access var"
 	if p.curToken().tokenType != word {
 		return p.updateInvalid(s, errMsg)
 	}
 	n := p.fetchID()
 
-	return &RefVar{Name: n}
-}
-
-func (p *Parser) parseAssignVar(s Statement) Statement {
-	if _, invalid := s.(*InvalidStatement); !invalid {
-		// 既に解析済みの場合はリターン
-		return s
-	}
-	errMsg := "err parse assign var"
-
-	if p.curToken().tokenType != word {
-		return p.updateInvalid(s, errMsg)
-	}
-
-	n := p.fetchID()
-
-	switch p.curToken().tokenType {
-	case plus:
-		if p.peekToken().tokenType == plus {
-			p.pos++
-			p.pos++
-			if p.curToken().tokenType != assign {
-				return p.updateInvalid(s, errMsg)
-			}
-			p.pos++
-			// next
-		} else {
-			return p.updateInvalid(s, errMsg)
-		}
-	case minus:
-		if p.peekToken().tokenType == minus {
-			p.pos++
-			p.pos++
-			if p.curToken().tokenType != assign {
-				return p.updateInvalid(s, errMsg)
-			}
-			p.pos++
-			// next
-		} else {
-			return p.updateInvalid(s, errMsg)
-		}
-	case assign:
-		p.pos++
-		// next
-	default:
-		return p.updateInvalid(s, errMsg)
-	}
-
-	return &AssignVar{Name: n}
+	return &AccessVar{Name: n}
 }
 
 func (p *Parser) parseParameter() []*VariableDef {
