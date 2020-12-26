@@ -135,9 +135,6 @@ func (p *Parser) parseModule() *Module {
 		}
 		if s := p.parseStatement(); s != nil {
 			ss = append(ss, s)
-			if _, invalid := s.(*InvalidStatement); invalid {
-				break
-			}
 		}
 	}
 	m := &Module{ss}
@@ -145,71 +142,80 @@ func (p *Parser) parseModule() *Module {
 }
 
 func (p *Parser) parseStatement() Statement {
-	var s Statement = &InvalidStatement{Contents: "parse"}
+	var s Statement = nil
 	p.prevPos = p.pos
 	switch p.curToken().tokenType {
 	case keyTypedef:
 		p.skipTypedef()
-		s = nil
 	case keyExtern:
-		s = p.parsePrototypeDecl(s)
-		s = p.parseVariableDecl(s)
+		if s == nil {
+			s = p.parsePrototypeDecl()
+		}
+		if s == nil {
+			s = p.parseVariableDecl()
+		}
 	case keyStruct:
 		p.skipStruct()
-		s = nil
 	case keyAttribute:
 		p.pos++
 		p.skipParen()
-		s = nil
 	default:
-		s = p.parseFunctionDef(s)
-		s = p.parsePrototypeDecl(s)
-		s = p.parseVariableDef(s)
+		if s == nil {
+			s = p.parseFunctionDef()
+		}
+		if s == nil {
+			s = p.parsePrototypeDecl()
+		}
+		if s == nil {
+			s = p.parseVariableDef()
+		}
 	}
 	return s
 }
 
 func (p *Parser) parseBlockStatementSub() Statement {
-	var s Statement = &InvalidStatement{Contents: "parse"}
+	var s Statement = nil
 	p.prevPos = p.pos
 	switch p.curToken().tokenType {
 	default:
-		s = p.parseVariableDef(s)
-		s = p.parseAccessVar(s)
+		if s == nil {
+			s = p.parseVariableDef()
+		}
+		if s == nil {
+			s = p.parseAccessVar()
+		}
 	}
 	return s
 }
 
-func (p *Parser) parseVariableDef(s Statement) Statement {
-	if _, invalid := s.(*InvalidStatement); !invalid {
-		// 既に解析済みの場合はリターン
-		return s
-	}
-	errMsg := "err parse variable def"
-
+func (p *Parser) parseVariableDef() Statement {
 	// semicolon or assign or lbracket or eof の手前まで pos を進める
 	typeCnt := 0
 	n := p.peekToken()
 	for n.tokenType != semicolon && n.tokenType != assign && n.tokenType != lbracket && n.tokenType != eof {
 		// 現在トークンが識別子もしくは型に関するかチェック
 		if !p.curToken().IsTypeToken() {
-			return p.updateInvalid(s, errMsg)
+			p.posReset()
+			return nil
 		}
 		typeCnt++
 		p.pos++
 		n = p.peekToken()
 	}
 	if n.tokenType == eof {
-		return p.updateInvalid(s, errMsg)
+		p.posReset()
+		return nil
 	}
 
 	if !p.curToken().IsTypeToken() {
-		return p.updateInvalid(s, errMsg)
+		p.posReset()
+		return nil
 	}
 	typeCnt++
 
 	if typeCnt <= 1 {
-		return p.updateInvalid(s, errMsg)
+		p.posReset()
+		return nil
 	}
 
 	// Name
@@ -229,16 +235,13 @@ func (p *Parser) parseVariableDef(s Statement) Statement {
 		p.pos++
 		// next
 	default:
-		return p.updateInvalid(s, errMsg)
+		p.posReset()
+		return nil
 	}
 	return &VariableDef{Name: id}
 }
 
-func (p *Parser) parseVariableDecl(s Statement) Statement {
-	if _, invalid := s.(*InvalidStatement); !invalid {
-		// 既に解析済みの場合はリターン
-		return s
-	}
+func (p *Parser) parseVariableDecl() Statement {
 	// セミコロンの手前まで pos を進める
 	for p.peekToken().tokenType != semicolon {
 		p.pos++
@@ -253,25 +256,21 @@ func (p *Parser) parseVariableDecl(s Statement) Statement {
 	return &VariableDecl{Name: id}
 }
 
-func (p *Parser) parsePrototypeDecl(s Statement) Statement {
-	if _, invalid := s.(*InvalidStatement); !invalid {
-		// 既に解析済みの場合はリターン
-		return s
-	}
-	errMsg := "err parse prototype decl"
-
+func (p *Parser) parsePrototypeDecl() Statement {
 	n := p.peekToken()
 	for n.tokenType != lparen {
 		// 現在トークンが識別子もしくは型に関するかチェック
 		if !p.curToken().IsTypeToken() && p.curToken().tokenType != keyExtern {
-			return p.updateInvalid(s, errMsg)
+			p.posReset()
+			return nil
 		}
 		p.pos++
 		n = p.peekToken()
 	}
 
 	if !p.curToken().IsTypeToken() {
-		return p.updateInvalid(s, errMsg)
+		p.posReset()
+		return nil
 	}
 
 	// Name
@@ -285,13 +284,7 @@ func (p *Parser) parsePrototypeDecl(s Statement) Statement {
 
 }
 
-func (p *Parser) parseFunctionDef(s Statement) Statement {
-	if _, invalid := s.(*InvalidStatement); !invalid {
-		// 既に解析済みの場合はリターン
-		return s
-	}
-	errMsg := "err parse function def"
-
+func (p *Parser) parseFunctionDef() Statement {
 	// lparen or eof の手前まで pos を進める
 	n := p.peekToken()
 	for n.IsTypeToken() {
@@ -302,7 +295,8 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 		n = p.peekToken()
 	}
 	if n.tokenType != lparen {
-		return p.updateInvalid(s, errMsg)
+		p.posReset()
+		return nil
 	}
 
 	// Name
@@ -315,29 +309,21 @@ func (p *Parser) parseFunctionDef(s Statement) Statement {
 
 	// lbrace かチェック
 	if p.curToken().tokenType != lbrace {
-		return p.updateInvalid(s, errMsg)
+		p.posReset()
+		return nil
 	}
 
-	x := p.parseBlockStatement(&InvalidStatement{Contents: "parse"})
+	x := p.parseBlockStatement()
 
-	switch x.(type) {
-	case *BlockStatement:
-		b, _ := x.(*BlockStatement)
+	if b, ok := x.(*BlockStatement); ok {
 		return &FunctionDef{Name: id, Params: ps, Block: b}
-	case *InvalidStatement:
-		v, _ := x.(*InvalidStatement)
-		return p.updateInvalid(s, errMsg+v.Contents)
-	default:
-		return p.updateInvalid(s, errMsg)
+	} else {
+		p.posReset()
+		return nil
 	}
 }
 
-func (p *Parser) parseBlockStatement(s Statement) Statement {
-	if _, invalid := s.(*InvalidStatement); !invalid {
-		// 既に解析済みの場合はリターン
-		return s
-	}
-	errMsg := "err parse block"
+func (p *Parser) parseBlockStatement() Statement {
 	// lbrace の次へ
 	p.pos++
 
@@ -346,9 +332,6 @@ func (p *Parser) parseBlockStatement(s Statement) Statement {
 		if p.curToken().IsTypeToken() {
 			s := p.parseBlockStatementSub()
 			ss = append(ss, s)
-			if _, invalid := s.(*InvalidStatement); invalid {
-				return p.updateInvalid(s, errMsg)
-			}
 		} else {
 			// パース対象外のトークンの場合はスキップする
 			p.pos++
@@ -360,14 +343,10 @@ func (p *Parser) parseBlockStatement(s Statement) Statement {
 	return &BlockStatement{ss}
 }
 
-func (p *Parser) parseAccessVar(s Statement) Statement {
-	if _, invalid := s.(*InvalidStatement); !invalid {
-		// 既に解析済みの場合はリターン
-		return s
-	}
-	errMsg := "err parse access var"
+func (p *Parser) parseAccessVar() Statement {
 	if p.curToken().tokenType != word {
-		return p.updateInvalid(s, errMsg)
+		p.posReset()
+		return nil
 	}
 	n := p.fetchID()
 
@@ -454,20 +433,6 @@ func (p *Parser) progUntilPrev(tkType int) {
 
 func (p *Parser) posReset() {
 	p.pos = p.prevPos
-}
-
-func (p *Parser) updateInvalid(s Statement, msg string) Statement {
-	var invs *InvalidStatement
-	var b bool
-
-	i := &InvalidStatement{Contents: "updateInvalid err"}
-	if invs, b = s.(*InvalidStatement); b {
-		invs.Contents += ", " + msg
-		invs.Tk = p.curToken()
-		i = invs
-	}
-	p.posReset()
-	return i
 }
 
 func (p *Parser) skipStruct() {
