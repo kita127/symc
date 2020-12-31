@@ -299,25 +299,6 @@ void func(int a)
 			},
 		},
 		{
-			"function def 3",
-			`
-void func(int a)
-{
-    {
-        {}
-    }
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{},
-					},
-				},
-			},
-		},
-		{
 			"function def 4",
 			`
 void func(int a)
@@ -410,6 +391,24 @@ void func(int a)
 void func(int a)
 {
     (hoge) = (fuga);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 10",
+			`
+void func(int a)
+{
+    hoge = 10;
+    fuga = 20;
 }
 `,
 			&Module{

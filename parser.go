@@ -329,28 +329,32 @@ func (p *Parser) parseFunctionDef() Statement {
 
 func (p *Parser) parseBlockStatement() []Statement {
 	p.pos++
-	p.prevPos = p.pos
 
 	var ss []Statement = nil
 
-	switch p.curToken().tokenType {
-	case lbrace:
-		ss = append(ss, p.parseBlockStatement()...)
-	case word:
-		if ss == nil {
-			if s := p.parseVariableDef(); s != nil {
-				ss = append(ss, s)
+	for p.curToken().tokenType != rbrace {
+		var ts []Statement = nil
+		p.prevPos = p.pos
+		switch p.curToken().tokenType {
+		case lbrace:
+			ts = append(ts, p.parseBlockStatement()...)
+		case word:
+			if ts == nil {
+				if s := p.parseVariableDef(); s != nil {
+					ts = append(ts, s)
+				}
+			}
+			if ts == nil {
+				// other statement
+				ts = p.parseExpressionStatement()
+			}
+		case lparen:
+			if ts == nil {
+				// other statement
+				ts = p.parseExpressionStatement()
 			}
 		}
-		if ss == nil {
-			// other statement
-			ss = p.parseExpressionStatement()
-		}
-	case lparen:
-		if ss == nil {
-			// other statement
-			ss = p.parseExpressionStatement()
-		}
+		ss = append(ss, ts...)
 	}
 
 	if ss == nil {
@@ -362,7 +366,6 @@ func (p *Parser) parseBlockStatement() []Statement {
 
 	return ss
 }
-
 
 func (p *Parser) parseExpressionStatement() []Statement {
 	var ss []Statement = nil
