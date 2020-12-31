@@ -370,6 +370,13 @@ func (p *Parser) parseParameter() []*VariableDef {
 	vs := []*VariableDef{}
 	p.pos++
 
+	if p.curToken().tokenType == rparen {
+		// パラメータになにもなし
+		p.pos++
+		// next
+		return vs
+	}
+
 	n := p.peekToken()
 	for {
 		for n.IsTypeToken() {

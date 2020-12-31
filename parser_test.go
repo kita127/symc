@@ -285,7 +285,6 @@ void func_a( void ) {}
 void func(int a)
 {
     hoge;
-    fuga = 100;
 }
 `,
 			&Module{
@@ -294,7 +293,6 @@ void func(int a)
 						Params: []*VariableDef{{Name: "a"}},
 						Block: &BlockStatement{Statements: []Statement{
 							&AccessVar{Name: "hoge"},
-							&AccessVar{Name: "fuga"},
 						},
 						},
 					},
@@ -311,6 +309,21 @@ inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
 				[]Statement{
 					&FunctionDef{Name: "__sputc",
 						Params: []*VariableDef{{Name: "_c"}, {Name: "_p"}},
+						Block:  &BlockStatement{Statements: []Statement{}}},
+				},
+			},
+		},
+		{
+			"function def 4",
+			`
+void func()
+{
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
 						Block:  &BlockStatement{Statements: []Statement{}}},
 				},
 			},
