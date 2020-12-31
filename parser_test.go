@@ -407,6 +407,7 @@ void func(int a)
 			`
 void func(int a)
 {
+    unsigned char aaa;
     hoge = 10;
     fuga = 20;
 }
@@ -415,7 +416,7 @@ void func(int a)
 				[]Statement{
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+						Statements: []Statement{&VariableDef{Name: "aaa"}, &AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
 					},
 				},
 			},
