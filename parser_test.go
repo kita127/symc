@@ -375,14 +375,14 @@ void func(int a)
 			`
 void func(int a)
 {
-    hoge = 10;
+    hoge = fuga;
 }
 `,
 			&Module{
 				[]Statement{
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
 					},
 				},
 			},

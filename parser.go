@@ -346,6 +346,7 @@ func (p *Parser) parseBlockStatement() []Statement {
 			ss = p.parseFuncStatement()
 		}
 		if ss == nil {
+			// 識別子だけ
 			if s := p.parseAccessVar(); s != nil {
 				ss = append(ss, s)
 			}
@@ -374,9 +375,21 @@ func (p *Parser) parseFuncStatement() []Statement {
 
 func (p *Parser) parseInfixExpression() []Statement {
 	l := p.fetchID()
-	p.progUntil(semicolon)
+	if p.curToken().tokenType != assign {
+		p.posReset()
+		return nil
+	}
 	p.pos++
-	return []Statement{&AccessVar{Name: l}}
+	r := p.fetchID()
+
+	if p.curToken().tokenType != semicolon {
+		p.posReset()
+		return nil
+	}
+
+	p.pos++
+	// next
+	return []Statement{&AccessVar{Name: l}, &AccessVar{Name: r}}
 }
 
 //func (p *Parser) parseBlockStatement______() Statement {
