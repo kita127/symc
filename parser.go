@@ -342,7 +342,7 @@ func (p *Parser) parseBlockStatement() []Statement {
 			}
 		}
 		if ss == nil {
-			// Expression Statement
+			// other statement
 			ss = p.parseFuncStatement()
 		}
 	}
@@ -359,6 +359,25 @@ func (p *Parser) parseBlockStatement() []Statement {
 
 func (p *Parser) parseFuncStatement() []Statement {
 	var ss []Statement = nil
+
+	for p.curToken().tokenType != semicolon {
+		if p.curToken().tokenType == word {
+			id := p.curToken().literal
+			ss = append(ss, &AccessVar{Name: id})
+		}
+		p.pos++
+	}
+
+	// semicolon
+	p.pos++
+	// next
+
+	return ss
+}
+
+func (p *Parser) parseExpression() []Statement {
+	var ss []Statement = nil
+
 	if ss == nil {
 		ss = p.parseInfixExpression()
 	}
@@ -367,25 +386,29 @@ func (p *Parser) parseFuncStatement() []Statement {
 		if s := p.parseAccessVar(); s != nil {
 			ss = append(ss, s)
 		}
-		// semicolon
-		p.pos++
 	}
+
 	return ss
 }
 
 func (p *Parser) parseInfixExpression() []Statement {
-	var r string
+	ss := []Statement{}
 
-	l := p.fetchID()
+	l := p.parseExpression()
+	if l != nil {
+		ss = append(ss, l...)
+	}
+
 	if p.curToken().tokenType != assign {
 		p.posReset()
 		return nil
 	}
+
 	p.pos++
-	if p.curToken().tokenType == word {
-		r = p.fetchID()
-	} else {
-		p.pos++
+
+	r := p.parseExpression()
+	if r != nil {
+		ss = append(ss, r...)
 	}
 
 	if p.curToken().tokenType != semicolon {
@@ -395,11 +418,8 @@ func (p *Parser) parseInfixExpression() []Statement {
 
 	p.pos++
 	// next
-	if len(r) != 0 {
-		return []Statement{&AccessVar{Name: l}, &AccessVar{Name: r}}
-	} else {
-		return []Statement{&AccessVar{Name: l}}
-	}
+
+	return ss
 }
 
 //func (p *Parser) parseBlockStatement______() Statement {
