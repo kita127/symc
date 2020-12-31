@@ -285,6 +285,7 @@ void func_a( void ) {}
 void func(int a)
 {
     hoge;
+    fuga = 100;
 }
 `,
 			&Module{
@@ -293,6 +294,7 @@ void func(int a)
 						Params: []*VariableDef{{Name: "a"}},
 						Block: &BlockStatement{Statements: []Statement{
 							&AccessVar{Name: "hoge"},
+							&AccessVar{Name: "fuga"},
 						},
 						},
 					},
