@@ -331,29 +331,32 @@ func (p *Parser) parseBlockStatement() []Statement {
 	p.pos++
 	p.prevPos = p.pos
 
-	ss := []Statement{}
+	var ss []Statement = nil
 
 	if p.curToken().tokenType == lbrace {
 		ss = append(ss, p.parseBlockStatement()...)
 	} else if p.curToken().tokenType == word {
-		var ts []Statement = nil
-		if ts == nil {
+		if ss == nil {
 			if s := p.parseVariableDef(); s != nil {
-				ts = append(ts, s)
+				ss = append(ss, s)
 			}
 		}
-		if ts == nil {
+		if ss == nil {
 			// Expression Statement
-			ts = p.parseFuncStatement()
+			ss = p.parseFuncStatement()
 		}
-		if ts == nil {
+		if ss == nil {
 			if s := p.parseAccessVar(); s != nil {
-				ts = append(ts, s)
+				ss = append(ss, s)
 			}
 			// semicolon
 			p.pos++
 		}
-		ss = append(ss, ts...)
+	}
+
+	if ss == nil {
+		// 何もない
+		ss = []Statement{}
 	}
 
 	p.pos++
