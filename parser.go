@@ -336,21 +336,44 @@ func (p *Parser) parseBlockStatement() []Statement {
 	if p.curToken().tokenType == lbrace {
 		ss = append(ss, p.parseBlockStatement()...)
 	} else if p.curToken().tokenType == word {
-		var s Statement
-		if s == nil {
-			s = p.parseVariableDef()
+		var ts []Statement = nil
+		if ts == nil {
+			if s := p.parseVariableDef(); s != nil {
+				ts = append(ts, s)
+			}
 		}
-		if s == nil {
-			s = p.parseAccessVar()
+		if ts == nil {
+			// Expression Statement
+			ts = p.parseFuncStatement()
+		}
+		if ts == nil {
+			if s := p.parseAccessVar(); s != nil {
+				ts = append(ts, s)
+			}
 			// semicolon
 			p.pos++
 		}
-		ss = append(ss, s)
+		ss = append(ss, ts...)
 	}
 
 	p.pos++
 
 	return ss
+}
+
+func (p *Parser) parseFuncStatement() []Statement {
+	var ss []Statement = nil
+	if ss == nil {
+		ss = p.parseInfixExpression()
+	}
+	return ss
+}
+
+func (p *Parser) parseInfixExpression() []Statement {
+	l := p.fetchID()
+	p.progUntil(semicolon)
+	p.pos++
+	return []Statement{&AccessVar{Name: l}}
 }
 
 //func (p *Parser) parseBlockStatement______() Statement {
