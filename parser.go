@@ -182,20 +182,20 @@ func (p *Parser) parseStatement() Statement {
 	return s
 }
 
-func (p *Parser) parseBlockStatementSub() Statement {
-	var s Statement = nil
-	p.prevPos = p.pos
-	switch p.curToken().tokenType {
-	default:
-		if s == nil {
-			s = p.parseVariableDef()
-		}
-		if s == nil {
-			s = p.parseExpressionStatement()
-		}
-	}
-	return s
-}
+//func (p *Parser) parseBlockStatementSub() Statement {
+//	var s Statement = nil
+//	p.prevPos = p.pos
+//	switch p.curToken().tokenType {
+//	default:
+//		if s == nil {
+//			s = p.parseVariableDef()
+//		}
+//		if s == nil {
+//			s = p.parseExpressionStatement()
+//		}
+//	}
+//	return s
+//}
 
 func (p *Parser) parseVariableDef() Statement {
 	// semicolon or assign or lbracket or eof の手前まで pos を進める
@@ -333,9 +333,10 @@ func (p *Parser) parseBlockStatement() []Statement {
 
 	var ss []Statement = nil
 
-	if p.curToken().tokenType == lbrace {
+	switch p.curToken().tokenType {
+	case lbrace:
 		ss = append(ss, p.parseBlockStatement()...)
-	} else if p.curToken().tokenType == word {
+	case word:
 		if ss == nil {
 			if s := p.parseVariableDef(); s != nil {
 				ss = append(ss, s)
@@ -343,7 +344,12 @@ func (p *Parser) parseBlockStatement() []Statement {
 		}
 		if ss == nil {
 			// other statement
-			ss = p.parseFuncStatement()
+			ss = p.parseExpressionStatement()
+		}
+	case lparen:
+		if ss == nil {
+			// other statement
+			ss = p.parseExpressionStatement()
 		}
 	}
 
@@ -357,7 +363,8 @@ func (p *Parser) parseBlockStatement() []Statement {
 	return ss
 }
 
-func (p *Parser) parseFuncStatement() []Statement {
+
+func (p *Parser) parseExpressionStatement() []Statement {
 	var ss []Statement = nil
 
 	for p.curToken().tokenType != semicolon {
@@ -459,17 +466,17 @@ func (p *Parser) parseParameter() []*VariableDef {
 	return vs
 }
 
-func (p *Parser) parseExpressionStatement() Statement {
-	if p.curToken().tokenType == word {
-		id := p.curToken().literal
-		p.pos++
-		// next
-		return &AccessVar{Name: id}
-	} else {
-		p.posReset()
-		return nil
-	}
-}
+//func (p *Parser) parseExpressionStatement() Statement {
+//	if p.curToken().tokenType == word {
+//		id := p.curToken().literal
+//		p.pos++
+//		// next
+//		return &AccessVar{Name: id}
+//	} else {
+//		p.posReset()
+//		return nil
+//	}
+//}
 
 func (p *Parser) skipTypedef() {
 
