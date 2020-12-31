@@ -298,6 +298,42 @@ void func(int a)
 				},
 			},
 		},
+		{
+			"function def 2",
+			`
+void func(int a)
+{
+    {
+        {}
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
+		{
+			"function def 3",
+			`
+void func(int a)
+{
+    int hoge;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&VariableDef{Name: "hoge"}},
+					},
+				},
+			},
+		},
 		//		{
 		//			"function def 3",
 		//			`

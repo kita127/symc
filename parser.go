@@ -322,53 +322,57 @@ func (p *Parser) parseFunctionDef() Statement {
 		return nil
 	}
 
-	p.parseBlockStatement()
+	ss := p.parseBlockStatement()
 
-	return &FunctionDef{Name: id, Params: ps, Statements: []Statement{}}
+	return &FunctionDef{Name: id, Params: ps, Statements: ss}
 }
 
-func (p *Parser) parseBlockStatement() Statement {
-	p.pos++
-
-	if p.curToken().tokenType == lbrace {
-		p.parseBlockStatement()
-	}
-
-	p.pos++
-
-	return nil
-}
-
-func (p *Parser) parseBlockStatement______() Statement {
-	// lbrace の次へ
+func (p *Parser) parseBlockStatement() []Statement {
 	p.pos++
 
 	ss := []Statement{}
-	for p.curToken().tokenType != rbrace {
-		if p.curToken().IsTypeToken() {
-			s := p.parseBlockStatementSub()
-			if s != nil {
-				ss = append(ss, s)
-			} else {
-				return nil
-			}
-		} else if p.curToken().tokenType == lbrace {
-			s := p.parseBlockStatement()
-			if s != nil {
-				ss = append(ss, s)
-			} else {
-				return nil
-			}
-		} else {
-			// パース対象外のトークンの場合はスキップする
-			p.pos++
-		}
-	}
-	p.pos++
-	//next
 
-	return &BlockStatement{ss}
+	if p.curToken().tokenType == lbrace {
+		p.parseBlockStatement()
+	} else if p.curToken().tokenType == word {
+		ss = append(ss, p.parseVariableDef())
+	}
+
+	p.pos++
+
+	return ss
 }
+
+//func (p *Parser) parseBlockStatement______() Statement {
+//	// lbrace の次へ
+//	p.pos++
+//
+//	ss := []Statement{}
+//	for p.curToken().tokenType != rbrace {
+//		if p.curToken().IsTypeToken() {
+//			s := p.parseBlockStatementSub()
+//			if s != nil {
+//				ss = append(ss, s)
+//			} else {
+//				return nil
+//			}
+//		} else if p.curToken().tokenType == lbrace {
+//			s := p.parseBlockStatement()
+//			if s != nil {
+//				ss = append(ss, s)
+//			} else {
+//				return nil
+//			}
+//		} else {
+//			// パース対象外のトークンの場合はスキップする
+//			p.pos++
+//		}
+//	}
+//	p.pos++
+//	//next
+//
+//	return &BlockStatement{ss}
+//}
 
 func (p *Parser) parseAccessVar() Statement {
 	if p.curToken().tokenType != word {
