@@ -370,17 +370,20 @@ func (p *Parser) parseBlockStatement() []Statement {
 func (p *Parser) parseExpressionStatement() []Statement {
 	var ss []Statement = nil
 	preParen := false
+	castNum := 0
 
 	for p.curToken().tokenType != semicolon {
 		switch p.curToken().tokenType {
 		case lparen:
 			p.pos++
-			ss = append(ss, p.parseParen()...)
+			ts := p.parseParen()
+			ss = append(ss, ts...)
 			preParen = true
+			castNum = len(ts)
 		case word:
 			if preParen {
 				// キャストの型は削除
-				ss = ss[:len(ss)-1]
+				ss = ss[:len(ss)-castNum]
 				preParen = false
 			}
 			id := p.curToken().literal
