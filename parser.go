@@ -322,15 +322,24 @@ func (p *Parser) parseFunctionDef() Statement {
 		return nil
 	}
 
-	p.pos++
-	p.pos++
-
-	// p.parseBlockStatement()
+	p.parseBlockStatement()
 
 	return &FunctionDef{Name: id, Params: ps, Statements: []Statement{}}
 }
 
 func (p *Parser) parseBlockStatement() Statement {
+	p.pos++
+
+	if p.curToken().tokenType == lbrace {
+		p.parseBlockStatement()
+	}
+
+	p.pos++
+
+	return nil
+}
+
+func (p *Parser) parseBlockStatement______() Statement {
 	// lbrace の次へ
 	p.pos++
 

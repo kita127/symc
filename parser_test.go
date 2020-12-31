@@ -279,26 +279,23 @@ void func_name( void ) {}
 				},
 			},
 		},
-		//		{
-		//			"function def 2",
-		//			`
-		//void func(int a)
-		//{
-		//    hoge;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{{Name: "a"}},
-		//						Block: &BlockStatement{Statements: []Statement{
-		//							&AccessVar{Name: "hoge"},
-		//						},
-		//						},
-		//					},
-		//				},
-		//			},
-		//		},
+		{
+			"function def 2",
+			`
+void func(int a)
+{
+    {}
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
 		//		{
 		//			"function def 3",
 		//			`
