@@ -329,13 +329,23 @@ func (p *Parser) parseFunctionDef() Statement {
 
 func (p *Parser) parseBlockStatement() []Statement {
 	p.pos++
+	p.prevPos = p.pos
 
 	ss := []Statement{}
 
 	if p.curToken().tokenType == lbrace {
 		ss = append(ss, p.parseBlockStatement()...)
 	} else if p.curToken().tokenType == word {
-		ss = append(ss, p.parseVariableDef())
+		var s Statement
+		if s == nil {
+			s = p.parseVariableDef()
+		}
+		if s == nil {
+			s = p.parseAccessVar()
+			// semicolon
+			p.pos++
+		}
+		ss = append(ss, s)
 	}
 
 	p.pos++

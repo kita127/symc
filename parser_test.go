@@ -353,6 +353,23 @@ void func(int a)
 				},
 			},
 		},
+		{
+			"function def 5",
+			`
+void func(int a)
+{
+    hoge;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}},
+					},
+				},
+			},
+		},
 		//		{
 		//			"function def 3",
 		//			`
