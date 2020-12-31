@@ -63,14 +63,14 @@ func (v *PrototypeDecl) String() string {
 }
 
 type FunctionDef struct {
-	Name   string
-	Params []*VariableDef
-	Block  *BlockStatement
+	Name       string
+	Params     []*VariableDef
+	Statements []Statement
 }
 
 func (v *FunctionDef) statementNode() {}
 func (v *FunctionDef) String() string {
-	return fmt.Sprintf("FunctionDef : Name=%s, Params=%s, Block=%s", v.Name, v.Params, v.Block)
+	return fmt.Sprintf("FunctionDef : Name=%s, Params=%s, Statements=%s", v.Name, v.Params, v.Statements)
 }
 
 type BlockStatement struct {
@@ -322,14 +322,12 @@ func (p *Parser) parseFunctionDef() Statement {
 		return nil
 	}
 
-	x := p.parseBlockStatement()
+	p.pos++
+	p.pos++
 
-	if b, ok := x.(*BlockStatement); ok {
-		return &FunctionDef{Name: id, Params: ps, Block: b}
-	} else {
-		p.posReset()
-		return nil
-	}
+	// p.parseBlockStatement()
+
+	return &FunctionDef{Name: id, Params: ps, Statements: []Statement{}}
 }
 
 func (p *Parser) parseBlockStatement() Statement {
@@ -340,6 +338,13 @@ func (p *Parser) parseBlockStatement() Statement {
 	for p.curToken().tokenType != rbrace {
 		if p.curToken().IsTypeToken() {
 			s := p.parseBlockStatementSub()
+			if s != nil {
+				ss = append(ss, s)
+			} else {
+				return nil
+			}
+		} else if p.curToken().tokenType == lbrace {
+			s := p.parseBlockStatement()
 			if s != nil {
 				ss = append(ss, s)
 			} else {
