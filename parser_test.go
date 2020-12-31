@@ -284,7 +284,9 @@ void func_name( void ) {}
 			`
 void func(int a)
 {
-    {}
+    {
+        {}
+    }
 }
 `,
 			&Module{
