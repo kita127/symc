@@ -375,53 +375,6 @@ func (p *Parser) parseFuncStatement() []Statement {
 	return ss
 }
 
-func (p *Parser) parseExpression() []Statement {
-	var ss []Statement = nil
-
-	if ss == nil {
-		ss = p.parseInfixExpression()
-	}
-	if ss == nil {
-		// 識別子だけ
-		if s := p.parseAccessVar(); s != nil {
-			ss = append(ss, s)
-		}
-	}
-
-	return ss
-}
-
-func (p *Parser) parseInfixExpression() []Statement {
-	ss := []Statement{}
-
-	l := p.parseExpression()
-	if l != nil {
-		ss = append(ss, l...)
-	}
-
-	if p.curToken().tokenType != assign {
-		p.posReset()
-		return nil
-	}
-
-	p.pos++
-
-	r := p.parseExpression()
-	if r != nil {
-		ss = append(ss, r...)
-	}
-
-	if p.curToken().tokenType != semicolon {
-		p.posReset()
-		return nil
-	}
-
-	p.pos++
-	// next
-
-	return ss
-}
-
 //func (p *Parser) parseBlockStatement______() Statement {
 //	// lbrace の次へ
 //	p.pos++
