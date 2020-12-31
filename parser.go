@@ -333,7 +333,7 @@ func (p *Parser) parseBlockStatement() []Statement {
 	ss := []Statement{}
 
 	if p.curToken().tokenType == lbrace {
-		p.parseBlockStatement()
+		ss = append(ss, p.parseBlockStatement()...)
 	} else if p.curToken().tokenType == word {
 		ss = append(ss, p.parseVariableDef())
 	}
