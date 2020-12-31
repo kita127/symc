@@ -345,14 +345,6 @@ func (p *Parser) parseBlockStatement() []Statement {
 			// Expression Statement
 			ss = p.parseFuncStatement()
 		}
-		if ss == nil {
-			// 識別子だけ
-			if s := p.parseAccessVar(); s != nil {
-				ss = append(ss, s)
-			}
-			// semicolon
-			p.pos++
-		}
 	}
 
 	if ss == nil {
@@ -369,6 +361,14 @@ func (p *Parser) parseFuncStatement() []Statement {
 	var ss []Statement = nil
 	if ss == nil {
 		ss = p.parseInfixExpression()
+	}
+	if ss == nil {
+		// 識別子だけ
+		if s := p.parseAccessVar(); s != nil {
+			ss = append(ss, s)
+		}
+		// semicolon
+		p.pos++
 	}
 	return ss
 }
