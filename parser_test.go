@@ -409,7 +409,7 @@ void func(int a)
 			`
 void func(int a)
 {
-    (hoge) = fuga;
+    (hoge) = (fuga);
 }
 `,
 			&Module{
