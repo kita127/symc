@@ -375,6 +375,23 @@ void func(int a)
 			`
 void func(int a)
 {
+    hoge = 10;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 8",
+			`
+void func(int a)
+{
     hoge = fuga;
 }
 `,

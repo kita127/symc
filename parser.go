@@ -374,13 +374,19 @@ func (p *Parser) parseFuncStatement() []Statement {
 }
 
 func (p *Parser) parseInfixExpression() []Statement {
+	var r string
+
 	l := p.fetchID()
 	if p.curToken().tokenType != assign {
 		p.posReset()
 		return nil
 	}
 	p.pos++
-	r := p.fetchID()
+	if p.curToken().tokenType == word {
+		r = p.fetchID()
+	} else {
+		p.pos++
+	}
 
 	if p.curToken().tokenType != semicolon {
 		p.posReset()
@@ -389,7 +395,11 @@ func (p *Parser) parseInfixExpression() []Statement {
 
 	p.pos++
 	// next
-	return []Statement{&AccessVar{Name: l}, &AccessVar{Name: r}}
+	if len(r) != 0 {
+		return []Statement{&AccessVar{Name: l}, &AccessVar{Name: r}}
+	} else {
+		return []Statement{&AccessVar{Name: l}}
+	}
 }
 
 //func (p *Parser) parseBlockStatement______() Statement {
