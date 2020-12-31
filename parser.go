@@ -369,9 +369,20 @@ func (p *Parser) parseBlockStatement() []Statement {
 
 func (p *Parser) parseExpressionStatement() []Statement {
 	var ss []Statement = nil
+	preParen := false
 
 	for p.curToken().tokenType != semicolon {
-		if p.curToken().tokenType == word {
+		switch p.curToken().tokenType {
+		case lparen:
+			p.pos++
+			ss = append(ss, p.parseParen()...)
+			preParen = true
+		case word:
+			if preParen {
+				// キャストの型は削除
+				ss = ss[:len(ss)-1]
+				preParen = false
+			}
 			id := p.curToken().literal
 			ss = append(ss, &AccessVar{Name: id})
 		}
@@ -381,6 +392,23 @@ func (p *Parser) parseExpressionStatement() []Statement {
 	// semicolon
 	p.pos++
 	// next
+
+	return ss
+}
+
+func (p *Parser) parseParen() []Statement {
+	var ss []Statement = nil
+	for p.curToken().tokenType != rparen {
+		switch p.curToken().tokenType {
+		case lparen:
+			p.pos++
+			ss = append(ss, p.parseParen()...)
+		case word:
+			id := p.curToken().literal
+			ss = append(ss, &AccessVar{Name: id})
+			p.pos++
+		}
+	}
 
 	return ss
 }
