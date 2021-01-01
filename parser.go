@@ -421,6 +421,7 @@ func (p *Parser) parseCast() Statement {
 	switch p.curToken().tokenType {
 	case integer:
 	case word:
+	case lparen:
 	default:
 		p.posReset()
 		return nil
