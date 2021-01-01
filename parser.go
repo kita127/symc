@@ -394,22 +394,31 @@ func (p *Parser) parseExpression() []Statement {
 
 	switch p.curToken().tokenType {
 	case lparen:
-		p.pos++
-		ts := p.parseExpression()
-		ss = append(ss, ts...)
-		// rparen
-		p.pos++
+		prePos := p.pos
+		ts := p.parseCast()
+		if ts != nil {
+			ss = append(ss, ts...)
+		} else {
+			p.pos = prePos
+			p.pos++
+			ts := p.parseExpression()
+			ss = append(ss, ts...)
+			// rparen
+			p.pos++
+		}
 	case word:
 		s := p.parseAccessVar()
 		ss = append(ss, s)
 	case integer:
 		p.pos++
 		ss = []Statement{}
+	default:
+		return nil
 	}
 	return ss
 }
 
-func (p *Parser) parseCast() Statement {
+func (p *Parser) parseCast() []Statement {
 	if p.curToken().tokenType != lparen {
 		p.posReset()
 		return nil
@@ -424,16 +433,9 @@ func (p *Parser) parseCast() Statement {
 	}
 
 	p.pos++
+	ss := p.parseExpression()
 
-	switch p.curToken().tokenType {
-	case integer:
-	case word:
-	case lparen:
-	default:
-		p.posReset()
-		return nil
-	}
-	return &Nothing{}
+	return ss
 }
 
 //func (p *Parser) parseBlockStatement______() Statement {
