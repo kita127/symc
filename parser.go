@@ -108,6 +108,14 @@ func (v *Typedef) String() string {
 	return fmt.Sprintf("Typedef : Name=%s", v.Name)
 }
 
+type Nothing struct {
+}
+
+func (v *Nothing) statementNode() {}
+func (v *Nothing) String() string {
+	return fmt.Sprintf("Nothing")
+}
+
 // 構文解析器
 type Parser struct {
 	lexer   *Lexer
@@ -368,11 +376,23 @@ func (p *Parser) parseExpressionStatement() []Statement {
 	var ss []Statement = nil
 
 	for p.curToken().tokenType != semicolon {
-		if p.curToken().tokenType == word {
-			id := p.curToken().literal
-			ss = append(ss, &AccessVar{Name: id})
+		var s Statement = nil
+		p.prevPos = p.pos
+		if s == nil {
+			if s = p.parseCast(); s != nil {
+				if _, yes := s.(*Nothing); !yes {
+					ss = append(ss, s)
+				}
+			}
 		}
-		p.pos++
+		if s == nil {
+			if s = p.parseAccessVar(); s != nil {
+				ss = append(ss, s)
+			}
+		}
+		if s == nil {
+			p.pos++
+		}
 	}
 
 	// semicolon
@@ -380,6 +400,32 @@ func (p *Parser) parseExpressionStatement() []Statement {
 	// next
 
 	return ss
+}
+
+func (p *Parser) parseCast() Statement {
+	if p.curToken().tokenType != lparen {
+		p.posReset()
+		return nil
+	}
+	p.pos++
+	if p.curToken().tokenType != word {
+		p.posReset()
+		return nil
+	}
+	p.pos++
+	if p.curToken().tokenType != rparen {
+		p.posReset()
+		return nil
+	}
+	p.pos++
+	if p.curToken().tokenType != integer {
+		p.posReset()
+		return nil
+	}
+	p.pos++
+	// next
+
+	return &Nothing{}
 }
 
 //func (p *Parser) parseBlockStatement______() Statement {
