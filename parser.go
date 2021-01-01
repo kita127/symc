@@ -190,21 +190,6 @@ func (p *Parser) parseStatement() Statement {
 	return s
 }
 
-//func (p *Parser) parseBlockStatementSub() Statement {
-//	var s Statement = nil
-//	p.prevPos = p.pos
-//	switch p.curToken().tokenType {
-//	default:
-//		if s == nil {
-//			s = p.parseVariableDef()
-//		}
-//		if s == nil {
-//			s = p.parseExpressionStatement()
-//		}
-//	}
-//	return s
-//}
-
 func (p *Parser) parseVariableDef() Statement {
 	// semicolon or assign or lbracket or eof の手前まで pos を進める
 	typeCnt := 0
@@ -342,7 +327,7 @@ func (p *Parser) parseBlockStatement() []Statement {
 
 	for p.curToken().tokenType != rbrace {
 		var ts []Statement = nil
-		p.prevPos = p.pos
+		prevPos := p.pos
 		switch p.curToken().tokenType {
 		case lbrace:
 			ts = append(ts, p.parseBlockStatement()...)
@@ -355,6 +340,7 @@ func (p *Parser) parseBlockStatement() []Statement {
 				}
 			}
 			if ts == nil {
+				p.pos = prevPos
 				// other statement
 				ts = p.parseExpressionStatement()
 			}
@@ -445,37 +431,6 @@ func (p *Parser) parseCast() []Statement {
 	return ss
 }
 
-//func (p *Parser) parseBlockStatement______() Statement {
-//	// lbrace の次へ
-//	p.pos++
-//
-//	ss := []Statement{}
-//	for p.curToken().tokenType != rbrace {
-//		if p.curToken().IsTypeToken() {
-//			s := p.parseBlockStatementSub()
-//			if s != nil {
-//				ss = append(ss, s)
-//			} else {
-//				return nil
-//			}
-//		} else if p.curToken().tokenType == lbrace {
-//			s := p.parseBlockStatement()
-//			if s != nil {
-//				ss = append(ss, s)
-//			} else {
-//				return nil
-//			}
-//		} else {
-//			// パース対象外のトークンの場合はスキップする
-//			p.pos++
-//		}
-//	}
-//	p.pos++
-//	//next
-//
-//	return &BlockStatement{ss}
-//}
-
 func (p *Parser) parseAccessVar() Statement {
 	if p.curToken().tokenType != word {
 		p.posReset()
@@ -528,18 +483,6 @@ func (p *Parser) parseParameter() []*VariableDef {
 
 	return vs
 }
-
-//func (p *Parser) parseExpressionStatement() Statement {
-//	if p.curToken().tokenType == word {
-//		id := p.curToken().literal
-//		p.pos++
-//		// next
-//		return &AccessVar{Name: id}
-//	} else {
-//		p.posReset()
-//		return nil
-//	}
-//}
 
 func (p *Parser) skipTypedef() {
 
