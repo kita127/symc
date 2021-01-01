@@ -373,32 +373,15 @@ func (p *Parser) parseBlockStatement() []Statement {
 }
 
 func (p *Parser) parseExpressionStatement() []Statement {
-	var ss []Statement = nil
-
-	for p.curToken().tokenType != semicolon {
-		var s Statement = nil
-		p.prevPos = p.pos
-		if s == nil {
-			if s = p.parseCast(); s != nil {
-				if _, yes := s.(*Nothing); !yes {
-					ss = append(ss, s)
-				}
-			}
-		}
-		if s == nil {
-			if s = p.parseAccessVar(); s != nil {
-				ss = append(ss, s)
-			}
-		}
-		if s == nil {
-			p.pos++
-		}
-	}
-
-	// semicolon
+	l := p.parseExpression()
 	p.pos++
-	// next
+	return l
+}
 
+func (p *Parser) parseExpression() []Statement {
+	var ss []Statement = nil
+	s := p.parseAccessVar()
+	ss = append(ss, s)
 	return ss
 }
 
