@@ -535,6 +535,62 @@ void func()
 				},
 			},
 		},
+		{
+			"function def 18",
+			`
+void func()
+{
+    var1 = a1 +  b1;
+    var2 = a2 -  b2;
+    var3 = a3 *  b3;
+    var4 = a4 /  b4;
+    var5 = a5 |  b5;
+    var6 = a6 &  b6;
+    var7 = a7 || b7;
+    var8 = a8 && b8;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// +
+							&AccessVar{Name: "var1"},
+							&AccessVar{Name: "a1"},
+							&AccessVar{Name: "b1"},
+							// -
+							&AccessVar{Name: "var2"},
+							&AccessVar{Name: "a2"},
+							&AccessVar{Name: "b2"},
+							// *
+							&AccessVar{Name: "var3"},
+							&AccessVar{Name: "a3"},
+							&AccessVar{Name: "b3"},
+							// /
+							&AccessVar{Name: "var4"},
+							&AccessVar{Name: "a4"},
+							&AccessVar{Name: "b4"},
+							// |
+							&AccessVar{Name: "var5"},
+							&AccessVar{Name: "a5"},
+							&AccessVar{Name: "b5"},
+							// &
+							&AccessVar{Name: "var6"},
+							&AccessVar{Name: "a6"},
+							&AccessVar{Name: "b6"},
+							// ||
+							&AccessVar{Name: "var7"},
+							&AccessVar{Name: "a7"},
+							&AccessVar{Name: "b7"},
+							// &&
+							&AccessVar{Name: "var8"},
+							&AccessVar{Name: "a8"},
+							&AccessVar{Name: "b8"},
+						}},
+				},
+			},
+		},
 		//		{
 		//			"function def 4",
 		//			`
