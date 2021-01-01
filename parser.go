@@ -407,8 +407,15 @@ func (p *Parser) parseExpression() []Statement {
 			p.pos++
 		}
 	case word:
-		s := p.parseAccessVar()
-		ss = append(ss, s)
+		l := p.parseAccessVar()
+		ss = append(ss, l)
+
+		if p.curToken().isOperator() {
+			p.pos++
+			r := p.parseExpression()
+			ss = append(ss, r...)
+		}
+
 	case integer:
 		p.pos++
 		ss = []Statement{}
