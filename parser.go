@@ -371,8 +371,11 @@ func (p *Parser) parseExpressionStatement() []Statement {
 
 	ss = append(ss, l...)
 
-	if p.curToken().tokenType == assign {
-		p.pos++
+	if p.curToken().isOperator() {
+		for p.curToken().isOperator() {
+			// 中置演算子は無視する
+			p.pos++
+		}
 		r := p.parseExpression()
 		ss = append(ss, r...)
 	}
