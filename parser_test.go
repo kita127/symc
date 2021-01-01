@@ -402,25 +402,25 @@ void func(int a)
 				},
 			},
 		},
-		//		{
-		//			"function def 10",
-		//			`
-		//void func(int a)
-		//{
-		//    unsigned char aaa;
-		//    hoge = 10;
-		//    fuga = 20;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&VariableDef{Name: "aaa"}, &AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
-		//					},
-		//				},
-		//			},
-		//		},
+		{
+			"function def 10",
+			`
+void func(int a)
+{
+    unsigned char aaa;
+    hoge = 10;
+    fuga = 20;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&VariableDef{Name: "aaa"}, &AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+					},
+				},
+			},
+		},
 		//		{
 		//			"function def 11",
 		//			`
