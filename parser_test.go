@@ -591,6 +591,37 @@ void func()
 				},
 			},
 		},
+		{
+			"function def 19",
+			`
+void func()
+{
+    var1 = a1 <<  b1;
+    var2 = a2 >>  b2;
+    var3 = a3 ^ b3;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// <<
+							&AccessVar{Name: "var1"},
+							&AccessVar{Name: "a1"},
+							&AccessVar{Name: "b1"},
+							// >>
+							&AccessVar{Name: "var2"},
+							&AccessVar{Name: "a2"},
+							&AccessVar{Name: "b2"},
+							// ^
+							&AccessVar{Name: "var3"},
+							&AccessVar{Name: "a3"},
+							&AccessVar{Name: "b3"},
+						}},
+				},
+			},
+		},
 		//		{
 		//			"function def 4",
 		//			`
