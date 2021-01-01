@@ -385,23 +385,23 @@ void func(int a)
 				},
 			},
 		},
-		//		{
-		//			"function def 9",
-		//			`
-		//void func(int a)
-		//{
-		//    (hoge) = (fuga);
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
-		//					},
-		//				},
-		//			},
-		//		},
+		{
+			"function def 9",
+			`
+void func(int a)
+{
+    (hoge) = (fuga);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+					},
+				},
+			},
+		},
 		//		{
 		//			"function def 10",
 		//			`

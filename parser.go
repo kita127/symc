@@ -393,6 +393,12 @@ func (p *Parser) parseExpression() []Statement {
 	var ss []Statement = nil
 
 	switch p.curToken().tokenType {
+	case lparen:
+		p.pos++
+		ts := p.parseExpression()
+		ss = append(ss, ts...)
+		// rparen
+		p.pos++
 	case word:
 		s := p.parseAccessVar()
 		ss = append(ss, s)
