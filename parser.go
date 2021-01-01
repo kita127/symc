@@ -408,16 +408,16 @@ func (p *Parser) parseCast() Statement {
 		return nil
 	}
 	p.pos++
-	if p.curToken().tokenType != word {
-		p.posReset()
-		return nil
+	for p.curToken().tokenType != rparen {
+		if p.curToken().tokenType != word {
+			p.posReset()
+			return nil
+		}
+		p.pos++
 	}
+
 	p.pos++
-	if p.curToken().tokenType != rparen {
-		p.posReset()
-		return nil
-	}
-	p.pos++
+
 	switch p.curToken().tokenType {
 	case integer:
 	case word:
