@@ -506,35 +506,35 @@ void func(int a)
 				},
 			},
 		},
-		//		{
-		//			"function def 3",
-		//			`
-		//inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "__sputc",
-		//						Params: []*VariableDef{{Name: "_c"}, {Name: "_p"}},
-		//						Block:  &BlockStatement{Statements: []Statement{}}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 4",
-		//			`
-		//void func()
-		//{
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{},
-		//						Block:  &BlockStatement{Statements: []Statement{}}},
-		//				},
-		//			},
-		//		},
+		{
+			"function def 3",
+			`
+inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "__sputc",
+						Params:     []*VariableDef{{Name: "_c"}, {Name: "_p"}},
+						Statements: []Statement{}},
+				},
+			},
+		},
+		{
+			"function def 4",
+			`
+void func()
+{
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{}},
+				},
+			},
+		},
 		//		{
 		//			"function def 4",
 		//			`
@@ -561,7 +561,7 @@ void func(int a)
 		//				[]Statement{
 		//					&FunctionDef{Name: "muruchi_piyomi",
 		//						Params: []*VariableDef{{Name: "s"}},
-		//						Block: &BlockStatement{Statements: []Statement{
+		//						Statements: []Statement{
 		//							&VariableDef{Name: "purin"},
 		//							&VariableDef{Name: "p"},
 		//							&AccessVar{Name: "purin.aaa"},
@@ -570,7 +570,7 @@ void func(int a)
 		//							&AccessVar{Name: "purin"},
 		//							&AccessVar{Name: "p->aaa"},
 		//							&AccessVar{Name: "purin.aaa"},
-		//						}}},
+		//						}},
 		//				},
 		//			},
 		//		},
