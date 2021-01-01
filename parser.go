@@ -339,16 +339,13 @@ func (p *Parser) parseBlockStatement() []Statement {
 		case lbrace:
 			ts = append(ts, p.parseBlockStatement()...)
 		case word:
+			fallthrough
+		case lparen:
 			if ts == nil {
 				if s := p.parseVariableDef(); s != nil {
 					ts = append(ts, s)
 				}
 			}
-			if ts == nil {
-				// other statement
-				ts = p.parseExpressionStatement()
-			}
-		case lparen:
 			if ts == nil {
 				// other statement
 				ts = p.parseExpressionStatement()
