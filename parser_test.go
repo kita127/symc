@@ -489,23 +489,23 @@ void func(int a)
 				},
 			},
 		},
-		//		{
-		//			"function def 12",
-		//			`
-		//void func(int a)
-		//{
-		//    hoge = (unsigned char)10;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&AccessVar{Name: "hoge"}},
-		//					},
-		//				},
-		//			},
-		//		},
+		{
+			"function def 12",
+			`
+void func(int a)
+{
+    hoge = (unsigned char)10;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}},
+					},
+				},
+			},
+		},
 		//		{
 		//			"function def 3",
 		//			`
