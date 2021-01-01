@@ -220,6 +220,13 @@ func (p *Parser) parseVariableDef() Statement {
 		return nil
 	}
 
+	if p.curToken().tokenType == asterisk {
+		// var *= hoge;
+		// この手の文と間違えないようにする
+		p.posReset()
+		return nil
+	}
+
 	// Name
 	id := p.tokens[p.pos].literal
 	p.pos++

@@ -622,6 +622,52 @@ void func()
 				},
 			},
 		},
+		{
+			"function def 20",
+			`
+void func()
+{
+    var1 += a1;
+    var2 -= a2;
+    var3 /= a3;
+    var4 *= a4;
+    var5 |= a5;
+    var6 &= a6;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// +=
+							&AccessVar{Name: "var1"},
+							&AccessVar{Name: "a1"},
+							// -=
+							&AccessVar{Name: "var2"},
+							&AccessVar{Name: "a2"},
+							// /=
+							&AccessVar{Name: "var3"},
+							&AccessVar{Name: "a3"},
+							// *=
+							&AccessVar{Name: "var4"},
+							&AccessVar{Name: "a4"},
+							// |=
+							&AccessVar{Name: "var5"},
+							&AccessVar{Name: "a5"},
+							// &=
+							&AccessVar{Name: "var6"},
+							&AccessVar{Name: "a6"},
+							// <<=
+							//&AccessVar{Name: "var7"},
+							//&AccessVar{Name: "a7"},
+							// >>=
+							//&AccessVar{Name: "var8"},
+							//&AccessVar{Name: "a8"},
+						}},
+				},
+			},
+		},
 		//		{
 		//			"function def 4",
 		//			`
