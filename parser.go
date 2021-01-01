@@ -418,13 +418,13 @@ func (p *Parser) parseCast() Statement {
 		return nil
 	}
 	p.pos++
-	if p.curToken().tokenType != integer {
+	switch p.curToken().tokenType {
+	case integer:
+	case word:
+	default:
 		p.posReset()
 		return nil
 	}
-	p.pos++
-	// next
-
 	return &Nothing{}
 }
 
