@@ -490,7 +490,7 @@ void func(int a)
 			},
 		},
 		{
-			"function def 12",
+			"function def 15",
 			`
 void func(int a)
 {
@@ -507,7 +507,7 @@ void func(int a)
 			},
 		},
 		{
-			"function def 3",
+			"function def 16",
 			`
 inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
 }
@@ -521,7 +521,7 @@ inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
 			},
 		},
 		{
-			"function def 4",
+			"function def 17",
 			`
 void func()
 {
