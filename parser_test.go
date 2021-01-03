@@ -451,6 +451,31 @@ void func()
 			},
 		},
 		{
+			"function parameter 1",
+			`
+void f_hoge(int a){}
+void f_fuga(int a, char b){}
+void f_piyo(int a, char b, AnyType c[]){}
+void f_ice(int a, char b, AnyType c[100]){}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "f_hoge",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{}},
+					&FunctionDef{Name: "f_fuga",
+						Params:     []*VariableDef{{Name: "a"}, {Name: "b"}},
+						Statements: []Statement{}},
+					&FunctionDef{Name: "f_piyo",
+						Params:     []*VariableDef{{Name: "a"}, {Name: "b"}, {Name: "c"}},
+						Statements: []Statement{}},
+					&FunctionDef{Name: "f_ice",
+						Params:     []*VariableDef{{Name: "a"}, {Name: "b"}, {Name: "c"}},
+						Statements: []Statement{}},
+				},
+			},
+		},
+		{
 			"expression 1",
 			`
 void func()
