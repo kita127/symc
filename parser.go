@@ -393,6 +393,8 @@ func (p *Parser) parseExpression() []Statement {
 		l := p.parseAccessVar()
 		ss = append(ss, l)
 
+	case letter:
+		fallthrough
 	case integer:
 		p.pos++
 		ss = []Statement{}

@@ -769,6 +769,27 @@ void func(int a)
 				},
 			},
 		},
+		{
+			"character 1",
+			`
+void func(void)
+{
+    char c = 'A';
+    c = 'B';
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&VariableDef{Name: "c"},
+							&AccessVar{Name: "c"},
+						},
+					},
+				},
+			},
+		},
 		//		{
 		//			"function def 4",
 		//			`
