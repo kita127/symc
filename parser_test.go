@@ -374,13 +374,19 @@ void func(int a)
 void func(int a)
 {
     hoge = fuga;
+    p_var = &address;
 }
 `,
 			&Module{
 				[]Statement{
 					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+						Params: []*VariableDef{{Name: "a"}},
+						Statements: []Statement{
+							&AccessVar{Name: "hoge"},
+							&AccessVar{Name: "fuga"},
+							&AccessVar{Name: "p_var"},
+							&AccessVar{Name: "address"},
+						},
 					},
 				},
 			},
