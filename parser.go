@@ -231,8 +231,8 @@ func (p *Parser) extractVarName() Statement {
 
 func (p *Parser) parseVariableDef() Statement {
 
-	// 変数定義の場合は型に関連するワードもしくは識別子が最低２つはある
-	if !p.curToken().IsTypeToken() || !p.peekToken().IsTypeToken() {
+	// 変数定義か確認する
+	if !p.isVariabeDef() {
 		p.posReset()
 		return nil
 	}
@@ -256,6 +256,22 @@ func (p *Parser) parseVariableDef() Statement {
 		return nil
 	}
 	return s
+}
+
+func (p *Parser) isVariabeDef() bool {
+	// セミコロンもしくはイコールまでの間に word が2つ以上なければ変数定義ではない
+	wordCnt := 0
+	pPrev := p.pos
+	t := p.curToken()
+	for t.tokenType != semicolon && t.tokenType != assign && t.tokenType != eof {
+		if t.tokenType == word {
+			wordCnt++
+		}
+		p.pos++
+		t = p.curToken()
+	}
+	p.pos = pPrev
+	return wordCnt >= 2
 }
 
 func (p *Parser) parseVariableDecl() Statement {
