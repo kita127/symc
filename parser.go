@@ -366,20 +366,7 @@ func (p *Parser) parseBlockStatement() []Statement {
 }
 
 func (p *Parser) parseExpressionStatement() []Statement {
-	var ss []Statement = nil
-	l := p.parseExpression()
-
-	ss = append(ss, l...)
-
-	if p.curToken().isOperator() {
-		for p.curToken().isOperator() {
-			// 中置演算子は無視する
-			p.pos++
-		}
-		r := p.parseExpression()
-		ss = append(ss, r...)
-	}
-
+	ss := p.parseExpression()
 	// semicolon
 	p.pos++
 	return ss
@@ -406,18 +393,21 @@ func (p *Parser) parseExpression() []Statement {
 		l := p.parseAccessVar()
 		ss = append(ss, l)
 
-		if p.curToken().isOperator() {
-			p.pos++
-			r := p.parseExpression()
-			ss = append(ss, r...)
-		}
-
 	case integer:
 		p.pos++
 		ss = []Statement{}
 	default:
 		return nil
 	}
+
+	if p.curToken().isOperator() {
+		for p.curToken().isOperator() {
+			p.pos++
+		}
+		r := p.parseExpression()
+		ss = append(ss, r...)
+	}
+
 	return ss
 }
 

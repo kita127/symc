@@ -670,6 +670,28 @@ void func()
 				},
 			},
 		},
+		{
+			"function def 21",
+			`
+void func()
+{
+    var1 = a1 + b1 + c1;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// +=
+							&AccessVar{Name: "var1"},
+							&AccessVar{Name: "a1"},
+							&AccessVar{Name: "b1"},
+							&AccessVar{Name: "c1"},
+						}},
+				},
+			},
+		},
 		//		{
 		//			"function def 4",
 		//			`
