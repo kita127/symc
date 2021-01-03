@@ -63,14 +63,14 @@ func (v *PrototypeDecl) String() string {
 }
 
 type FunctionDef struct {
-	Name   string
-	Params []*VariableDef
-	Block  *BlockStatement
+	Name       string
+	Params     []*VariableDef
+	Statements []Statement
 }
 
 func (v *FunctionDef) statementNode() {}
 func (v *FunctionDef) String() string {
-	return fmt.Sprintf("FunctionDef : Name=%s, Params=%s, Block=%s", v.Name, v.Params, v.Block)
+	return fmt.Sprintf("FunctionDef : Name=%s, Params=%s, Statements=%s", v.Name, v.Params, v.Statements)
 }
 
 type BlockStatement struct {
@@ -108,6 +108,14 @@ func (v *Typedef) String() string {
 	return fmt.Sprintf("Typedef : Name=%s", v.Name)
 }
 
+type Nothing struct {
+}
+
+func (v *Nothing) statementNode() {}
+func (v *Nothing) String() string {
+	return fmt.Sprintf("Nothing")
+}
+
 // 構文解析器
 type Parser struct {
 	lexer   *Lexer
@@ -135,6 +143,9 @@ func (p *Parser) parseModule() *Module {
 		}
 		if s := p.parseStatement(); s != nil {
 			ss = append(ss, s)
+			if _, yes := s.(*InvalidStatement); yes {
+				break
+			}
 		}
 	}
 	m := &Module{ss}
@@ -154,6 +165,9 @@ func (p *Parser) parseStatement() Statement {
 		if s == nil {
 			s = p.parseVariableDecl()
 		}
+		if s == nil {
+			return &InvalidStatement{Contents: "could not parse", Tk: p.curToken()}
+		}
 	case keyStruct:
 		p.skipStruct()
 	case keyAttribute:
@@ -169,20 +183,8 @@ func (p *Parser) parseStatement() Statement {
 		if s == nil {
 			s = p.parseVariableDef()
 		}
-	}
-	return s
-}
-
-func (p *Parser) parseBlockStatementSub() Statement {
-	var s Statement = nil
-	p.prevPos = p.pos
-	switch p.curToken().tokenType {
-	default:
 		if s == nil {
-			s = p.parseVariableDef()
-		}
-		if s == nil {
-			s = p.parseAccessVar()
+			return &InvalidStatement{Contents: "could not parse", Tk: p.curToken()}
 		}
 	}
 	return s
@@ -214,6 +216,13 @@ func (p *Parser) parseVariableDef() Statement {
 	typeCnt++
 
 	if typeCnt <= 1 {
+		p.posReset()
+		return nil
+	}
+
+	if p.curToken().tokenType == asterisk {
+		// var *= hoge;
+		// この手の文と間違えないようにする
 		p.posReset()
 		return nil
 	}
@@ -313,34 +322,115 @@ func (p *Parser) parseFunctionDef() Statement {
 		return nil
 	}
 
-	x := p.parseBlockStatement()
+	ss := p.parseBlockStatement()
 
-	if b, ok := x.(*BlockStatement); ok {
-		return &FunctionDef{Name: id, Params: ps, Block: b}
-	} else {
+	return &FunctionDef{Name: id, Params: ps, Statements: ss}
+}
+
+func (p *Parser) parseBlockStatement() []Statement {
+	p.pos++
+
+	var ss []Statement = nil
+
+	for p.curToken().tokenType != rbrace {
+		var ts []Statement = nil
+		prevPos := p.pos
+		switch p.curToken().tokenType {
+		case lbrace:
+			ts = append(ts, p.parseBlockStatement()...)
+		case lparen:
+			fallthrough
+		case word:
+			if ts == nil {
+				if s := p.parseVariableDef(); s != nil {
+					ts = append(ts, s)
+				}
+			}
+			if ts == nil {
+				p.pos = prevPos
+				// other statement
+				ts = p.parseExpressionStatement()
+			}
+		}
+		ss = append(ss, ts...)
+	}
+
+	if ss == nil {
+		// 何もない
+		ss = []Statement{}
+	}
+
+	p.pos++
+
+	return ss
+}
+
+func (p *Parser) parseExpressionStatement() []Statement {
+	ss := p.parseExpression()
+	// semicolon
+	p.pos++
+	return ss
+}
+
+func (p *Parser) parseExpression() []Statement {
+	var ss []Statement = nil
+
+	switch p.curToken().tokenType {
+	case lparen:
+		prePos := p.pos
+		ts := p.parseCast()
+		if ts != nil {
+			ss = append(ss, ts...)
+		} else {
+			p.pos = prePos
+			p.pos++
+			ts := p.parseExpression()
+			ss = append(ss, ts...)
+			// rparen
+			p.pos++
+		}
+	case word:
+		l := p.parseAccessVar()
+		ss = append(ss, l)
+
+	case letter:
+		fallthrough
+	case integer:
+		p.pos++
+		ss = []Statement{}
+	default:
+		return nil
+	}
+
+	if p.curToken().isOperator() {
+		for p.curToken().isOperator() {
+			p.pos++
+		}
+		r := p.parseExpression()
+		ss = append(ss, r...)
+	}
+
+	return ss
+}
+
+func (p *Parser) parseCast() []Statement {
+	if p.curToken().tokenType != lparen {
 		p.posReset()
 		return nil
 	}
-}
-
-func (p *Parser) parseBlockStatement() Statement {
-	// lbrace の次へ
 	p.pos++
-
-	ss := []Statement{}
-	for p.curToken().tokenType != rbrace {
-		if p.curToken().IsTypeToken() {
-			s := p.parseBlockStatementSub()
-			ss = append(ss, s)
-		} else {
-			// パース対象外のトークンの場合はスキップする
-			p.pos++
+	for p.curToken().tokenType != rparen {
+		if p.curToken().tokenType != word {
+			p.posReset()
+			return nil
 		}
+		p.pos++
 	}
-	p.pos++
-	//next
 
-	return &BlockStatement{ss}
+	p.pos++
+	ss := p.parseExpression()
+
+	return ss
 }
 
 func (p *Parser) parseAccessVar() Statement {
@@ -356,6 +446,13 @@ func (p *Parser) parseAccessVar() Statement {
 func (p *Parser) parseParameter() []*VariableDef {
 	vs := []*VariableDef{}
 	p.pos++
+
+	if p.curToken().tokenType == rparen {
+		// パラメータになにもなし
+		p.pos++
+		// next
+		return vs
+	}
 
 	n := p.peekToken()
 	for {
