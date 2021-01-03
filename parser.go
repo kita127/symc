@@ -230,45 +230,14 @@ func (p *Parser) extractVarName() Statement {
 }
 
 func (p *Parser) parseVariableDef() Statement {
-	// semicolon or assign or lbracket or eof の手前まで pos を進める
-	typeCnt := 0
-	n := p.peekToken()
-	for n.tokenType != semicolon && n.tokenType != assign && n.tokenType != lbracket && n.tokenType != eof {
-		// 現在トークンが識別子もしくは型に関するかチェック
-		if !p.curToken().IsTypeToken() {
-			p.posReset()
-			return nil
-		}
-		typeCnt++
-		p.pos++
-		n = p.peekToken()
-	}
-	if n.tokenType == eof {
+
+	// 変数定義の場合は型に関連するワードもしくは識別子が最低２つはある
+	if !p.curToken().IsTypeToken() || !p.peekToken().IsTypeToken() {
 		p.posReset()
 		return nil
 	}
 
-	if !p.curToken().IsTypeToken() {
-		p.posReset()
-		return nil
-	}
-	typeCnt++
-
-	if typeCnt <= 1 {
-		p.posReset()
-		return nil
-	}
-
-	if p.curToken().tokenType == asterisk {
-		// var *= hoge;
-		// この手の文と間違えないようにする
-		p.posReset()
-		return nil
-	}
-
-	// Name
-	id := p.tokens[p.pos].literal
-	p.pos++
+	s := p.extractVarName()
 	// semicolon or assign or lbracket
 	switch p.curToken().tokenType {
 	case semicolon:
@@ -286,7 +255,7 @@ func (p *Parser) parseVariableDef() Statement {
 		p.posReset()
 		return nil
 	}
-	return &VariableDef{Name: id}
+	return s
 }
 
 func (p *Parser) parseVariableDecl() Statement {
