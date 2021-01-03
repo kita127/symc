@@ -424,91 +424,6 @@ void func(int a)
 		{
 			"function def 11",
 			`
-void func(int a)
-{
-    hoge = (char)10;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}},
-					},
-				},
-			},
-		},
-		{
-			"function def 12",
-			`
-void func(int a)
-{
-    hoge = (char)fuga;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
-					},
-				},
-			},
-		},
-		{
-			"function def 13",
-			`
-void func(int a)
-{
-    hoge = (char)(fuga);
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
-					},
-				},
-			},
-		},
-		{
-			"function def 14",
-			`
-void func(int a)
-{
-    hoge = (char)(fuga + piyo);
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}, &AccessVar{Name: "piyo"}},
-					},
-				},
-			},
-		},
-		{
-			"function def 15",
-			`
-void func(int a)
-{
-    hoge = (unsigned char)10;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}},
-					},
-				},
-			},
-		},
-		{
-			"function def 16",
-			`
 inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
 }
 `,
@@ -521,7 +436,7 @@ inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
 			},
 		},
 		{
-			"function def 17",
+			"function def 12",
 			`
 void func()
 {
@@ -536,7 +451,7 @@ void func()
 			},
 		},
 		{
-			"function def 18",
+			"expression 1",
 			`
 void func()
 {
@@ -592,7 +507,7 @@ void func()
 			},
 		},
 		{
-			"function def 19",
+			"expression 2",
 			`
 void func()
 {
@@ -623,7 +538,7 @@ void func()
 			},
 		},
 		{
-			"function def 20",
+			"expression 3",
 			`
 void func()
 {
@@ -671,7 +586,7 @@ void func()
 			},
 		},
 		{
-			"function def 21",
+			"expression 4",
 			`
 void func()
 {
@@ -693,7 +608,7 @@ void func()
 			},
 		},
 		{
-			"function def 22",
+			"expression 5",
 			`
 void func()
 {
@@ -741,6 +656,91 @@ void func()
 							&AccessVar{Name: "d6"},
 							&AccessVar{Name: "e6"},
 						}},
+				},
+			},
+		},
+		{
+			"cast 1",
+			`
+void func(int a)
+{
+    hoge = (char)10;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 2",
+			`
+void func(int a)
+{
+    hoge = (char)fuga;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 3",
+			`
+void func(int a)
+{
+    hoge = (char)(fuga);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 4",
+			`
+void func(int a)
+{
+    hoge = (char)(fuga + piyo);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}, &AccessVar{Name: "piyo"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 5",
+			`
+void func(int a)
+{
+    hoge = (unsigned char)10;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}},
+					},
 				},
 			},
 		},
