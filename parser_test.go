@@ -817,6 +817,23 @@ void func(void)
 				},
 			},
 		},
+		{
+			"return 1",
+			`
+void f_xxx(void)
+{
+    return;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "f_xxx",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
 		//		{
 		//			"function def 4",
 		//			`

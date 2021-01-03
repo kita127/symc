@@ -338,6 +338,8 @@ func (p *Parser) parseBlockStatement() []Statement {
 		switch p.curToken().tokenType {
 		case lbrace:
 			ts = append(ts, p.parseBlockStatement()...)
+		case keyReturn:
+			ts = p.parseReturn()
 		case lparen:
 			fallthrough
 		case word:
@@ -362,6 +364,18 @@ func (p *Parser) parseBlockStatement() []Statement {
 
 	p.pos++
 
+	return ss
+}
+
+func (p *Parser) parseReturn() []Statement {
+	var ss []Statement = nil
+	if p.curToken().tokenType == keyReturn {
+		ss = []Statement{}
+		p.pos++
+		// semicolon
+		p.pos++
+		// next
+	}
 	return ss
 }
 
