@@ -692,6 +692,58 @@ void func()
 				},
 			},
 		},
+		{
+			"function def 22",
+			`
+void func()
+{
+    var1 = (a1);
+    var2 = (a2 + b2);
+    var3 = ((a3 + b3) + c3);
+    var4 = (a4 + (b4 + c4));
+    var5 = ((a5 + b5) + (c5 + d5));
+    var6 = (((a6 + b6) - c6) + (d6 + e6));
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// 1
+							&AccessVar{Name: "var1"},
+							&AccessVar{Name: "a1"},
+							// 2
+							&AccessVar{Name: "var2"},
+							&AccessVar{Name: "a2"},
+							&AccessVar{Name: "b2"},
+							// 3
+							&AccessVar{Name: "var3"},
+							&AccessVar{Name: "a3"},
+							&AccessVar{Name: "b3"},
+							&AccessVar{Name: "c3"},
+							// 4
+							&AccessVar{Name: "var4"},
+							&AccessVar{Name: "a4"},
+							&AccessVar{Name: "b4"},
+							&AccessVar{Name: "c4"},
+							// 5
+							&AccessVar{Name: "var5"},
+							&AccessVar{Name: "a5"},
+							&AccessVar{Name: "b5"},
+							&AccessVar{Name: "c5"},
+							&AccessVar{Name: "d5"},
+							// 6
+							&AccessVar{Name: "var6"},
+							&AccessVar{Name: "a6"},
+							&AccessVar{Name: "b6"},
+							&AccessVar{Name: "c6"},
+							&AccessVar{Name: "d6"},
+							&AccessVar{Name: "e6"},
+						}},
+				},
+			},
+		},
 		//		{
 		//			"function def 4",
 		//			`
