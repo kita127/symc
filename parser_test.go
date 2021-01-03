@@ -790,6 +790,27 @@ void func(void)
 				},
 			},
 		},
+		{
+			"access struct var 1",
+			`
+void func(void)
+{
+    hoge.a1 = 'A';
+    fuga->b1 = 100;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&AccessVar{Name: "hoge.a1"},
+							&AccessVar{Name: "fuga->b1"},
+						},
+					},
+				},
+			},
+		},
 		//		{
 		//			"function def 4",
 		//			`
