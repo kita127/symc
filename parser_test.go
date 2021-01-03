@@ -89,6 +89,17 @@ int hoge = 0;
 			},
 		},
 		{
+			"function pointer def 1",
+			`
+void (* p_f)();
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
 			"variable decl 1",
 			`
 extern char fuga;`,
@@ -139,6 +150,18 @@ int renameat(int, const char *, int, const char *) __attribute__((availability(m
 			&Module{
 				[]Statement{
 					&PrototypeDecl{Name: "renameat"},
+				},
+			},
+		},
+		{
+			"prototype dec 4",
+			`
+extern int __vsnprintf_chk (char * restrict, size_t, int, size_t,
+       const char * restrict, va_list);
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "__vsnprintf_chk"},
 				},
 			},
 		},

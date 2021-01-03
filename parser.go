@@ -181,12 +181,51 @@ func (p *Parser) parseStatement() Statement {
 			s = p.parsePrototypeDecl()
 		}
 		if s == nil {
+			s = p.parseFunctionPointerDef()
+		}
+		if s == nil {
 			s = p.parseVariableDef()
 		}
 		if s == nil {
 			return &InvalidStatement{Contents: "could not parse", Tk: p.curToken()}
 		}
 	}
+	return s
+}
+
+func (p *Parser) parseFunctionPointerDef() Statement {
+	for p.curToken().tokenType != lparen {
+		if !p.curToken().IsTypeToken() {
+			p.posReset()
+			return nil
+		}
+		p.pos++
+	}
+	p.pos++
+	s := p.extractVarName()
+	if s == nil {
+		p.posReset()
+		return nil
+	}
+	p.progUntil(semicolon)
+	p.pos++
+	return s
+}
+
+func (p *Parser) extractVarName() Statement {
+	n := p.peekToken()
+	for n.IsTypeToken() {
+		if !p.curToken().IsTypeToken() {
+			return nil
+		}
+		p.pos++
+		n = p.peekToken()
+	}
+	if p.curToken().tokenType != word {
+		return nil
+	}
+	s := &VariableDef{Name: p.curToken().literal}
+	p.pos++
 	return s
 }
 
@@ -277,7 +316,7 @@ func (p *Parser) parsePrototypeDecl() Statement {
 		n = p.peekToken()
 	}
 
-	if !p.curToken().IsTypeToken() {
+	if p.curToken().tokenType != word {
 		p.posReset()
 		return nil
 	}
