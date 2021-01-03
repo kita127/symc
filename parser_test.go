@@ -824,12 +824,28 @@ void f_xxx(void)
 {
     return;
 }
+void f_yyy(void)
+{
+    return 10;
+}
+void f_zzz(void)
+{
+    return a;
+}
 `,
 			&Module{
 				[]Statement{
 					&FunctionDef{Name: "f_xxx",
 						Params:     []*VariableDef{},
 						Statements: []Statement{},
+					},
+					&FunctionDef{Name: "f_yyy",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+					&FunctionDef{Name: "f_zzz",
+						Params:     []*VariableDef{},
+						Statements: []Statement{&AccessVar{Name: "a"}},
 					},
 				},
 			},

@@ -372,7 +372,11 @@ func (p *Parser) parseReturn() []Statement {
 	if p.curToken().tokenType == keyReturn {
 		ss = []Statement{}
 		p.pos++
-		// semicolon
+		if p.curToken().tokenType != semicolon {
+			// 何らかの式がある
+			ts := p.parseExpression()
+			ss = append(ss, ts...)
+		}
 		p.pos++
 		// next
 	}
