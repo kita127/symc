@@ -89,6 +89,50 @@ int hoge = 0;
 			},
 		},
 		{
+			"function pointer def 1",
+			`
+void (* p_f)();
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
+			"function pointer def 2",
+			`
+int (* p_f)();
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
+			"function pointer def 3",
+			`
+int (* p_f)(void);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
+			"function pointer def 4",
+			`
+const * AnyType (* p_f)(int a, char b[]);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
 			"variable decl 1",
 			`
 extern char fuga;`,
@@ -106,6 +150,17 @@ extern const int *hoge;
 			&Module{
 				[]Statement{
 					&VariableDecl{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable decl 3",
+			`
+extern int (* p_f)(void);
+`,
+			&Module{
+				[]Statement{
+					&VariableDecl{Name: "p_f"},
 				},
 			},
 		},
@@ -139,6 +194,29 @@ int renameat(int, const char *, int, const char *) __attribute__((availability(m
 			&Module{
 				[]Statement{
 					&PrototypeDecl{Name: "renameat"},
+				},
+			},
+		},
+		{
+			"prototype dec 4",
+			`
+extern int __vsnprintf_chk (char * restrict, size_t, int, size_t,
+       const char * restrict, va_list);
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "__vsnprintf_chk"},
+				},
+			},
+		},
+		{
+			"prototype dec 5",
+			`
+int  _read(void *, char *, int);
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "_read"},
 				},
 			},
 		},
@@ -374,13 +452,19 @@ void func(int a)
 void func(int a)
 {
     hoge = fuga;
+    p_var = &address;
 }
 `,
 			&Module{
 				[]Statement{
 					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+						Params: []*VariableDef{{Name: "a"}},
+						Statements: []Statement{
+							&AccessVar{Name: "hoge"},
+							&AccessVar{Name: "fuga"},
+							&AccessVar{Name: "p_var"},
+							&AccessVar{Name: "address"},
+						},
 					},
 				},
 			},
@@ -790,6 +874,60 @@ void func(void)
 				},
 			},
 		},
+		{
+			"access struct var 1",
+			`
+void func(void)
+{
+    hoge.a1 = 'A';
+    fuga->b1 = 100;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&AccessVar{Name: "hoge.a1"},
+							&AccessVar{Name: "fuga->b1"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"return 1",
+			`
+void f_xxx(void)
+{
+    return;
+}
+void f_yyy(void)
+{
+    return 10;
+}
+void f_zzz(void)
+{
+    return a;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "f_xxx",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+					&FunctionDef{Name: "f_yyy",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+					&FunctionDef{Name: "f_zzz",
+						Params:     []*VariableDef{},
+						Statements: []Statement{&AccessVar{Name: "a"}},
+					},
+				},
+			},
+		},
 		//		{
 		//			"function def 4",
 		//			`
@@ -879,6 +1017,144 @@ void func(void)
 		//				},
 		//			},
 		//		},
+		//		{
+		//			"testx",
+		//			`
+		//# 1 "hoge.c"
+		//# 1 "<built-in>" 1
+		//# 1 "<built-in>" 3
+		//# 366 "<built-in>" 3
+		//# 1 "<command line>" 1
+		//# 1 "<built-in>" 2
+		//# 1 "hoge.c" 2
+		//
+		//int func(int a)
+		//{
+		//    int hoge = 0;
+		//    hoge++;
+		//    a = a + (10);
+		//    return a;
+		//}
+		//`,
+		//			&Module{
+		//				[]Statement{
+		//					&FunctionDef{Name: "func",
+		//						Params: []*VariableDef{{Name: "a"}},
+		//						Block: &BlockStatement{Statements: []Statement{
+		//							&VariableDef{Name: "hoge"},
+		//							&AccessVar{Name: "hoge"},
+		//							&AccessVar{Name: "a"},
+		//							&AccessVar{Name: "a"},
+		//							&AccessVar{Name: "a"},
+		//						},
+		//						},
+		//					},
+		//				},
+		//			},
+		//		},
+		//		{
+		//			"test err1",
+		//			`int hoge`,
+		//			&Module{
+		//				[]Statement{
+		//					&InvalidStatement{Contents: "parse, err parse function def, err parse prototype decl, err parse variable def"},
+		//				},
+		//			},
+		//		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("got=%v, expect=%v", got, tt.expect)
+		}
+	}
+}
+
+func TestParseApp(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"app test 1",
+			`
+# 1 "hoge.c"
+# 1 "<built-in>" 1
+# 1 "<built-in>" 3
+# 366 "<built-in>" 3
+# 1 "<command line>" 1
+# 1 "<built-in>" 2
+# 1 "hoge.c" 2
+# 1 "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdio.h" 1 3 4
+# 64 "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/stdio.h" 3 4
+# 1 "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h" 1 3 4
+# 68 "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdio.h" 3 4
+# 1 "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/cdefs.h" 1 3 4
+# 647 "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/sys/cdefs.h" 3 4
+
+typedef struct {
+  char xxx;
+} Gt;
+
+typedef struct {
+  int aaa;
+  Gt bbb;
+} St;
+
+int muruchi_piyomi(char *s) {
+  St purin;
+  St *p;
+  purin.aaa = 100;
+  purin.bbb.xxx = 'A';
+  p = &purin;
+  p->aaa = purin.aaa + 200;
+  return (0);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "muruchi_piyomi",
+						Params: []*VariableDef{{Name: "s"}},
+						Statements: []Statement{
+							&VariableDef{Name: "purin"},
+							&VariableDef{Name: "p"},
+							&AccessVar{Name: "purin.aaa"},
+							&AccessVar{Name: "purin.bbb.xxx"},
+							&AccessVar{Name: "p"},
+							&AccessVar{Name: "purin"},
+							&AccessVar{Name: "p->aaa"},
+							&AccessVar{Name: "purin.aaa"},
+						}},
+				},
+			},
+		},
+
+		{
+			"app 2",
+			`
+void hoge(void){
+  _p->_p++ = _c;
+  _p->_p-- = _c;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "hoge",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&AccessVar{Name: "_p->_p"},
+							&AccessVar{Name: "_c"},
+							&AccessVar{Name: "_p->_p"},
+							&AccessVar{Name: "_c"},
+						}},
+				},
+			},
+		},
 		//		{
 		//			"testx",
 		//			`

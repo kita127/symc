@@ -190,94 +190,124 @@ func (p *Parser) parseStatement() Statement {
 	return s
 }
 
-func (p *Parser) parseVariableDef() Statement {
-	// semicolon or assign or lbracket or eof の手前まで pos を進める
-	typeCnt := 0
-	n := p.peekToken()
-	for n.tokenType != semicolon && n.tokenType != assign && n.tokenType != lbracket && n.tokenType != eof {
-		// 現在トークンが識別子もしくは型に関するかチェック
-		if !p.curToken().IsTypeToken() {
-			p.posReset()
-			return nil
+func (p *Parser) extractVarName() (string, error) {
+	e := fmt.Errorf("fail extractVarName token=%s", p.curToken().literal)
+
+	for {
+		if p.curToken().tokenType == lparen {
+			p.pos++
+			s, err := p.extractVarName()
+			if err != nil {
+				return "", e
+			}
+			// rparen
+			p.pos++
+			return s, nil
+		} else if !p.curToken().IsTypeToken() {
+			break
 		}
-		typeCnt++
 		p.pos++
-		n = p.peekToken()
-	}
-	if n.tokenType == eof {
-		p.posReset()
-		return nil
 	}
 
-	if !p.curToken().IsTypeToken() {
-		p.posReset()
-		return nil
-	}
-	typeCnt++
+	p.pos--
 
-	if typeCnt <= 1 {
-		p.posReset()
-		return nil
+	if p.curToken().tokenType != word {
+		return "", e
 	}
 
-	if p.curToken().tokenType == asterisk {
-		// var *= hoge;
-		// この手の文と間違えないようにする
-		p.posReset()
-		return nil
-	}
-
-	// Name
-	id := p.tokens[p.pos].literal
+	s := p.curToken().literal
 	p.pos++
+	return s, nil
+
+}
+
+func (p *Parser) parseVariableDef() Statement {
+
+	// 変数定義か確認する
+	if !p.isVariabeDef() {
+		p.posReset()
+		return nil
+	}
+
+	s, err := p.extractVarName()
+	if err != nil {
+		p.posReset()
+		return nil
+	}
 	// semicolon or assign or lbracket
 	switch p.curToken().tokenType {
 	case semicolon:
 		fallthrough
 	case assign:
 		fallthrough
+	case lparen:
+		fallthrough
 	case lbracket:
 		// semicolon まで進める
-		for p.curToken().tokenType != semicolon {
-			p.pos++
-		}
+		p.progUntil(semicolon)
 		p.pos++
 		// next
 	default:
 		p.posReset()
 		return nil
 	}
-	return &VariableDef{Name: id}
+	return &VariableDef{Name: s}
+}
+
+func (p *Parser) isVariabeDef() bool {
+	// セミコロンもしくはイコールまでの間に型を表すトークンが2つ以上なければ変数定義ではない
+	wordCnt := 0
+	pPrev := p.pos
+	t := p.curToken()
+	for t.tokenType != semicolon && t.tokenType != assign && t.tokenType != eof {
+		if t.IsTypeToken() {
+			wordCnt++
+		}
+		p.pos++
+		t = p.curToken()
+	}
+	p.pos = pPrev
+	return wordCnt >= 2
 }
 
 func (p *Parser) parseVariableDecl() Statement {
-	// セミコロンの手前まで pos を進める
-	for p.peekToken().tokenType != semicolon {
-		p.pos++
+	// extern
+	p.pos++
+
+	id, err := p.extractVarName()
+	if err != nil {
+		p.posReset()
+		return nil
 	}
-	// Name
-	id := p.curToken().literal
+
+    // セミコロンまでスキップ
+	p.progUntil(semicolon)
+
 	p.pos++
-	// semicolon
-	p.pos++
-	// next
+    // next
 
 	return &VariableDecl{Name: id}
 }
 
 func (p *Parser) parsePrototypeDecl() Statement {
-	n := p.peekToken()
-	for n.tokenType != lparen {
-		// 現在トークンが識別子もしくは型に関するかチェック
-		if !p.curToken().IsTypeToken() && p.curToken().tokenType != keyExtern {
-			p.posReset()
-			return nil
-		}
+
+	if p.curToken().tokenType == keyExtern {
 		p.pos++
-		n = p.peekToken()
 	}
 
-	if !p.curToken().IsTypeToken() {
+	for p.curToken().IsTypeToken() {
+		p.pos++
+	}
+
+	if p.curToken().tokenType != lparen {
+		// ( でなければプロトタイプ宣言ではない
+		p.posReset()
+		return nil
+	}
+
+	p.pos--
+
+	if p.curToken().tokenType != word {
 		p.posReset()
 		return nil
 	}
@@ -285,8 +315,20 @@ func (p *Parser) parsePrototypeDecl() Statement {
 	// Name
 	id := p.curToken().literal
 
-	// semicolon まで進める
-	p.progUntil(semicolon)
+	p.pos++
+
+	// 関数の引数の括弧は飛ばす
+	p.skipParen()
+
+	if p.curToken().tokenType == keyAttribute {
+		// attribute の場合はセミコロンまでスキップ
+		p.progUntil(semicolon)
+	} else if p.curToken().tokenType != semicolon {
+		// セミコロン意外はプロトタイプ宣言ではない
+		p.posReset()
+		return nil
+	}
+
 	p.pos++
 	// next
 	return &PrototypeDecl{Name: id}
@@ -338,6 +380,8 @@ func (p *Parser) parseBlockStatement() []Statement {
 		switch p.curToken().tokenType {
 		case lbrace:
 			ts = append(ts, p.parseBlockStatement()...)
+		case keyReturn:
+			ts = p.parseReturn()
 		case lparen:
 			fallthrough
 		case word:
@@ -362,6 +406,22 @@ func (p *Parser) parseBlockStatement() []Statement {
 
 	p.pos++
 
+	return ss
+}
+
+func (p *Parser) parseReturn() []Statement {
+	var ss []Statement = nil
+	if p.curToken().tokenType == keyReturn {
+		ss = []Statement{}
+		p.pos++
+		if p.curToken().tokenType != semicolon {
+			// 何らかの式がある
+			ts := p.parseExpression()
+			ss = append(ss, ts...)
+		}
+		p.pos++
+		// next
+	}
 	return ss
 }
 
