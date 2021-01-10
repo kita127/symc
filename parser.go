@@ -181,9 +181,6 @@ func (p *Parser) parseStatement() Statement {
 			s = p.parsePrototypeDecl()
 		}
 		if s == nil {
-			s = p.parseFunctionPointerDef()
-		}
-		if s == nil {
 			s = p.parseVariableDef()
 		}
 		if s == nil {
@@ -193,40 +190,31 @@ func (p *Parser) parseStatement() Statement {
 	return s
 }
 
-func (p *Parser) parseFunctionPointerDef() Statement {
-	for p.curToken().tokenType != lparen {
-		if !p.curToken().IsTypeToken() {
-			p.posReset()
-			return nil
-		}
-		p.pos++
-	}
-	p.pos++
-	s := p.extractVarName()
-	if s == nil {
-		p.posReset()
-		return nil
-	}
-	p.progUntil(semicolon)
-	p.pos++
-	return s
-}
-
 func (p *Parser) extractVarName() Statement {
-	n := p.peekToken()
-	for n.IsTypeToken() {
-		if !p.curToken().IsTypeToken() {
-			return nil
+
+	for {
+		if p.curToken().tokenType == lparen {
+			p.pos++
+			s := p.extractVarName()
+			// rparen
+			p.pos++
+			return s
+		} else if !p.curToken().IsTypeToken() {
+			break
 		}
 		p.pos++
-		n = p.peekToken()
 	}
+
+	p.pos--
+
 	if p.curToken().tokenType != word {
 		return nil
 	}
+
 	s := &VariableDef{Name: p.curToken().literal}
 	p.pos++
 	return s
+
 }
 
 func (p *Parser) parseVariableDef() Statement {
@@ -244,6 +232,8 @@ func (p *Parser) parseVariableDef() Statement {
 		fallthrough
 	case assign:
 		fallthrough
+	case lparen:
+		fallthrough
 	case lbracket:
 		// semicolon まで進める
 		for p.curToken().tokenType != semicolon {
@@ -259,12 +249,12 @@ func (p *Parser) parseVariableDef() Statement {
 }
 
 func (p *Parser) isVariabeDef() bool {
-	// セミコロンもしくはイコールまでの間に word が2つ以上なければ変数定義ではない
+	// セミコロンもしくはイコールまでの間に型を表すトークンが2つ以上なければ変数定義ではない
 	wordCnt := 0
 	pPrev := p.pos
 	t := p.curToken()
 	for t.tokenType != semicolon && t.tokenType != assign && t.tokenType != eof {
-		if t.tokenType == word {
+		if t.IsTypeToken() {
 			wordCnt++
 		}
 		p.pos++
