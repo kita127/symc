@@ -1217,6 +1217,29 @@ void func(void)
 				},
 			},
 		},
+		{
+			"if 3",
+			`
+void func(void)
+{
+    if ( hoge == 0){
+        fuga = a + (1 - 2);
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&AccessVar{Name: "hoge"},
+							&AccessVar{Name: "fuga"},
+							&AccessVar{Name: "a"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

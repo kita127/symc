@@ -416,9 +416,13 @@ func (p *Parser) parseIfStatement() []Statement {
 	// if
 	p.pos++
 
-	ss := p.parseExpression()
+	ss := []Statement{}
 
-	p.parseBlockStatement()
+	// 条件式
+	ss = append(ss, p.parseExpression()...)
+
+	// ブロック分
+	ss = append(ss, p.parseBlockStatement()...)
 
 	return ss
 }
