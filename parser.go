@@ -19,10 +19,24 @@ func (m *Module) String() string {
 	s += " }"
 	return s
 }
+func (v *Module) PrettyString() string {
+	txt := ""
+
+	for _, s := range v.Statements {
+		txt += s.PrettyString()
+		txt += "\n"
+	}
+	return txt
+}
+
+type PrettyStringer interface {
+	PrettyString() string
+}
 
 type Statement interface {
 	statementNode()
 	fmt.Stringer
+	PrettyStringer
 }
 
 type InvalidStatement struct {
@@ -34,6 +48,9 @@ func (v *InvalidStatement) statementNode() {}
 func (v *InvalidStatement) String() string {
 	return fmt.Sprintf("InvalidStatement : Contents=%s, Tk=%s", v.Contents, v.Tk.literal)
 }
+func (v *InvalidStatement) PrettyString() string {
+	return fmt.Sprintf("InvalidStatement(%s)a", v.Tk.literal)
+}
 
 type VariableDef struct {
 	Name string
@@ -42,6 +59,9 @@ type VariableDef struct {
 func (v *VariableDef) statementNode() {}
 func (v *VariableDef) String() string {
 	return fmt.Sprintf("VariableDef : Name=%s", v.Name)
+}
+func (v *VariableDef) PrettyString() string {
+	return fmt.Sprintf("var %s", v.Name)
 }
 
 type VariableDecl struct {
@@ -52,6 +72,9 @@ func (v *VariableDecl) statementNode() {}
 func (v *VariableDecl) String() string {
 	return fmt.Sprintf("VariableDecl : Name=%s", v.Name)
 }
+func (v *VariableDecl) PrettyString() string {
+	return fmt.Sprintf("dec %s", v.Name)
+}
 
 type PrototypeDecl struct {
 	Name string
@@ -60,6 +83,9 @@ type PrototypeDecl struct {
 func (v *PrototypeDecl) statementNode() {}
 func (v *PrototypeDecl) String() string {
 	return fmt.Sprintf("PrototypeDecl : Name=%s", v.Name)
+}
+func (v *PrototypeDecl) PrettyString() string {
+	return fmt.Sprintf("prototype %s", v.Name)
 }
 
 type FunctionDef struct {
@@ -72,22 +98,26 @@ func (v *FunctionDef) statementNode() {}
 func (v *FunctionDef) String() string {
 	return fmt.Sprintf("FunctionDef : Name=%s, Params=%s, Statements=%s", v.Name, v.Params, v.Statements)
 }
+func (v *FunctionDef) PrettyString() string {
+	txt := fmt.Sprintf("func %s (", v.Name)
 
-type BlockStatement struct {
-	Statements []Statement
-}
-
-func (v *BlockStatement) statementNode() {}
-func (v *BlockStatement) String() string {
-	s := fmt.Sprintf("BlockStatement={")
 	sep := ""
-	for _, v2 := range v.Statements {
-		s += sep
-		sep = ", "
-		s += v2.String()
+	for _, p := range v.Params {
+		txt += sep
+		txt += p.PrettyString()
+		sep = " ,"
 	}
-	s += " }"
-	return s
+
+	txt += ") {\n"
+
+	for _, t := range v.Statements {
+		txt += "    "
+		txt += t.PrettyString()
+		txt += "\n"
+	}
+	txt += "}\n"
+
+	return txt
 }
 
 type AccessVar struct {
@@ -98,6 +128,9 @@ func (v *AccessVar) statementNode() {}
 func (v *AccessVar) String() string {
 	return fmt.Sprintf("AccessVar : Name=%s", v.Name)
 }
+func (v *AccessVar) PrettyString() string {
+	return fmt.Sprintf("%s", v.Name)
+}
 
 type Typedef struct {
 	Name string
@@ -107,6 +140,9 @@ func (v *Typedef) statementNode() {}
 func (v *Typedef) String() string {
 	return fmt.Sprintf("Typedef : Name=%s", v.Name)
 }
+func (v *Typedef) PrettyString() string {
+	return fmt.Sprintf("%s", v.Name)
+}
 
 type Nothing struct {
 }
@@ -114,6 +150,9 @@ type Nothing struct {
 func (v *Nothing) statementNode() {}
 func (v *Nothing) String() string {
 	return fmt.Sprintf("Nothing")
+}
+func (v *Nothing) PrettyString() string {
+	return ""
 }
 
 // 構文解析器

@@ -10,6 +10,6 @@ import (
 
 func main() {
 	input, _ := ioutil.ReadAll(os.Stdin)
-	res := symc.ParseModule(string(input))
-	fmt.Println(res)
+	module := symc.ParseModule(string(input))
+	fmt.Println(module.PrettyString())
 }
