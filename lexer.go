@@ -391,7 +391,7 @@ func isDec(c byte) bool {
 	return '0' <= c && c <= '9'
 }
 
-func (t *Token) IsTypeToken() bool {
+func (t *Token) isTypeToken() bool {
 	return (t.tokenType == word || t.tokenType == asterisk || t.tokenType == keyConst || t.tokenType == keyAttribute || t.tokenType == keyVoid)
 }
 

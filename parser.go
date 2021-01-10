@@ -203,7 +203,7 @@ func (p *Parser) extractVarName() (string, error) {
 			// rparen
 			p.pos++
 			return s, nil
-		} else if !p.curToken().IsTypeToken() {
+		} else if !p.curToken().isTypeToken() {
 			break
 		}
 		p.pos++
@@ -260,7 +260,7 @@ func (p *Parser) isVariabeDef() bool {
 	pPrev := p.pos
 	t := p.curToken()
 	for t.tokenType != semicolon && t.tokenType != assign && t.tokenType != eof {
-		if t.IsTypeToken() {
+		if t.isTypeToken() {
 			wordCnt++
 		}
 		p.pos++
@@ -295,7 +295,7 @@ func (p *Parser) parsePrototypeDecl() Statement {
 		p.pos++
 	}
 
-	for p.curToken().IsTypeToken() {
+	for p.curToken().isTypeToken() {
 		p.pos++
 	}
 
@@ -338,7 +338,7 @@ func (p *Parser) parsePrototypeDecl() Statement {
 func (p *Parser) parseFunctionDef() Statement {
 	// lparen or eof の手前まで pos を進める
 	n := p.peekToken()
-	for n.IsTypeToken() {
+	for n.isTypeToken() {
 		p.pos++
 		if p.curToken().tokenType == keyAttribute {
 			p.skipParen()
@@ -534,7 +534,7 @@ func (p *Parser) parseParameter() []*VariableDef {
 
 	n := p.peekToken()
 	for {
-		for n.IsTypeToken() {
+		for n.isTypeToken() {
 			p.pos++
 			n = p.peekToken()
 		}
