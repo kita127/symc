@@ -236,9 +236,7 @@ func (p *Parser) parseVariableDef() Statement {
 		fallthrough
 	case lbracket:
 		// semicolon まで進める
-		for p.curToken().tokenType != semicolon {
-			p.pos++
-		}
+		p.progUntil(semicolon)
 		p.pos++
 		// next
 	default:
