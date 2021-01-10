@@ -572,6 +572,7 @@ void func()
     var6 = a6 &  b6;
     var7 = a7 || b7;
     var8 = a8 && b8;
+    var9 = a9 > b9;
 }
 `,
 			&Module{
@@ -611,6 +612,10 @@ void func()
 							&AccessVar{Name: "var8"},
 							&AccessVar{Name: "a8"},
 							&AccessVar{Name: "b8"},
+							// >
+							&AccessVar{Name: "var9"},
+							&AccessVar{Name: "a9"},
+							&AccessVar{Name: "b9"},
 						}},
 				},
 			},
