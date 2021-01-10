@@ -210,6 +210,17 @@ extern int __vsnprintf_chk (char * restrict, size_t, int, size_t,
 			},
 		},
 		{
+			"prototype dec 5",
+			`
+int  _read(void *, char *, int);
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "_read"},
+				},
+			},
+		},
+		{
 			"typedef 1",
 			`
 typedef unsigned char __uint8_t;
