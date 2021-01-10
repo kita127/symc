@@ -416,11 +416,11 @@ func (p *Parser) parseIfStatement() []Statement {
 	// if
 	p.pos++
 
-	p.skipParen()
+	ss := p.parseExpression()
 
 	p.parseBlockStatement()
 
-	return []Statement{}
+	return ss
 }
 
 func (p *Parser) parseReturn() []Statement {

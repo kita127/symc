@@ -1197,6 +1197,26 @@ void func(void)
 				},
 			},
 		},
+		{
+			"if 2",
+			`
+void func(void)
+{
+    if ( hoge == 0){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&AccessVar{Name: "hoge"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
