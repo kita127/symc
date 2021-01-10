@@ -190,15 +190,19 @@ func (p *Parser) parseStatement() Statement {
 	return s
 }
 
-func (p *Parser) extractVarName() Statement {
+func (p *Parser) extractVarName() (string, error) {
+	e := fmt.Errorf("fail extractVarName token=%s", p.curToken().literal)
 
 	for {
 		if p.curToken().tokenType == lparen {
 			p.pos++
-			s := p.extractVarName()
+			s, err := p.extractVarName()
+			if err != nil {
+				return "", e
+			}
 			// rparen
 			p.pos++
-			return s
+			return s, nil
 		} else if !p.curToken().IsTypeToken() {
 			break
 		}
@@ -208,12 +212,12 @@ func (p *Parser) extractVarName() Statement {
 	p.pos--
 
 	if p.curToken().tokenType != word {
-		return nil
+		return "", e
 	}
 
-	s := &VariableDef{Name: p.curToken().literal}
+	s := p.curToken().literal
 	p.pos++
-	return s
+	return s, nil
 
 }
 
@@ -225,7 +229,11 @@ func (p *Parser) parseVariableDef() Statement {
 		return nil
 	}
 
-	s := p.extractVarName()
+	s, err := p.extractVarName()
+	if err != nil {
+		p.posReset()
+		return nil
+	}
 	// semicolon or assign or lbracket
 	switch p.curToken().tokenType {
 	case semicolon:
@@ -243,7 +251,7 @@ func (p *Parser) parseVariableDef() Statement {
 		p.posReset()
 		return nil
 	}
-	return s
+	return &VariableDef{Name: s}
 }
 
 func (p *Parser) isVariabeDef() bool {
@@ -263,16 +271,20 @@ func (p *Parser) isVariabeDef() bool {
 }
 
 func (p *Parser) parseVariableDecl() Statement {
-	// セミコロンの手前まで pos を進める
-	for p.peekToken().tokenType != semicolon {
-		p.pos++
+	// extern
+	p.pos++
+
+	id, err := p.extractVarName()
+	if err != nil {
+		p.posReset()
+		return nil
 	}
-	// Name
-	id := p.curToken().literal
+
+    // セミコロンまでスキップ
+	p.progUntil(semicolon)
+
 	p.pos++
-	// semicolon
-	p.pos++
-	// next
+    // next
 
 	return &VariableDecl{Name: id}
 }

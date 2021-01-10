@@ -154,6 +154,17 @@ extern const int *hoge;
 			},
 		},
 		{
+			"variable decl 3",
+			`
+extern int (* p_f)(void);
+`,
+			&Module{
+				[]Statement{
+					&VariableDecl{Name: "p_f"},
+				},
+			},
+		},
+		{
 			"prototype dec 1",
 			`
 void func_a( void );
