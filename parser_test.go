@@ -928,45 +928,6 @@ void f_zzz(void)
 				},
 			},
 		},
-		//		{
-		//			"function def 4",
-		//			`
-		//typedef struct {
-		//  char xxx;
-		//} Gt;
-		//
-		//typedef struct {
-		//  int aaa;
-		//  Gt bbb;
-		//} St;
-		//
-		//int muruchi_piyomi(char *s) {
-		//  St purin;
-		//  St *p;
-		//  purin.aaa = 100;
-		//  purin.bbb.xxx = 'A';
-		//  p = &purin;
-		//  p->aaa = purin.aaa + 200;
-		//  return (0);
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "muruchi_piyomi",
-		//						Params: []*VariableDef{{Name: "s"}},
-		//						Statements: []Statement{
-		//							&VariableDef{Name: "purin"},
-		//							&VariableDef{Name: "p"},
-		//							&AccessVar{Name: "purin.aaa"},
-		//							&AccessVar{Name: "purin.bbb.xxx"},
-		//							&AccessVar{Name: "p"},
-		//							&AccessVar{Name: "purin"},
-		//							&AccessVar{Name: "p->aaa"},
-		//							&AccessVar{Name: "purin.aaa"},
-		//						}},
-		//				},
-		//			},
-		//		},
 
 		//		{
 		//			"function def 5",
@@ -1199,6 +1160,43 @@ void hoge(void){
 		//				},
 		//			},
 		//		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("got=%v, expect=%v", got, tt.expect)
+		}
+	}
+}
+
+func TestStatements(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"if 1",
+			`
+void func(void)
+{
+    if (1){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

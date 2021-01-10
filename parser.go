@@ -280,11 +280,11 @@ func (p *Parser) parseVariableDecl() Statement {
 		return nil
 	}
 
-    // セミコロンまでスキップ
+	// セミコロンまでスキップ
 	p.progUntil(semicolon)
 
 	p.pos++
-    // next
+	// next
 
 	return &VariableDecl{Name: id}
 }
@@ -365,6 +365,10 @@ func (p *Parser) parseFunctionDef() Statement {
 	}
 
 	ss := p.parseBlockStatement()
+	if ss == nil {
+		p.posReset()
+		return nil
+	}
 
 	return &FunctionDef{Name: id, Params: ps, Statements: ss}
 }
@@ -372,7 +376,7 @@ func (p *Parser) parseFunctionDef() Statement {
 func (p *Parser) parseBlockStatement() []Statement {
 	p.pos++
 
-	var ss []Statement = nil
+	ss := []Statement{}
 
 	for p.curToken().tokenType != rbrace {
 		var ts []Statement = nil
@@ -382,6 +386,8 @@ func (p *Parser) parseBlockStatement() []Statement {
 			ts = append(ts, p.parseBlockStatement()...)
 		case keyReturn:
 			ts = p.parseReturn()
+		case keyIf:
+			ts = p.parseIfStatement()
 		case lparen:
 			fallthrough
 		case word:
@@ -395,18 +401,26 @@ func (p *Parser) parseBlockStatement() []Statement {
 				// other statement
 				ts = p.parseExpressionStatement()
 			}
+		default:
+			return nil
 		}
 		ss = append(ss, ts...)
-	}
-
-	if ss == nil {
-		// 何もない
-		ss = []Statement{}
 	}
 
 	p.pos++
 
 	return ss
+}
+
+func (p *Parser) parseIfStatement() []Statement {
+	// if
+	p.pos++
+
+	p.skipParen()
+
+	p.parseBlockStatement()
+
+	return []Statement{}
 }
 
 func (p *Parser) parseReturn() []Statement {
