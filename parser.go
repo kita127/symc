@@ -278,16 +278,22 @@ func (p *Parser) parseVariableDecl() Statement {
 }
 
 func (p *Parser) parsePrototypeDecl() Statement {
-	n := p.peekToken()
-	for n.tokenType != lparen {
-		// 現在トークンが識別子もしくは型に関するかチェック
-		if !p.curToken().IsTypeToken() && p.curToken().tokenType != keyExtern {
-			p.posReset()
-			return nil
-		}
+
+	if p.curToken().tokenType == keyExtern {
 		p.pos++
-		n = p.peekToken()
 	}
+
+	for p.curToken().IsTypeToken() {
+		p.pos++
+	}
+
+	if p.curToken().tokenType != lparen {
+		// ( でなければプロトタイプ宣言ではない
+		p.posReset()
+		return nil
+	}
+
+	p.pos--
 
 	if p.curToken().tokenType != word {
 		p.posReset()
@@ -297,8 +303,20 @@ func (p *Parser) parsePrototypeDecl() Statement {
 	// Name
 	id := p.curToken().literal
 
-	// semicolon まで進める
-	p.progUntil(semicolon)
+	p.pos++
+
+	// 関数の引数の括弧は飛ばす
+	p.skipParen()
+
+	if p.curToken().tokenType == keyAttribute {
+		// attribute の場合はセミコロンまでスキップ
+		p.progUntil(semicolon)
+	} else if p.curToken().tokenType != semicolon {
+		// セミコロン意外はプロトタイプ宣言ではない
+		p.posReset()
+		return nil
+	}
+
 	p.pos++
 	// next
 	return &PrototypeDecl{Name: id}

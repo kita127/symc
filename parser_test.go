@@ -100,6 +100,17 @@ void (* p_f)();
 			},
 		},
 		{
+			"function pointer def 2",
+			`
+int (* p_f)();
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
 			"variable decl 1",
 			`
 extern char fuga;`,
