@@ -88,17 +88,17 @@ int hoge = 0;
 				},
 			},
 		},
-		//		{
-		//			"function pointer def 1",
-		//			`
-		//void (* p_f)();
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&VariableDef{Name: "p_f"},
-		//				},
-		//			},
-		//		},
+		{
+			"function pointer def 1",
+			`
+void (* p_f)();
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
 		//		{
 		//			"function pointer def 2",
 		//			`

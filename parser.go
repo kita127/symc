@@ -301,26 +301,61 @@ func (p *Parser) parseVariableDef() Statement {
 }
 
 func (p *Parser) parseVariableDefSub() Statement {
+	prePos := p.pos
+
+	// はじめに関数ポインタか確認
+	s := p.parseFuncPointerVarDef()
+
+	if s == nil {
+		// 関数ポインタ以外
+		p.pos = prePos
+
+		for p.curToken().isTypeToken() {
+			p.pos++
+		}
+		p.pos--
+
+		if p.curToken().tokenType != word {
+			return nil
+		}
+
+		s = &VariableDef{Name: p.curToken().literal}
+
+		p.pos++
+
+		if p.curToken().tokenType == lbracket {
+			// 配列の場合
+			p.progUntil(rbracket)
+			p.pos++
+		}
+	}
+
+	return s
+}
+
+func (p *Parser) parseFuncPointerVarDef() Statement {
 	for p.curToken().isTypeToken() {
 		p.pos++
 	}
-	p.pos--
+	if p.curToken().tokenType != lparen {
+		return nil
+	}
+	p.pos++
+	s := p.parseVariableDefSub()
+	if s == nil {
+		return nil
+	}
+	// rparen
+	p.pos++
 
-	if p.curToken().tokenType != word {
+	if p.curToken().tokenType != lparen {
+		return nil
+	}
+	if x := p.parseParameter(); x == nil {
 		return nil
 	}
 
-	id := p.curToken().literal
-
-	p.pos++
-
-	if p.curToken().tokenType == lbracket {
-		// 配列の場合
-		p.progUntil(rbracket)
-		p.pos++
-	}
-
-	return &VariableDef{Name: id}
+	return s
 }
 
 func (p *Parser) isVariabeDef() bool {
