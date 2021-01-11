@@ -1182,82 +1182,82 @@ void hoge(void){
 }
 
 // TestStatements
-//func TestStatements(t *testing.T) {
-//	testTbl := []struct {
-//		comment string
-//		src     string
-//		expect  *Module
-//	}{
-//		{
-//			"if 1",
-//			`
-//void func(void)
-//{
-//    if (1){
-//    }
-//}
-//`,
-//			&Module{
-//				[]Statement{
-//					&FunctionDef{Name: "func",
-//						Params:     []*VariableDef{},
-//						Statements: []Statement{},
-//					},
-//				},
-//			},
-//		},
-//		{
-//			"if 2",
-//			`
-//void func(void)
-//{
-//    if ( hoge == 0){
-//    }
-//}
-//`,
-//			&Module{
-//				[]Statement{
-//					&FunctionDef{Name: "func",
-//						Params: []*VariableDef{},
-//						Statements: []Statement{
-//							&AccessVar{Name: "hoge"},
-//						},
-//					},
-//				},
-//			},
-//		},
-//		{
-//			"if 3",
-//			`
-//void func(void)
-//{
-//    if ( hoge == 0){
-//        fuga = a + (1 - 2);
-//    }
-//}
-//`,
-//			&Module{
-//				[]Statement{
-//					&FunctionDef{Name: "func",
-//						Params: []*VariableDef{},
-//						Statements: []Statement{
-//							&AccessVar{Name: "hoge"},
-//							&AccessVar{Name: "fuga"},
-//							&AccessVar{Name: "a"},
-//						},
-//					},
-//				},
-//			},
-//		},
-//	}
-//
-//	for _, tt := range testTbl {
-//		t.Logf("%s", tt.comment)
-//		l := NewLexer(tt.src)
-//		p := NewParser(l)
-//		got := p.Parse()
-//		if !reflect.DeepEqual(got, tt.expect) {
-//			t.Errorf("got=%v, expect=%v", got, tt.expect)
-//		}
-//	}
-//}
+func TestStatements(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"if 1",
+			`
+void func(void)
+{
+    if (1){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
+		{
+			"if 2",
+			`
+void func(void)
+{
+    if ( hoge == 0){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&AccessVar{Name: "hoge"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"if 3",
+			`
+void func(void)
+{
+    if ( hoge == 0){
+        fuga = a + (1 - 2);
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&AccessVar{Name: "hoge"},
+							&AccessVar{Name: "fuga"},
+							&AccessVar{Name: "a"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("got=%v, expect=%v", got, tt.expect)
+		}
+	}
+}
