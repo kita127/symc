@@ -933,100 +933,6 @@ void f_zzz(void)
 				},
 			},
 		},
-
-		//		{
-		//			"function def 5",
-		//			`
-		//void whsxks(int a) {
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "whsxks",
-		//						Params: []*VariableDef{{Name: "a"}},
-		//						Block:  &BlockStatement{Statements: []Statement{}}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 6",
-		//			`
-		//void haraheri(int a, char *b, unsigned char s[]) {
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "haraheri",
-		//						Params: []*VariableDef{{Name: "a"}, {Name: "b"}, {Name: "s"}},
-		//						Block:  &BlockStatement{Statements: []Statement{}}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 7",
-		//			`
-		//void hoge(void){
-		//  _p->_p++ = _c;
-		//  _p->_p-- = _c;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "hoge",
-		//						Params: []*VariableDef{},
-		//						Block: &BlockStatement{Statements: []Statement{
-		//							&AccessVar{Name: "_p->_p"},
-		//							&AccessVar{Name: "_c"},
-		//							&AccessVar{Name: "_p->_p"},
-		//							&AccessVar{Name: "_c"},
-		//						}}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"testx",
-		//			`
-		//# 1 "hoge.c"
-		//# 1 "<built-in>" 1
-		//# 1 "<built-in>" 3
-		//# 366 "<built-in>" 3
-		//# 1 "<command line>" 1
-		//# 1 "<built-in>" 2
-		//# 1 "hoge.c" 2
-		//
-		//int func(int a)
-		//{
-		//    int hoge = 0;
-		//    hoge++;
-		//    a = a + (10);
-		//    return a;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{{Name: "a"}},
-		//						Block: &BlockStatement{Statements: []Statement{
-		//							&VariableDef{Name: "hoge"},
-		//							&AccessVar{Name: "hoge"},
-		//							&AccessVar{Name: "a"},
-		//							&AccessVar{Name: "a"},
-		//							&AccessVar{Name: "a"},
-		//						},
-		//						},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"test err1",
-		//			`int hoge`,
-		//			&Module{
-		//				[]Statement{
-		//					&InvalidStatement{Contents: "parse, err parse function def, err parse prototype decl, err parse variable def"},
-		//				},
-		//			},
-		//		},
 	}
 
 	for _, tt := range testTbl {
@@ -1178,6 +1084,7 @@ void hoge(void){
 	}
 }
 
+// TestStatements
 func TestStatements(t *testing.T) {
 	testTbl := []struct {
 		comment string
