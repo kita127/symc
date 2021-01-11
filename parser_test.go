@@ -857,11 +857,11 @@ void func()
 		{
 			"call expression 3",
 			`
-		void func()
-		{
-		    hoge(a);
-		}
-		`,
+void func()
+{
+    hoge(a);
+}
+`,
 			&Module{
 				[]Statement{
 					&FunctionDef{Name: "func",
@@ -869,6 +869,29 @@ void func()
 						Statements: []Statement{
 							&CallFunc{Name: "hoge",
 								Args: []Statement{&AccessVar{Name: "a"}},
+							},
+						}},
+				},
+			},
+		},
+		{
+			"call expression 4",
+			`
+void func()
+{
+    hoge(a, b, 100);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "hoge",
+								Args: []Statement{
+									&AccessVar{Name: "a"},
+									&AccessVar{Name: "b"},
+								},
 							},
 						}},
 				},
