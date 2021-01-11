@@ -343,197 +343,197 @@ __attribute__ ((__always_inline__)) int hoge;
 				},
 			},
 		},
-		//		{
-		//			"function def 1",
-		//			`
-		//void func_name( void ) {}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func_name",
-		//						Params:     []*VariableDef{},
-		//						Statements: []Statement{},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 2",
-		//			`
-		//void func(int a)
-		//{
-		//    {
-		//        {}
-		//    }
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 4",
-		//			`
-		//void func(int a)
-		//{
-		//    int hoge;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&VariableDef{Name: "hoge"}},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 5",
-		//			`
-		//void func(int a)
-		//{
-		//    {
-		//        int hoge;
-		//    }
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&VariableDef{Name: "hoge"}},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 6",
-		//			`
-		//void func(int a)
-		//{
-		//    hoge;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&AccessVar{Name: "hoge"}},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 7",
-		//			`
-		//void func(int a)
-		//{
-		//    hoge = 10;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&AccessVar{Name: "hoge"}},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 8",
-		//			`
-		//void func(int a)
-		//{
-		//    hoge = fuga;
-		//    p_var = &address;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{
-		//							&AccessVar{Name: "hoge"},
-		//							&AccessVar{Name: "fuga"},
-		//							&AccessVar{Name: "p_var"},
-		//							&AccessVar{Name: "address"},
-		//						},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 9",
-		//			`
-		//void func(int a)
-		//{
-		//    (hoge) = (fuga);
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 10",
-		//			`
-		//void func(int a)
-		//{
-		//    unsigned char aaa;
-		//    hoge = 10;
-		//    fuga = 20;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&VariableDef{Name: "aaa"}, &AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 11",
-		//			`
-		//inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "__sputc",
-		//						Params:     []*VariableDef{{Name: "_c"}, {Name: "_p"}},
-		//						Statements: []Statement{}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function def 12",
-		//			`
-		//void func()
-		//{
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{},
-		//						Statements: []Statement{}},
-		//				},
-		//			},
-		//		},
+		{
+			"function def 1",
+			`
+void func_name( void ) {}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func_name",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
+		{
+			"function def 2",
+			`
+void func(int a)
+{
+    {
+        {}
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
+		{
+			"function def 4",
+			`
+void func(int a)
+{
+    int hoge;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&VariableDef{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 5",
+			`
+void func(int a)
+{
+    {
+        int hoge;
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&VariableDef{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 6",
+			`
+void func(int a)
+{
+    hoge;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 7",
+			`
+void func(int a)
+{
+    hoge = 10;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 8",
+			`
+void func(int a)
+{
+    hoge = fuga;
+    p_var = &address;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{{Name: "a"}},
+						Statements: []Statement{
+							&AccessVar{Name: "hoge"},
+							&AccessVar{Name: "fuga"},
+							&AccessVar{Name: "p_var"},
+							&AccessVar{Name: "address"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"function def 9",
+			`
+void func(int a)
+{
+    (hoge) = (fuga);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 10",
+			`
+void func(int a)
+{
+    unsigned char aaa;
+    hoge = 10;
+    fuga = 20;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&VariableDef{Name: "aaa"}, &AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 11",
+			`
+inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "__sputc",
+						Params:     []*VariableDef{{Name: "_c"}, {Name: "_p"}},
+						Statements: []Statement{}},
+				},
+			},
+		},
+		{
+			"function def 12",
+			`
+void func()
+{
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{}},
+				},
+			},
+		},
 		{
 			"function parameter 1",
 			`
