@@ -898,6 +898,36 @@ void func()
 			},
 		},
 		{
+			"call expression 5",
+			`
+void func()
+{
+    hoge(a, fuga(piyo(1, b), 2));
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "hoge",
+								Args: []Statement{
+									&AccessVar{Name: "a"},
+									&CallFunc{Name: "fuga",
+										Args: []Statement{
+											&CallFunc{Name: "piyo",
+												Args: []Statement{&AccessVar{Name: "b"}},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			"cast 1",
 			`
 void func(int a)
