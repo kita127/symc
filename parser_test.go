@@ -538,23 +538,63 @@ void func()
 			"function parameter 1",
 			`
 void f_hoge(int a){}
-void f_fuga(int a, char b){}
-void f_piyo(int a, char b, AnyType c[]){}
-void f_ice(int a, char b, AnyType c[100]){}
 `,
 			&Module{
 				[]Statement{
 					&FunctionDef{Name: "f_hoge",
 						Params:     []*VariableDef{{Name: "a"}},
 						Statements: []Statement{}},
+				},
+			},
+		},
+		{
+			"function parameter 2",
+			`
+void f_fuga(int a, char b){}
+`,
+			&Module{
+				[]Statement{
 					&FunctionDef{Name: "f_fuga",
 						Params:     []*VariableDef{{Name: "a"}, {Name: "b"}},
 						Statements: []Statement{}},
+				},
+			},
+		},
+		{
+			"function parameter 3",
+			`
+void f_piyo(int a, char b, AnyType c[]){}
+`,
+			&Module{
+				[]Statement{
 					&FunctionDef{Name: "f_piyo",
 						Params:     []*VariableDef{{Name: "a"}, {Name: "b"}, {Name: "c"}},
 						Statements: []Statement{}},
+				},
+			},
+		},
+		{
+			"function parameter 4",
+			`
+void f_ice(int a, char b, AnyType c[100]){}
+`,
+			&Module{
+				[]Statement{
 					&FunctionDef{Name: "f_ice",
 						Params:     []*VariableDef{{Name: "a"}, {Name: "b"}, {Name: "c"}},
+						Statements: []Statement{}},
+				},
+			},
+		},
+		{
+			"function parameter 5",
+			`
+void func(void){}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
 						Statements: []Statement{}},
 				},
 			},
@@ -786,7 +826,50 @@ void func()
 					&FunctionDef{Name: "func",
 						Params: []*VariableDef{},
 						Statements: []Statement{
-							&CallFunc{Name: "hoge"},
+							&CallFunc{
+								Name: "hoge",
+								Args: []Statement{},
+							},
+						}},
+				},
+			},
+		},
+		{
+			"call expression 2",
+			`
+void func()
+{
+    hoge(100);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "hoge",
+								Args: []Statement{},
+							},
+						}},
+				},
+			},
+		},
+		{
+			"call expression 3",
+			`
+		void func()
+		{
+		    hoge(a);
+		}
+		`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "hoge",
+								Args: []Statement{&AccessVar{Name: "a"}},
+							},
 						}},
 				},
 			},

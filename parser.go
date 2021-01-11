@@ -134,14 +134,22 @@ func (v *AccessVar) PrettyString() string {
 
 type CallFunc struct {
 	Name string
+	Args []Statement
 }
 
 func (v *CallFunc) statementNode() {}
 func (v *CallFunc) String() string {
-	return fmt.Sprintf("CallFunc : Name=%s", v.Name)
+	return fmt.Sprintf("CallFunc : Name=%s, Args=%v", v.Name, v.Args)
 }
 func (v *CallFunc) PrettyString() string {
-	return fmt.Sprintf("%s()", v.Name)
+	txt := fmt.Sprintf("%s(", v.Name)
+	sep := ""
+	for _, a := range v.Args {
+		txt += sep
+		txt += fmt.Sprintf("%s", a.PrettyString())
+		sep = ", "
+	}
+	return txt
 }
 
 type Typedef struct {
@@ -280,29 +288,82 @@ func (p *Parser) parseVariableDef() Statement {
 		return nil
 	}
 
-	s, err := p.extractVarName()
-	if err != nil {
+	s := p.parseVariableDefSub()
+	if s == nil {
 		p.posReset()
 		return nil
 	}
-	// semicolon or assign or lbracket
+
 	switch p.curToken().tokenType {
 	case semicolon:
-		fallthrough
+		p.pos++
 	case assign:
-		fallthrough
-	case lparen:
-		fallthrough
-	case lbracket:
-		// semicolon まで進める
 		p.progUntil(semicolon)
 		p.pos++
-		// next
 	default:
 		p.posReset()
 		return nil
 	}
-	return &VariableDef{Name: s}
+
+	return s
+}
+
+func (p *Parser) parseVariableDefSub() Statement {
+	prePos := p.pos
+
+	// はじめに関数ポインタか確認
+	s := p.parseFuncPointerVarDef()
+
+	if s == nil {
+		// 関数ポインタ以外
+		p.pos = prePos
+
+		for p.curToken().isTypeToken() {
+			p.pos++
+		}
+		p.pos--
+
+		if p.curToken().tokenType != word {
+			return nil
+		}
+
+		s = &VariableDef{Name: p.curToken().literal}
+
+		p.pos++
+
+		if p.curToken().tokenType == lbracket {
+			// 配列の場合
+			p.progUntil(rbracket)
+			p.pos++
+		}
+	}
+
+	return s
+}
+
+func (p *Parser) parseFuncPointerVarDef() Statement {
+	for p.curToken().isTypeToken() {
+		p.pos++
+	}
+	if p.curToken().tokenType != lparen {
+		return nil
+	}
+	p.pos++
+	s := p.parseVariableDefSub()
+	if s == nil {
+		return nil
+	}
+	// rparen
+	p.pos++
+
+	if p.curToken().tokenType != lparen {
+		return nil
+	}
+	if x := p.parseParameter(); x == nil {
+		return nil
+	}
+
+	return s
 }
 
 func (p *Parser) isVariabeDef() bool {
@@ -553,12 +614,34 @@ func (p *Parser) parseCallFunc() Statement {
 	if p.curToken().tokenType != lparen {
 		return nil
 	}
-	p.progUntil(rparen)
-
 	p.pos++
-	// next
 
-	return &CallFunc{Name: id}
+	ss := []Statement{}
+
+	if p.curToken().tokenType == rparen {
+		// 引数なし
+		p.pos++
+		return &CallFunc{Name: id, Args: ss}
+	}
+
+	for {
+		ts := p.parseExpression()
+		if ts == nil {
+			return nil
+		}
+		ss = append(ss, ts...)
+
+		if p.curToken().tokenType == comma {
+			p.pos++
+		} else if p.curToken().tokenType == rparen {
+			p.pos++
+			break
+		} else {
+			return nil
+		}
+	}
+
+	return &CallFunc{Name: id, Args: ss}
 }
 
 func (p *Parser) parseCast() []Statement {
@@ -593,6 +676,7 @@ func (p *Parser) parseAccessVar() Statement {
 
 func (p *Parser) parseParameter() []*VariableDef {
 	vs := []*VariableDef{}
+	// lparen
 	p.pos++
 
 	if p.curToken().tokenType == rparen {
@@ -600,38 +684,38 @@ func (p *Parser) parseParameter() []*VariableDef {
 		p.pos++
 		// next
 		return vs
+	} else if p.curToken().tokenType == keyVoid {
+		// void
+		p.pos++
+		// rparen
+		p.pos++
+		// next
+		return vs
 	}
 
-	n := p.peekToken()
 	for {
-		for n.isTypeToken() {
-			p.pos++
-			n = p.peekToken()
+		s := p.parseVariableDefSub()
+		if s == nil {
+			return nil
 		}
-
-		if p.curToken().tokenType == word {
-			id := p.curToken().literal
-			vs = append(vs, &VariableDef{Name: id})
-		} else if p.curToken().tokenType == keyVoid {
-			// 何もしない
+		v, ok := s.(*VariableDef)
+		if !ok {
+			return nil
 		}
+		vs = append(vs, v)
 
-		if n.tokenType == rparen {
-			break
-		} else if n.tokenType == comma {
+		switch p.curToken().tokenType {
+		case rparen:
 			p.pos++
-			n = p.peekToken()
-		} else if n.tokenType == lbracket {
-			p.progUntil(rbracket)
-			n = p.peekToken()
+			// next
+			return vs
+		case comma:
+			p.pos++
+			// next
+		default:
+			return nil
 		}
 	}
-
-	p.pos++
-	p.pos++
-	// next
-
-	return vs
 }
 
 func (p *Parser) skipTypedef() {
