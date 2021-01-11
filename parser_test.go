@@ -813,62 +813,67 @@ void func()
 				},
 			},
 		},
-		//		{
-		//			"call expression 1",
-		//			`
-		//void func()
-		//{
-		//    hoge();
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{},
-		//						Statements: []Statement{
-		//							&CallFunc{Name: "hoge"},
-		//						}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"call expression 2",
-		//			`
-		//void func()
-		//{
-		//    hoge(100);
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{},
-		//						Statements: []Statement{
-		//							&CallFunc{Name: "hoge"},
-		//						}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"call expression 3",
-		//			`
-		//void func()
-		//{
-		//    hoge(a);
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{},
-		//						Statements: []Statement{
-		//							&CallFunc{Name: "hoge",
-		//								Args: []Statement{&AccessVar{Name: "a"}},
-		//							},
-		//						}},
-		//				},
-		//			},
-		//		},
+		{
+			"call expression 1",
+			`
+void func()
+{
+    hoge();
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{
+								Name: "hoge",
+								Args: []Statement{},
+							},
+						}},
+				},
+			},
+		},
+		{
+			"call expression 2",
+			`
+void func()
+{
+    hoge(100);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "hoge",
+								Args: []Statement{},
+							},
+						}},
+				},
+			},
+		},
+		{
+			"call expression 3",
+			`
+		void func()
+		{
+		    hoge(a);
+		}
+		`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "hoge",
+								Args: []Statement{&AccessVar{Name: "a"}},
+							},
+						}},
+				},
+			},
+		},
 		{
 			"cast 1",
 			`

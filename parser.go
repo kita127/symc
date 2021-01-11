@@ -134,14 +134,22 @@ func (v *AccessVar) PrettyString() string {
 
 type CallFunc struct {
 	Name string
+	Args []Statement
 }
 
 func (v *CallFunc) statementNode() {}
 func (v *CallFunc) String() string {
-	return fmt.Sprintf("CallFunc : Name=%s", v.Name)
+	return fmt.Sprintf("CallFunc : Name=%s, Args=%v", v.Name, v.Args)
 }
 func (v *CallFunc) PrettyString() string {
-	return fmt.Sprintf("%s()", v.Name)
+	txt := fmt.Sprintf("%s(", v.Name)
+	sep := ""
+	for _, a := range v.Args {
+		txt += sep
+		txt += fmt.Sprintf("%s", a.PrettyString())
+		sep = ", "
+	}
+	return txt
 }
 
 type Typedef struct {
@@ -606,12 +614,34 @@ func (p *Parser) parseCallFunc() Statement {
 	if p.curToken().tokenType != lparen {
 		return nil
 	}
-	p.progUntil(rparen)
-
 	p.pos++
-	// next
 
-	return &CallFunc{Name: id}
+	ss := []Statement{}
+
+	if p.curToken().tokenType == rparen {
+		// 引数なし
+		p.pos++
+		return &CallFunc{Name: id, Args: ss}
+	}
+
+	for {
+		ts := p.parseExpression()
+		if ts == nil {
+			return nil
+		}
+		ss = append(ss, ts...)
+
+		if p.curToken().tokenType == comma {
+			p.pos++
+		} else if p.curToken().tokenType == rparen {
+			p.pos++
+			break
+		} else {
+			return nil
+		}
+	}
+
+	return &CallFunc{Name: id, Args: ss}
 }
 
 func (p *Parser) parseCast() []Statement {
