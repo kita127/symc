@@ -611,6 +611,7 @@ func (p *Parser) parseAccessVar() Statement {
 
 func (p *Parser) parseParameter() []*VariableDef {
 	vs := []*VariableDef{}
+	// lparen
 	p.pos++
 
 	if p.curToken().tokenType == rparen {
@@ -618,38 +619,35 @@ func (p *Parser) parseParameter() []*VariableDef {
 		p.pos++
 		// next
 		return vs
+	} else if p.curToken().tokenType == keyVoid {
+		// void
+		p.pos++
+		return vs
 	}
 
-	n := p.peekToken()
 	for {
-		for n.isTypeToken() {
-			p.pos++
-			n = p.peekToken()
+		s := p.parseVariableDefSub()
+		if s == nil {
+			return nil
 		}
-
-		if p.curToken().tokenType == word {
-			id := p.curToken().literal
-			vs = append(vs, &VariableDef{Name: id})
-		} else if p.curToken().tokenType == keyVoid {
-			// 何もしない
+		v, ok := s.(*VariableDef)
+		if !ok {
+			return nil
 		}
+		vs = append(vs, v)
 
-		if n.tokenType == rparen {
-			break
-		} else if n.tokenType == comma {
+		switch p.curToken().tokenType {
+		case rparen:
 			p.pos++
-			n = p.peekToken()
-		} else if n.tokenType == lbracket {
-			p.progUntil(rbracket)
-			n = p.peekToken()
+			// next
+			return vs
+		case comma:
+			p.pos++
+			// next
+		default:
+			return nil
 		}
 	}
-
-	p.pos++
-	p.pos++
-	// next
-
-	return vs
 }
 
 func (p *Parser) skipTypedef() {
