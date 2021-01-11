@@ -55,39 +55,39 @@ int hoge[] = {0x00, 0x01, 0x02};
 				},
 			},
 		},
-		//		{
-		//			"variable definition 5",
-		//			`
-		//int hoge[3] = {0x00, 0x01, 0x02};
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&VariableDef{Name: "hoge"},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"variable definition 6",
-		//			`
-		//char hoge[] = "hello";
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&VariableDef{Name: "hoge"},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"variable definition 7",
-		//			`
-		//int hoge = 0;
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&VariableDef{Name: "hoge"},
-		//				},
-		//			},
-		//		},
+		{
+			"variable definition 5",
+			`
+int hoge[3] = {0x00, 0x01, 0x02};
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable definition 6",
+			`
+char hoge[] = "hello";
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable definition 7",
+			`
+int hoge = 0;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
 		//		{
 		//			"function pointer def 1",
 		//			`
@@ -534,19 +534,19 @@ int hoge[] = {0x00, 0x01, 0x02};
 		//				},
 		//			},
 		//		},
-		//		{
-		//			"function parameter 1",
-		//			`
-		//void f_hoge(int a){}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "f_hoge",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{}},
-		//				},
-		//			},
-		//		},
+		{
+			"function parameter 1",
+			`
+void f_hoge(int a){}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "f_hoge",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{}},
+				},
+			},
+		},
 		//		{
 		//			"function parameter 2",
 		//			`
