@@ -622,6 +622,9 @@ func (p *Parser) parseParameter() []*VariableDef {
 	} else if p.curToken().tokenType == keyVoid {
 		// void
 		p.pos++
+		// rparen
+		p.pos++
+		// next
 		return vs
 	}
 

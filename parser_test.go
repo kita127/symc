@@ -547,259 +547,272 @@ void f_hoge(int a){}
 				},
 			},
 		},
-		//		{
-		//			"function parameter 2",
-		//			`
-		//void f_fuga(int a, char b){}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "f_fuga",
-		//						Params:     []*VariableDef{{Name: "a"}, {Name: "b"}},
-		//						Statements: []Statement{}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function parameter 3",
-		//			`
-		//void f_piyo(int a, char b, AnyType c[]){}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "f_piyo",
-		//						Params:     []*VariableDef{{Name: "a"}, {Name: "b"}, {Name: "c"}},
-		//						Statements: []Statement{}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function parameter 4",
-		//			`
-		//void f_ice(int a, char b, AnyType c[100]){}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "f_ice",
-		//						Params:     []*VariableDef{{Name: "a"}, {Name: "b"}, {Name: "c"}},
-		//						Statements: []Statement{}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"expression 1",
-		//			`
-		//void func()
-		//{
-		//    var1 = a1 +  b1;
-		//    var2 = a2 -  b2;
-		//    var3 = a3 *  b3;
-		//    var4 = a4 /  b4;
-		//    var5 = a5 |  b5;
-		//    var6 = a6 &  b6;
-		//    var7 = a7 || b7;
-		//    var8 = a8 && b8;
-		//    var9 = a9 > b9;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{},
-		//						Statements: []Statement{
-		//							// +
-		//							&AccessVar{Name: "var1"},
-		//							&AccessVar{Name: "a1"},
-		//							&AccessVar{Name: "b1"},
-		//							// -
-		//							&AccessVar{Name: "var2"},
-		//							&AccessVar{Name: "a2"},
-		//							&AccessVar{Name: "b2"},
-		//							// *
-		//							&AccessVar{Name: "var3"},
-		//							&AccessVar{Name: "a3"},
-		//							&AccessVar{Name: "b3"},
-		//							// /
-		//							&AccessVar{Name: "var4"},
-		//							&AccessVar{Name: "a4"},
-		//							&AccessVar{Name: "b4"},
-		//							// |
-		//							&AccessVar{Name: "var5"},
-		//							&AccessVar{Name: "a5"},
-		//							&AccessVar{Name: "b5"},
-		//							// &
-		//							&AccessVar{Name: "var6"},
-		//							&AccessVar{Name: "a6"},
-		//							&AccessVar{Name: "b6"},
-		//							// ||
-		//							&AccessVar{Name: "var7"},
-		//							&AccessVar{Name: "a7"},
-		//							&AccessVar{Name: "b7"},
-		//							// &&
-		//							&AccessVar{Name: "var8"},
-		//							&AccessVar{Name: "a8"},
-		//							&AccessVar{Name: "b8"},
-		//							// >
-		//							&AccessVar{Name: "var9"},
-		//							&AccessVar{Name: "a9"},
-		//							&AccessVar{Name: "b9"},
-		//						}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"expression 2",
-		//			`
-		//void func()
-		//{
-		//    var1 = a1 <<  b1;
-		//    var2 = a2 >>  b2;
-		//    var3 = a3 ^ b3;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{},
-		//						Statements: []Statement{
-		//							// <<
-		//							&AccessVar{Name: "var1"},
-		//							&AccessVar{Name: "a1"},
-		//							&AccessVar{Name: "b1"},
-		//							// >>
-		//							&AccessVar{Name: "var2"},
-		//							&AccessVar{Name: "a2"},
-		//							&AccessVar{Name: "b2"},
-		//							// ^
-		//							&AccessVar{Name: "var3"},
-		//							&AccessVar{Name: "a3"},
-		//							&AccessVar{Name: "b3"},
-		//						}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"expression 3",
-		//			`
-		//void func()
-		//{
-		//    var1 += a1;
-		//    var2 -= a2;
-		//    var3 /= a3;
-		//    var4 *= a4;
-		//    var5 |= a5;
-		//    var6 &= a6;
-		//    var7 <<= a7;
-		//    var8 >>= a8;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{},
-		//						Statements: []Statement{
-		//							// +=
-		//							&AccessVar{Name: "var1"},
-		//							&AccessVar{Name: "a1"},
-		//							// -=
-		//							&AccessVar{Name: "var2"},
-		//							&AccessVar{Name: "a2"},
-		//							// /=
-		//							&AccessVar{Name: "var3"},
-		//							&AccessVar{Name: "a3"},
-		//							// *=
-		//							&AccessVar{Name: "var4"},
-		//							&AccessVar{Name: "a4"},
-		//							// |=
-		//							&AccessVar{Name: "var5"},
-		//							&AccessVar{Name: "a5"},
-		//							// &=
-		//							&AccessVar{Name: "var6"},
-		//							&AccessVar{Name: "a6"},
-		//							// <<=
-		//							&AccessVar{Name: "var7"},
-		//							&AccessVar{Name: "a7"},
-		//							// >>=
-		//							&AccessVar{Name: "var8"},
-		//							&AccessVar{Name: "a8"},
-		//						}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"expression 4",
-		//			`
-		//void func()
-		//{
-		//    var1 = a1 + b1 + c1;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{},
-		//						Statements: []Statement{
-		//							// +=
-		//							&AccessVar{Name: "var1"},
-		//							&AccessVar{Name: "a1"},
-		//							&AccessVar{Name: "b1"},
-		//							&AccessVar{Name: "c1"},
-		//						}},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"expression 5",
-		//			`
-		//void func()
-		//{
-		//    var1 = (a1);
-		//    var2 = (a2 + b2);
-		//    var3 = ((a3 + b3) + c3);
-		//    var4 = (a4 + (b4 + c4));
-		//    var5 = ((a5 + b5) + (c5 + d5));
-		//    var6 = (((a6 + b6) - c6) + (d6 + e6));
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{},
-		//						Statements: []Statement{
-		//							// 1
-		//							&AccessVar{Name: "var1"},
-		//							&AccessVar{Name: "a1"},
-		//							// 2
-		//							&AccessVar{Name: "var2"},
-		//							&AccessVar{Name: "a2"},
-		//							&AccessVar{Name: "b2"},
-		//							// 3
-		//							&AccessVar{Name: "var3"},
-		//							&AccessVar{Name: "a3"},
-		//							&AccessVar{Name: "b3"},
-		//							&AccessVar{Name: "c3"},
-		//							// 4
-		//							&AccessVar{Name: "var4"},
-		//							&AccessVar{Name: "a4"},
-		//							&AccessVar{Name: "b4"},
-		//							&AccessVar{Name: "c4"},
-		//							// 5
-		//							&AccessVar{Name: "var5"},
-		//							&AccessVar{Name: "a5"},
-		//							&AccessVar{Name: "b5"},
-		//							&AccessVar{Name: "c5"},
-		//							&AccessVar{Name: "d5"},
-		//							// 6
-		//							&AccessVar{Name: "var6"},
-		//							&AccessVar{Name: "a6"},
-		//							&AccessVar{Name: "b6"},
-		//							&AccessVar{Name: "c6"},
-		//							&AccessVar{Name: "d6"},
-		//							&AccessVar{Name: "e6"},
-		//						}},
-		//				},
-		//			},
-		//		},
+		{
+			"function parameter 2",
+			`
+void f_fuga(int a, char b){}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "f_fuga",
+						Params:     []*VariableDef{{Name: "a"}, {Name: "b"}},
+						Statements: []Statement{}},
+				},
+			},
+		},
+		{
+			"function parameter 3",
+			`
+void f_piyo(int a, char b, AnyType c[]){}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "f_piyo",
+						Params:     []*VariableDef{{Name: "a"}, {Name: "b"}, {Name: "c"}},
+						Statements: []Statement{}},
+				},
+			},
+		},
+		{
+			"function parameter 4",
+			`
+void f_ice(int a, char b, AnyType c[100]){}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "f_ice",
+						Params:     []*VariableDef{{Name: "a"}, {Name: "b"}, {Name: "c"}},
+						Statements: []Statement{}},
+				},
+			},
+		},
+		{
+			"function parameter 5",
+			`
+void func(void){}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{}},
+				},
+			},
+		},
+		{
+			"expression 1",
+			`
+void func()
+{
+    var1 = a1 +  b1;
+    var2 = a2 -  b2;
+    var3 = a3 *  b3;
+    var4 = a4 /  b4;
+    var5 = a5 |  b5;
+    var6 = a6 &  b6;
+    var7 = a7 || b7;
+    var8 = a8 && b8;
+    var9 = a9 > b9;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// +
+							&AccessVar{Name: "var1"},
+							&AccessVar{Name: "a1"},
+							&AccessVar{Name: "b1"},
+							// -
+							&AccessVar{Name: "var2"},
+							&AccessVar{Name: "a2"},
+							&AccessVar{Name: "b2"},
+							// *
+							&AccessVar{Name: "var3"},
+							&AccessVar{Name: "a3"},
+							&AccessVar{Name: "b3"},
+							// /
+							&AccessVar{Name: "var4"},
+							&AccessVar{Name: "a4"},
+							&AccessVar{Name: "b4"},
+							// |
+							&AccessVar{Name: "var5"},
+							&AccessVar{Name: "a5"},
+							&AccessVar{Name: "b5"},
+							// &
+							&AccessVar{Name: "var6"},
+							&AccessVar{Name: "a6"},
+							&AccessVar{Name: "b6"},
+							// ||
+							&AccessVar{Name: "var7"},
+							&AccessVar{Name: "a7"},
+							&AccessVar{Name: "b7"},
+							// &&
+							&AccessVar{Name: "var8"},
+							&AccessVar{Name: "a8"},
+							&AccessVar{Name: "b8"},
+							// >
+							&AccessVar{Name: "var9"},
+							&AccessVar{Name: "a9"},
+							&AccessVar{Name: "b9"},
+						}},
+				},
+			},
+		},
+		{
+			"expression 2",
+			`
+void func()
+{
+    var1 = a1 <<  b1;
+    var2 = a2 >>  b2;
+    var3 = a3 ^ b3;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// <<
+							&AccessVar{Name: "var1"},
+							&AccessVar{Name: "a1"},
+							&AccessVar{Name: "b1"},
+							// >>
+							&AccessVar{Name: "var2"},
+							&AccessVar{Name: "a2"},
+							&AccessVar{Name: "b2"},
+							// ^
+							&AccessVar{Name: "var3"},
+							&AccessVar{Name: "a3"},
+							&AccessVar{Name: "b3"},
+						}},
+				},
+			},
+		},
+		{
+			"expression 3",
+			`
+void func()
+{
+    var1 += a1;
+    var2 -= a2;
+    var3 /= a3;
+    var4 *= a4;
+    var5 |= a5;
+    var6 &= a6;
+    var7 <<= a7;
+    var8 >>= a8;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// +=
+							&AccessVar{Name: "var1"},
+							&AccessVar{Name: "a1"},
+							// -=
+							&AccessVar{Name: "var2"},
+							&AccessVar{Name: "a2"},
+							// /=
+							&AccessVar{Name: "var3"},
+							&AccessVar{Name: "a3"},
+							// *=
+							&AccessVar{Name: "var4"},
+							&AccessVar{Name: "a4"},
+							// |=
+							&AccessVar{Name: "var5"},
+							&AccessVar{Name: "a5"},
+							// &=
+							&AccessVar{Name: "var6"},
+							&AccessVar{Name: "a6"},
+							// <<=
+							&AccessVar{Name: "var7"},
+							&AccessVar{Name: "a7"},
+							// >>=
+							&AccessVar{Name: "var8"},
+							&AccessVar{Name: "a8"},
+						}},
+				},
+			},
+		},
+		{
+			"expression 4",
+			`
+void func()
+{
+    var1 = a1 + b1 + c1;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// +=
+							&AccessVar{Name: "var1"},
+							&AccessVar{Name: "a1"},
+							&AccessVar{Name: "b1"},
+							&AccessVar{Name: "c1"},
+						}},
+				},
+			},
+		},
+		{
+			"expression 5",
+			`
+void func()
+{
+    var1 = (a1);
+    var2 = (a2 + b2);
+    var3 = ((a3 + b3) + c3);
+    var4 = (a4 + (b4 + c4));
+    var5 = ((a5 + b5) + (c5 + d5));
+    var6 = (((a6 + b6) - c6) + (d6 + e6));
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// 1
+							&AccessVar{Name: "var1"},
+							&AccessVar{Name: "a1"},
+							// 2
+							&AccessVar{Name: "var2"},
+							&AccessVar{Name: "a2"},
+							&AccessVar{Name: "b2"},
+							// 3
+							&AccessVar{Name: "var3"},
+							&AccessVar{Name: "a3"},
+							&AccessVar{Name: "b3"},
+							&AccessVar{Name: "c3"},
+							// 4
+							&AccessVar{Name: "var4"},
+							&AccessVar{Name: "a4"},
+							&AccessVar{Name: "b4"},
+							&AccessVar{Name: "c4"},
+							// 5
+							&AccessVar{Name: "var5"},
+							&AccessVar{Name: "a5"},
+							&AccessVar{Name: "b5"},
+							&AccessVar{Name: "c5"},
+							&AccessVar{Name: "d5"},
+							// 6
+							&AccessVar{Name: "var6"},
+							&AccessVar{Name: "a6"},
+							&AccessVar{Name: "b6"},
+							&AccessVar{Name: "c6"},
+							&AccessVar{Name: "d6"},
+							&AccessVar{Name: "e6"},
+						}},
+				},
+			},
+		},
 		//		{
 		//			"call expression 1",
 		//			`
@@ -856,112 +869,112 @@ void f_hoge(int a){}
 		//				},
 		//			},
 		//		},
-		//		{
-		//			"cast 1",
-		//			`
-		//void func(int a)
-		//{
-		//    hoge = (char)10;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&AccessVar{Name: "hoge"}},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"cast 2",
-		//			`
-		//void func(int a)
-		//{
-		//    hoge = (char)fuga;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"cast 3",
-		//			`
-		//void func(int a)
-		//{
-		//    hoge = (char)(fuga);
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"cast 4",
-		//			`
-		//void func(int a)
-		//{
-		//    hoge = (char)(fuga + piyo);
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}, &AccessVar{Name: "piyo"}},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"cast 5",
-		//			`
-		//void func(int a)
-		//{
-		//    hoge = (unsigned char)10;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params:     []*VariableDef{{Name: "a"}},
-		//						Statements: []Statement{&AccessVar{Name: "hoge"}},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"character 1",
-		//			`
-		//void func(void)
-		//{
-		//    char c = 'A';
-		//    c = 'B';
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{},
-		//						Statements: []Statement{
-		//							&VariableDef{Name: "c"},
-		//							&AccessVar{Name: "c"},
-		//						},
-		//					},
-		//				},
-		//			},
-		//		},
+		{
+			"cast 1",
+			`
+void func(int a)
+{
+    hoge = (char)10;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 2",
+			`
+void func(int a)
+{
+    hoge = (char)fuga;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 3",
+			`
+void func(int a)
+{
+    hoge = (char)(fuga);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 4",
+			`
+void func(int a)
+{
+    hoge = (char)(fuga + piyo);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}, &AccessVar{Name: "piyo"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 5",
+			`
+void func(int a)
+{
+    hoge = (unsigned char)10;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&AccessVar{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"character 1",
+			`
+void func(void)
+{
+    char c = 'A';
+    c = 'B';
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&VariableDef{Name: "c"},
+							&AccessVar{Name: "c"},
+						},
+					},
+				},
+			},
+		},
 		//		{
 		//			"access struct var 1",
 		//			`
