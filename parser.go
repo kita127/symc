@@ -280,29 +280,47 @@ func (p *Parser) parseVariableDef() Statement {
 		return nil
 	}
 
-	s, err := p.extractVarName()
-	if err != nil {
+	s := p.parseVariableDefSub()
+	if s == nil {
 		p.posReset()
 		return nil
 	}
-	// semicolon or assign or lbracket
+
 	switch p.curToken().tokenType {
 	case semicolon:
-		fallthrough
+		p.pos++
 	case assign:
-		fallthrough
-	case lparen:
-		fallthrough
-	case lbracket:
-		// semicolon まで進める
 		p.progUntil(semicolon)
 		p.pos++
-		// next
 	default:
 		p.posReset()
 		return nil
 	}
-	return &VariableDef{Name: s}
+
+	return s
+}
+
+func (p *Parser) parseVariableDefSub() Statement {
+	for p.curToken().isTypeToken() {
+		p.pos++
+	}
+	p.pos--
+
+	if p.curToken().tokenType != word {
+		return nil
+	}
+
+	id := p.curToken().literal
+
+	p.pos++
+
+	if p.curToken().tokenType == lbracket {
+		// 配列の場合
+		p.progUntil(rbracket)
+		p.pos++
+	}
+
+	return &VariableDef{Name: id}
 }
 
 func (p *Parser) isVariabeDef() bool {
