@@ -99,39 +99,39 @@ void (* p_f)();
 				},
 			},
 		},
-		//		{
-		//			"function pointer def 2",
-		//			`
-		//int (* p_f)();
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&VariableDef{Name: "p_f"},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function pointer def 3",
-		//			`
-		//int (* p_f)(void);
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&VariableDef{Name: "p_f"},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"function pointer def 4",
-		//			`
-		//const * AnyType (* p_f)(int a, char b[]);
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&VariableDef{Name: "p_f"},
-		//				},
-		//			},
-		//		},
+		{
+			"function pointer def 2",
+			`
+int (* p_f)();
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
+			"function pointer def 3",
+			`
+int (* p_f)(void);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
+			"function pointer def 4",
+			`
+const * AnyType (* p_f)(int a, char b[]);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
 		{
 			"variable decl 1",
 			`
