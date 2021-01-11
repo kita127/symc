@@ -774,6 +774,24 @@ void func()
 			},
 		},
 		{
+			"call expression 1",
+			`
+void func()
+{
+    hoge();
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "hoge"},
+						}},
+				},
+			},
+		},
+		{
 			"cast 1",
 			`
 void func(int a)
@@ -946,6 +964,7 @@ void f_zzz(void)
 	}
 }
 
+// TestParseApp
 func TestParseApp(t *testing.T) {
 	testTbl := []struct {
 		comment string

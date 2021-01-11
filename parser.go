@@ -132,6 +132,18 @@ func (v *AccessVar) PrettyString() string {
 	return fmt.Sprintf("%s", v.Name)
 }
 
+type CallFunc struct {
+	Name string
+}
+
+func (v *CallFunc) statementNode() {}
+func (v *CallFunc) String() string {
+	return fmt.Sprintf("CallFunc : Name=%s", v.Name)
+}
+func (v *CallFunc) PrettyString() string {
+	return fmt.Sprintf("%s()", v.Name)
+}
+
 type Typedef struct {
 	Name string
 }
@@ -507,7 +519,12 @@ func (p *Parser) parseExpression() []Statement {
 			p.pos++
 		}
 	case word:
-		l := p.parseAccessVar()
+		prePos := p.pos
+		l := p.parseCallFunc()
+		if l == nil {
+			p.pos = prePos
+			l = p.parseAccessVar()
+		}
 		ss = append(ss, l)
 
 	case letter:
@@ -528,6 +545,20 @@ func (p *Parser) parseExpression() []Statement {
 	}
 
 	return ss
+}
+
+func (p *Parser) parseCallFunc() Statement {
+	id := p.curToken().literal
+	p.pos++
+	if p.curToken().tokenType != lparen {
+		return nil
+	}
+	p.progUntil(rparen)
+
+	p.pos++
+	// next
+
+	return &CallFunc{Name: id}
 }
 
 func (p *Parser) parseCast() []Statement {
