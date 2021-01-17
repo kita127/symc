@@ -589,14 +589,36 @@ func (p *Parser) parseForStatement() []Statement {
 func (p *Parser) parseIfStatement() []Statement {
 	// if
 	p.pos++
+	// lparen
+	p.pos++
 
 	ss := []Statement{}
 
 	// 条件式
-	ss = append(ss, p.parseExpression()...)
+	ts := p.parseExpression()
+	if ts == nil {
+		return nil
+	}
+	ss = append(ss, ts...)
 
-	// ブロック分
-	ss = append(ss, p.parseBlockStatement()...)
+	// rparen
+	p.pos++
+
+	if p.curToken().isToken(lbrace) {
+		// ブロック文
+		ts := p.parseBlockStatement()
+		if ts == nil {
+			return nil
+		}
+		ss = append(ss, ts...)
+	} else {
+		// １行命令
+		ts := p.parseExpressionStatement()
+		if ts == nil {
+			return nil
+		}
+		ss = append(ss, ts...)
+	}
 
 	return ss
 }

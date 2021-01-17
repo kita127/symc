@@ -1340,6 +1340,26 @@ void func(void)
 			},
 		},
 		{
+			"if 4",
+			`
+void func(void)
+{
+    if (1)
+        hoge;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&AccessVar{Name: "hoge"},
+						},
+					},
+				},
+			},
+		},
+		{
 			"for 1",
 			`
 void func(void)
