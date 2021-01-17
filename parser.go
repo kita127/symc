@@ -149,6 +149,7 @@ func (v *CallFunc) PrettyString() string {
 		txt += fmt.Sprintf("%s", a.PrettyString())
 		sep = ", "
 	}
+	txt += ")"
 	return txt
 }
 
