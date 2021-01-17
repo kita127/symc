@@ -133,6 +133,17 @@ const * AnyType (* p_f)(int a, char b[]);
 			},
 		},
 		{
+			"function pointer def 5",
+			`
+int (*_Nullable _read)(void *, char *, int);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "_read"},
+				},
+			},
+		},
+		{
 			"variable decl 1",
 			`
 extern char fuga;`,

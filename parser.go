@@ -360,11 +360,45 @@ func (p *Parser) parseFuncPointerVarDef() Statement {
 	if p.curToken().tokenType != lparen {
 		return nil
 	}
-	if x := p.parseParameter(); x == nil {
+	if x := p.parsePrototypeParameter(); x == nil {
 		return nil
 	}
 
 	return s
+}
+
+// parsePrototypeParameter
+// プロトタイプ宣言、関数ポインタの定義で使用するパラメータのパース
+// 識別子がないパターンのパラメータ定義に対応する
+// パラメータの識別子は返さず構文チェックのみ行う
+func (p *Parser) parsePrototypeParameter() []Statement {
+	p.pos++
+
+FOR:
+	for {
+		t := p.curToken()
+		switch t.tokenType {
+		case keyVoid:
+		case asterisk:
+		case comma:
+		case rbracket:
+		case lbracket:
+		case word:
+		case rparen:
+			break FOR
+		default:
+			return nil
+		}
+		p.pos++
+	}
+
+	p.pos++
+
+	if !p.curToken().isToken(semicolon) {
+		return nil
+	}
+
+	return []Statement{}
 }
 
 func (p *Parser) isVariabeDef() bool {
