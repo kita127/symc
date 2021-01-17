@@ -588,6 +588,8 @@ func (p *Parser) parseExpression() []Statement {
 		}
 		ss = append(ss, l)
 
+	case str:
+		fallthrough
 	case letter:
 		fallthrough
 	case integer:

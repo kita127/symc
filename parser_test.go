@@ -928,6 +928,27 @@ void func()
 			},
 		},
 		{
+			"call expression 6",
+			`
+void func()
+{
+    _read(0, "A", 1);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "_read",
+								Args: []Statement{},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			"cast 1",
 			`
 void func(int a)
