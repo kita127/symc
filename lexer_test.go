@@ -675,6 +675,20 @@ int func(int a) {
 				},
 			},
 		},
+		{
+			"test gcc 1",
+			`__asm`,
+			[]*Token{
+				{
+					keyAsm,
+					"__asm",
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
