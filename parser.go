@@ -49,7 +49,7 @@ func (v *InvalidStatement) String() string {
 	return fmt.Sprintf("InvalidStatement : Contents=%s, Tk=%s", v.Contents, v.Tk.literal)
 }
 func (v *InvalidStatement) PrettyString() string {
-	return fmt.Sprintf("InvalidStatement(%s)a", v.Tk.literal)
+	return fmt.Sprintf("InvalidStatement(%s)", v.Tk.literal)
 }
 
 type VariableDef struct {
