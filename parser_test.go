@@ -831,6 +831,10 @@ void func()
 {
     --a;
     ++a;
+    a--;
+    a++;
+    b++ + --b;
+    ++c - c--;
 }
 `,
 			&Module{
@@ -840,6 +844,12 @@ void func()
 						Statements: []Statement{
 							&AccessVar{Name: "a"},
 							&AccessVar{Name: "a"},
+							&AccessVar{Name: "a"},
+							&AccessVar{Name: "a"},
+							&AccessVar{Name: "b"},
+							&AccessVar{Name: "b"},
+							&AccessVar{Name: "c"},
+							&AccessVar{Name: "c"},
 						},
 					},
 				},
