@@ -1333,15 +1333,19 @@ void func(void)
 			`
 void func(void)
 {
-    for (){
+    for (i = 0; i < 10; i++){
     }
 }
 `,
 			&Module{
 				[]Statement{
 					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{},
-						Statements: []Statement{},
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&AccessVar{Name: "i"},
+							&AccessVar{Name: "i"},
+							&AccessVar{Name: "i"},
+						},
 					},
 				},
 			},

@@ -415,3 +415,7 @@ func (t *Token) isOperator() bool {
 	}
 	return true
 }
+
+func (t *Token) isToken(t2 int) bool {
+	return t.tokenType == t2
+}

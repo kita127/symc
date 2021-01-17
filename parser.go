@@ -529,6 +529,32 @@ func (p *Parser) parseBlockStatement() []Statement {
 
 func (p *Parser) parseForStatement() []Statement {
 	ss := []Statement{}
+
+	// for
+	p.pos++
+
+	if !p.curToken().isToken(lparen) {
+		return nil
+	}
+	p.pos++
+
+	for {
+		ts := p.parseExpression()
+		if ts == nil {
+			return nil
+		}
+		ss = append(ss, ts...)
+
+		if p.curToken().isToken(rparen) {
+			p.pos++
+			break
+		} else if p.curToken().isToken(semicolon) {
+			p.pos++
+		} else {
+			return nil
+		}
+	}
+
 	p.progUntil(rbrace)
 	p.pos++
 	return ss
