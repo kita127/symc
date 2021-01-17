@@ -535,9 +535,7 @@ func (p *Parser) parseBlockStatement() []Statement {
 			ts = p.parseIfStatement()
 		case keyFor:
 			ts = p.parseForStatement()
-		case lparen:
-			fallthrough
-		case word:
+		default:
 			if ts == nil {
 				if s := p.parseVariableDef(); s != nil {
 					ts = append(ts, s)
@@ -548,9 +546,6 @@ func (p *Parser) parseBlockStatement() []Statement {
 				// other statement
 				ts = p.parseExpressionStatement()
 			}
-		default:
-			p.updateErrLog(fmt.Sprintf("parseBlockStatement:token[%s]", p.curToken().literal))
-			return nil
 		}
 		ss = append(ss, ts...)
 	}
@@ -656,39 +651,51 @@ func (p *Parser) parseExpressionStatement() []Statement {
 func (p *Parser) parseExpression() []Statement {
 	var ss []Statement = nil
 
-	switch p.curToken().tokenType {
-	case lparen:
-		prePos := p.pos
-		ts := p.parseCast()
-		if ts != nil {
-			ss = append(ss, ts...)
-		} else {
-			p.pos = prePos
-			p.pos++
-			ts := p.parseExpression()
-			ss = append(ss, ts...)
-			// rparen
-			p.pos++
-		}
-	case word:
-		prePos := p.pos
-		l := p.parseCallFunc()
-		if l == nil {
-			p.pos = prePos
-			l = p.parseAccessVar()
-		}
-		ss = append(ss, l)
-
-	case str:
-		fallthrough
-	case letter:
-		fallthrough
-	case integer:
+	if p.curToken().isToken(minus) && p.peekToken().isToken(minus) {
+		// 前置式の場合の処理
 		p.pos++
-		ss = []Statement{}
-	default:
-		p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
-		return nil
+		p.pos++
+		ts := p.parseExpression()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseExpression:token=%s", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
+	} else {
+		switch p.curToken().tokenType {
+		case lparen:
+			prePos := p.pos
+			ts := p.parseCast()
+			if ts != nil {
+				ss = append(ss, ts...)
+			} else {
+				p.pos = prePos
+				p.pos++
+				ts := p.parseExpression()
+				ss = append(ss, ts...)
+				// rparen
+				p.pos++
+			}
+		case word:
+			prePos := p.pos
+			l := p.parseCallFunc()
+			if l == nil {
+				p.pos = prePos
+				l = p.parseAccessVar()
+			}
+			ss = append(ss, l)
+		case str:
+			fallthrough
+		case letter:
+			fallthrough
+		case integer:
+			p.pos++
+			ss = []Statement{}
+		default:
+			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+			return nil
+		}
+
 	}
 
 	if p.curToken().isOperator() {

@@ -825,6 +825,25 @@ void func()
 			},
 		},
 		{
+			"expression 6",
+			`
+void func()
+{
+    --a;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&AccessVar{Name: "a"},
+						},
+					},
+				},
+			},
+		},
+		{
 			"call expression 1",
 			`
 void func()
