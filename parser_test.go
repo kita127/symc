@@ -1328,6 +1328,24 @@ void func(void)
 				},
 			},
 		},
+		{
+			"for 1",
+			`
+void func(void)
+{
+    for (){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

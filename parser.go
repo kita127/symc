@@ -501,6 +501,8 @@ func (p *Parser) parseBlockStatement() []Statement {
 			ts = p.parseReturn()
 		case keyIf:
 			ts = p.parseIfStatement()
+		case keyFor:
+			ts = p.parseForStatement()
 		case lparen:
 			fallthrough
 		case word:
@@ -522,6 +524,13 @@ func (p *Parser) parseBlockStatement() []Statement {
 
 	p.pos++
 
+	return ss
+}
+
+func (p *Parser) parseForStatement() []Statement {
+	ss := []Statement{}
+	p.progUntil(rbrace)
+	p.pos++
 	return ss
 }
 
