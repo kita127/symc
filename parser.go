@@ -470,6 +470,9 @@ func (p *Parser) parsePrototypeDecl() Statement {
 	if p.curToken().tokenType == keyAttribute {
 		// attribute の場合はセミコロンまでスキップ
 		p.progUntil(semicolon)
+	} else if p.curToken().isToken(keyAsm) {
+		// __asm の場合はセミコロンまでスキップ
+		p.progUntil(semicolon)
 	} else if p.curToken().tokenType != semicolon {
 		// セミコロン意外はプロトタイプ宣言ではない
 		p.posReset()

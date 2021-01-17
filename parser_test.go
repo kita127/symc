@@ -1373,3 +1373,51 @@ void func(void)
 		}
 	}
 }
+
+// TestGcc
+func TestGcc(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{"test gcc 1",
+			`
+FILE *fopen(const char * restrict __filename, const char * restrict __mode) __asm("_" "fopen" );
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "fopen"},
+				},
+			},
+		},
+		{"test gcc 2",
+			`
+inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{
+						Name: "__sputc",
+						Params: []*VariableDef{
+							{Name: "_c"},
+							{Name: "_p"},
+						},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("got=%v, expect=%v", got, tt.expect)
+		}
+	}
+}
