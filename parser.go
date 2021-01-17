@@ -165,17 +165,6 @@ func (v *Typedef) PrettyString() string {
 	return fmt.Sprintf("%s", v.Name)
 }
 
-type Nothing struct {
-}
-
-func (v *Nothing) statementNode() {}
-func (v *Nothing) String() string {
-	return fmt.Sprintf("Nothing")
-}
-func (v *Nothing) PrettyString() string {
-	return ""
-}
-
 // 構文解析器
 type Parser struct {
 	lexer   *Lexer
