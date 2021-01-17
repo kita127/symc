@@ -46,10 +46,10 @@ type InvalidStatement struct {
 
 func (v *InvalidStatement) statementNode() {}
 func (v *InvalidStatement) String() string {
-	return fmt.Sprintf("InvalidStatement : Contents=%s, Tk=%s", v.Contents, v.Tk.literal)
+	return fmt.Sprintf("InvalidStatement : %s", v.Contents)
 }
 func (v *InvalidStatement) PrettyString() string {
-	return fmt.Sprintf("InvalidStatement(%s)", v.Tk.literal)
+	return v.String()
 }
 
 type VariableDef struct {
@@ -171,6 +171,7 @@ type Parser struct {
 	tokens  []*Token
 	pos     int
 	prevPos int
+	errLog  string
 }
 
 func NewParser(l *Lexer) *Parser {
@@ -196,6 +197,8 @@ func (p *Parser) parseModule() *Module {
 				break
 			}
 		}
+		// エラーログを初期化
+		p.errLog = ""
 	}
 	m := &Module{ss}
 	return m
@@ -215,7 +218,7 @@ func (p *Parser) parseStatement() Statement {
 			s = p.parseVariableDecl()
 		}
 		if s == nil {
-			return &InvalidStatement{Contents: "could not parse", Tk: p.curToken()}
+			return &InvalidStatement{Contents: p.errLog, Tk: p.curToken()}
 		}
 	case keyStruct:
 		p.skipStruct()
@@ -233,7 +236,7 @@ func (p *Parser) parseStatement() Statement {
 			s = p.parseVariableDef()
 		}
 		if s == nil {
-			return &InvalidStatement{Contents: "could not parse", Tk: p.curToken()}
+			return &InvalidStatement{Contents: p.errLog, Tk: p.curToken()}
 		}
 	}
 	return s
@@ -485,6 +488,7 @@ func (p *Parser) parseFunctionDef() Statement {
 		n = p.peekToken()
 	}
 	if n.tokenType != lparen {
+		p.updateErrLog(fmt.Sprintf("parseFunctionDef:token[%s]", p.curToken().literal))
 		p.posReset()
 		return nil
 	}
@@ -499,12 +503,14 @@ func (p *Parser) parseFunctionDef() Statement {
 
 	// lbrace かチェック
 	if p.curToken().tokenType != lbrace {
+		p.updateErrLog(fmt.Sprintf("parseFunctionDef:token[%s]", p.curToken().literal))
 		p.posReset()
 		return nil
 	}
 
 	ss := p.parseBlockStatement()
 	if ss == nil {
+		p.updateErrLog(fmt.Sprintf("parseFunctionDef:token[%s]", p.curToken().literal))
 		p.posReset()
 		return nil
 	}
@@ -543,6 +549,7 @@ func (p *Parser) parseBlockStatement() []Statement {
 				ts = p.parseExpressionStatement()
 			}
 		default:
+			p.updateErrLog(fmt.Sprintf("parseBlockStatement:token[%s]", p.curToken().literal))
 			return nil
 		}
 		ss = append(ss, ts...)
@@ -680,6 +687,7 @@ func (p *Parser) parseExpression() []Statement {
 		p.pos++
 		ss = []Statement{}
 	default:
+		p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
 		return nil
 	}
 
@@ -882,4 +890,10 @@ func (p *Parser) fetchID() string {
 		}
 	}
 	return id
+}
+
+func (p *Parser) updateErrLog(msg string) {
+	delimiter := ";"
+	p.errLog += msg
+	p.errLog += delimiter
 }
