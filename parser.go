@@ -652,7 +652,17 @@ func (p *Parser) parseExpression() []Statement {
 	var ss []Statement = nil
 
 	if p.curToken().isToken(minus) && p.peekToken().isToken(minus) {
-		// 前置式の場合の処理
+		// --前置式の場合の処理
+		p.pos++
+		p.pos++
+		ts := p.parseExpression()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseExpression:token=%s", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
+	} else if p.curToken().isToken(plus) && p.peekToken().isToken(plus) {
+		// ++前置式の場合の処理
 		p.pos++
 		p.pos++
 		ts := p.parseExpression()

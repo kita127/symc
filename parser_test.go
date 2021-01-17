@@ -830,6 +830,7 @@ void func()
 void func()
 {
     --a;
+    ++a;
 }
 `,
 			&Module{
@@ -837,6 +838,7 @@ void func()
 					&FunctionDef{Name: "func",
 						Params: []*VariableDef{},
 						Statements: []Statement{
+							&AccessVar{Name: "a"},
 							&AccessVar{Name: "a"},
 						},
 					},
