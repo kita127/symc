@@ -562,12 +562,6 @@ func (p *Parser) parseBlockStatement() []Statement {
 			}
 			if ts == nil {
 				p.pos = prevPos
-				if us := p.parseAssigne(); us != nil {
-					ts = append(ts, us...)
-				}
-			}
-			if ts == nil {
-				p.pos = prevPos
 				// other statement
 				ts = p.parseExpressionStatement()
 			}
@@ -604,11 +598,6 @@ func (p *Parser) parseAssigne() []Statement {
 		return nil
 	}
 
-	if !p.curToken().isToken(semicolon) {
-		return nil
-	}
-	p.pos++
-
 	ss = append(ss, &Assigne{id})
 	ss = append(ss, exps...)
 
@@ -633,13 +622,13 @@ func (p *Parser) parseForStatement() []Statement {
 			return nil
 		}
 		ss = append(ss, ts...)
-
 		if p.curToken().isToken(rparen) {
 			p.pos++
 			break
 		} else if p.curToken().isToken(semicolon) {
 			p.pos++
 		} else {
+			p.updateErrLog(fmt.Sprintf("parseForStatement:token[%s]", p.curToken().literal))
 			return nil
 		}
 	}
@@ -704,6 +693,10 @@ func (p *Parser) parseReturn() []Statement {
 
 func (p *Parser) parseExpressionStatement() []Statement {
 	ss := p.parseExpression()
+	if ss == nil {
+		p.updateErrLog(fmt.Sprintf("parseExpressionStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
 	// semicolon
 	p.pos++
 	return ss
@@ -712,83 +705,73 @@ func (p *Parser) parseExpressionStatement() []Statement {
 func (p *Parser) parseExpression() []Statement {
 	ss := []Statement{}
 
-	if p.curToken().isToken(minus) && p.peekToken().isToken(minus) {
-		// --前置式の場合の処理
+	if p.curToken().isPrefixExpression() {
+		// 前置式
 		p.pos++
-		p.pos++
-		ts := p.parseExpression()
-		if ts == nil {
-			p.updateErrLog(fmt.Sprintf("parseExpression:token=%s", p.curToken().literal))
-			return nil
-		}
-		ss = append(ss, ts...)
-	} else if p.curToken().isToken(plus) && p.peekToken().isToken(plus) {
-		// ++前置式の場合の処理
-		p.pos++
-		p.pos++
-		ts := p.parseExpression()
-		if ts == nil {
-			p.updateErrLog(fmt.Sprintf("parseExpression:token=%s", p.curToken().literal))
-			return nil
-		}
-		ss = append(ss, ts...)
-	} else {
-		switch p.curToken().tokenType {
-		case lparen:
-			prePos := p.pos
-			ts := p.parseCast()
-			if ts != nil {
-				ss = append(ss, ts...)
-			} else {
-				p.pos = prePos
-				p.pos++
-				ts := p.parseExpression()
-				ss = append(ss, ts...)
-				// rparen
-				p.pos++
-			}
-		case ampersand:
+	}
+
+	switch p.curToken().tokenType {
+	case lparen:
+		prePos := p.pos
+		ts := p.parseCast()
+		if ts != nil {
+			ss = append(ss, ts...)
+		} else {
+			p.pos = prePos
 			p.pos++
-			ls := p.parseExpression()
-			if ls == nil {
-				p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
-				return nil
-			}
-			ss = append(ss, ls...)
-		case word:
-			prePos := p.pos
-			l := p.parseCallFunc()
-			if l == nil {
-				p.pos = prePos
-				l = p.parseRefVar()
-			}
-			ss = append(ss, l)
-		case str:
-			fallthrough
-		case letter:
-			fallthrough
-		case integer:
+			ts := p.parseExpression()
+			ss = append(ss, ts...)
+			// rparen
 			p.pos++
-			ss = []Statement{}
-		default:
+		}
+	case ampersand:
+		p.pos++
+		ls := p.parseExpression()
+		if ls == nil {
 			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
 			return nil
 		}
-
+		ss = append(ss, ls...)
+	case word:
+		prePos := p.pos
+		ls := p.parseAssigne()
+		if ls == nil {
+			p.pos = prePos
+			ls = p.parseCallFunc()
+		}
+		if ls == nil {
+			p.pos = prePos
+			ls = p.parseRefVar()
+			if p.curToken().isInfixExpression() {
+				p.pos++
+			}
+		}
+		ss = append(ss, ls...)
+	case str:
+		fallthrough
+	case letter:
+		fallthrough
+	case integer:
+		p.pos++
+	default:
+		p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+		return nil
 	}
 
 	if p.curToken().isOperator() {
-		for p.curToken().isOperator() {
-			p.pos++
-		}
+		p.pos++
 		r := p.parseExpression()
+		if r == nil {
+			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+			return nil
+		}
 		ss = append(ss, r...)
 	}
 
 	return ss
 }
 
-func (p *Parser) parseCallFunc() Statement {
+func (p *Parser) parseCallFunc() []Statement {
 	id := p.curToken().literal
 	p.pos++
 	if p.curToken().tokenType != lparen {
@@ -801,7 +784,7 @@ func (p *Parser) parseCallFunc() Statement {
 	if p.curToken().tokenType == rparen {
 		// 引数なし
 		p.pos++
-		return &CallFunc{Name: id, Args: ss}
+		return []Statement{&CallFunc{Name: id, Args: ss}}
 	}
 
 	for {
@@ -821,7 +804,7 @@ func (p *Parser) parseCallFunc() Statement {
 		}
 	}
 
-	return &CallFunc{Name: id, Args: ss}
+	return []Statement{&CallFunc{Name: id, Args: ss}}
 }
 
 func (p *Parser) parseCast() []Statement {
@@ -842,14 +825,14 @@ func (p *Parser) parseCast() []Statement {
 	return ss
 }
 
-func (p *Parser) parseRefVar() Statement {
+func (p *Parser) parseRefVar() []Statement {
 	if p.curToken().tokenType != word {
 		p.posReset()
 		return nil
 	}
 	n := p.fetchID()
 
-	return &RefVar{Name: n}
+	return []Statement{&RefVar{Name: n}}
 }
 
 func (p *Parser) parseParameter() []*VariableDef {

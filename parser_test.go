@@ -830,11 +830,11 @@ void func()
 void func()
 {
     --a;
-    ++a;
-    a--;
-    a++;
-    b++ + --b;
-    ++c - c--;
+    ++b;
+    c--;
+    d++;
+    e++ + --f;
+    ++g - h--;
 }
 `,
 			&Module{
@@ -843,13 +843,13 @@ void func()
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							&RefVar{Name: "a"},
-							&RefVar{Name: "a"},
-							&RefVar{Name: "a"},
-							&RefVar{Name: "a"},
-							&RefVar{Name: "b"},
 							&RefVar{Name: "b"},
 							&RefVar{Name: "c"},
-							&RefVar{Name: "c"},
+							&RefVar{Name: "d"},
+							&RefVar{Name: "e"},
+							&RefVar{Name: "f"},
+							&RefVar{Name: "g"},
+							&RefVar{Name: "h"},
 						},
 					},
 				},
@@ -1353,7 +1353,7 @@ void func(void)
 			`
 void func(void)
 {
-    if ( hoge == 0){
+    if (hoge == 0){
     }
 }
 `,
@@ -1425,7 +1425,7 @@ void func(void)
 					&FunctionDef{Name: "func",
 						Params: []*VariableDef{},
 						Statements: []Statement{
-							&RefVar{Name: "i"},
+							&Assigne{Name: "i"},
 							&RefVar{Name: "i"},
 							&RefVar{Name: "i"},
 						},

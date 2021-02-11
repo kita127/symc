@@ -28,6 +28,9 @@ const (
 	slash
 	lt
 	gt
+	eq
+	gteq
+	lteq
 	semicolon
 	lparen
 	rparen
@@ -49,6 +52,10 @@ const (
 	arrow
 	leftShift
 	rightShift
+	increment
+	decrement
+	and
+	or
 	keyReturn
 	keyIf
 	keyElse
@@ -120,18 +127,29 @@ func (l *Lexer) nextToken() *Token {
 	case '=':
 		tk = &Token{tokenType: assign, literal: "="}
 		l.pos++
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: eq, literal: "=="}
+			l.pos++
+		}
 	case '+':
 		tk = &Token{tokenType: plus, literal: "+"}
 		l.pos++
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '+' {
+			tk = &Token{tokenType: increment, literal: "++"}
+			l.pos++
+		}
 	case '-':
-		d := l.input[l.pos+1]
-		if d == '>' {
+		tk = &Token{tokenType: minus, literal: "-"}
+		l.pos++
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '>' {
 			// ->
 			tk = &Token{tokenType: arrow, literal: "->"}
 			l.pos++
-			l.pos++
-		} else {
-			tk = &Token{tokenType: minus, literal: "-"}
+		} else if l.input[l.pos] == '-' {
+			tk = &Token{tokenType: decrement, literal: "--"}
 			l.pos++
 		}
 	case '!':
@@ -146,15 +164,23 @@ func (l *Lexer) nextToken() *Token {
 	case '<':
 		tk = &Token{tokenType: lt, literal: "<"}
 		l.pos++
-		if l.input[l.pos] == '<' {
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '<' {
 			tk = &Token{tokenType: leftShift, literal: "<<"}
+			l.pos++
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: lteq, literal: "<="}
 			l.pos++
 		}
 	case '>':
 		tk = &Token{tokenType: gt, literal: ">"}
 		l.pos++
-		if l.input[l.pos] == '>' {
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '>' {
 			tk = &Token{tokenType: rightShift, literal: ">>"}
+			l.pos++
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: gteq, literal: ">="}
 			l.pos++
 		}
 	case ';':
@@ -184,6 +210,11 @@ func (l *Lexer) nextToken() *Token {
 	case '&':
 		tk = &Token{tokenType: ampersand, literal: "&"}
 		l.pos++
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '&' {
+			tk = &Token{tokenType: and, literal: "&&"}
+			l.pos++
+		}
 	case '~':
 		tk = &Token{tokenType: tilde, literal: "~"}
 		l.pos++
@@ -193,6 +224,11 @@ func (l *Lexer) nextToken() *Token {
 	case '|':
 		tk = &Token{tokenType: vertical, literal: "|"}
 		l.pos++
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '|' {
+			tk = &Token{tokenType: or, literal: "||"}
+			l.pos++
+		}
 	case ':':
 		tk = &Token{tokenType: colon, literal: ":"}
 		l.pos++
@@ -425,6 +461,10 @@ func (t *Token) isOperator() bool {
 	case question:
 	case leftShift:
 	case rightShift:
+	case increment:
+	case decrement:
+	case or:
+	case and:
 	default:
 		return false
 	}
@@ -443,6 +483,26 @@ func (t *Token) isPreAssigneOperator() bool {
 	case vertical:
 	case leftShift:
 	case rightShift:
+	default:
+		return false
+	}
+	return true
+}
+
+func (t *Token) isPrefixExpression() bool {
+	switch t.tokenType {
+	case increment:
+	case decrement:
+	default:
+		return false
+	}
+	return true
+}
+
+func (t *Token) isInfixExpression() bool {
+	switch t.tokenType {
+	case increment:
+	case decrement:
 	default:
 		return false
 	}
