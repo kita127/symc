@@ -1425,6 +1425,65 @@ void func(void)
 	}
 }
 
+// TestAssigne
+func TestAssigne(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"assigne 1",
+			`
+void func(void)
+{
+    hoge = 1;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{"hoge"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"assigne 2",
+			`
+void func(void)
+{
+    hoge = a;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{"hoge"},
+							&AccessVar{"a"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("got=%v, expect=%v", got, tt.expect)
+		}
+	}
+}
+
 // TestGcc
 func TestGcc(t *testing.T) {
 	testTbl := []struct {

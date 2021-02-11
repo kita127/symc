@@ -1,5 +1,9 @@
 package symc
 
+// parse モジュール
+// 字句解析の結果を構文解析する
+// 構文解析後、次のトークンに必ず位置を合わせること
+
 import (
 	"fmt"
 )
@@ -130,6 +134,18 @@ func (v *AccessVar) String() string {
 }
 func (v *AccessVar) PrettyString() string {
 	return fmt.Sprintf("%s", v.Name)
+}
+
+type Assigne struct {
+	Name string
+}
+
+func (v *Assigne) statementNode() {}
+func (v *Assigne) String() string {
+	return fmt.Sprintf("Assigne : Name=%s", v.Name)
+}
+func (v *Assigne) PrettyString() string {
+	return fmt.Sprintf("assigne %s", v.Name)
 }
 
 type CallFunc struct {
@@ -477,6 +493,7 @@ func (p *Parser) parsePrototypeDecl() Statement {
 
 }
 
+// parseFunctionDef
 func (p *Parser) parseFunctionDef() Statement {
 	// lparen or eof の手前まで pos を進める
 	n := p.peekToken()
@@ -518,6 +535,7 @@ func (p *Parser) parseFunctionDef() Statement {
 	return &FunctionDef{Name: id, Params: ps, Statements: ss}
 }
 
+// parseBlockStatement
 func (p *Parser) parseBlockStatement() []Statement {
 	p.pos++
 
@@ -537,8 +555,15 @@ func (p *Parser) parseBlockStatement() []Statement {
 			ts = p.parseForStatement()
 		default:
 			if ts == nil {
+				p.pos = prevPos
 				if s := p.parseVariableDef(); s != nil {
 					ts = append(ts, s)
+				}
+			}
+			if ts == nil {
+				p.pos = prevPos
+				if us := p.parseAssigne(); us != nil {
+					ts = append(ts, us...)
 				}
 			}
 			if ts == nil {
@@ -553,6 +578,38 @@ func (p *Parser) parseBlockStatement() []Statement {
 	p.pos++
 
 	return ss
+}
+
+// parseAssigne
+func (p *Parser) parseAssigne() []Statement {
+	ss := []Statement{}
+
+	if !p.curToken().isToken(word) {
+		return nil
+	}
+	id := p.curToken().literal
+	p.pos++
+
+	if !p.curToken().isToken(assign) {
+		return nil
+	}
+	p.pos++
+
+	exps := p.parseExpression()
+	if exps == nil {
+		return nil
+	}
+
+	if !p.curToken().isToken(semicolon) {
+		return nil
+	}
+	p.pos++
+
+	ss = append(ss, &Assigne{id})
+	ss = append(ss, exps...)
+
+	return ss
+
 }
 
 func (p *Parser) parseForStatement() []Statement {
