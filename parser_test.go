@@ -452,7 +452,7 @@ void func(int a)
 				[]Statement{
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}},
 					},
 				},
 			},
@@ -471,9 +471,9 @@ void func(int a)
 					&FunctionDef{Name: "func",
 						Params: []*VariableDef{{Name: "a"}},
 						Statements: []Statement{
-							&AccessVar{Name: "hoge"},
+							&Assigne{Name: "hoge"},
 							&AccessVar{Name: "fuga"},
-							&AccessVar{Name: "p_var"},
+							&Assigne{Name: "p_var"},
 							&AccessVar{Name: "address"},
 						},
 					},
@@ -511,7 +511,7 @@ void func(int a)
 				[]Statement{
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&VariableDef{Name: "aaa"}, &AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+						Statements: []Statement{&VariableDef{Name: "aaa"}, &Assigne{Name: "hoge"}, &Assigne{Name: "fuga"}},
 					},
 				},
 			},
@@ -632,39 +632,39 @@ void func()
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							// +
-							&AccessVar{Name: "var1"},
+							&Assigne{Name: "var1"},
 							&AccessVar{Name: "a1"},
 							&AccessVar{Name: "b1"},
 							// -
-							&AccessVar{Name: "var2"},
+							&Assigne{Name: "var2"},
 							&AccessVar{Name: "a2"},
 							&AccessVar{Name: "b2"},
 							// *
-							&AccessVar{Name: "var3"},
+							&Assigne{Name: "var3"},
 							&AccessVar{Name: "a3"},
 							&AccessVar{Name: "b3"},
 							// /
-							&AccessVar{Name: "var4"},
+							&Assigne{Name: "var4"},
 							&AccessVar{Name: "a4"},
 							&AccessVar{Name: "b4"},
 							// |
-							&AccessVar{Name: "var5"},
+							&Assigne{Name: "var5"},
 							&AccessVar{Name: "a5"},
 							&AccessVar{Name: "b5"},
 							// &
-							&AccessVar{Name: "var6"},
+							&Assigne{Name: "var6"},
 							&AccessVar{Name: "a6"},
 							&AccessVar{Name: "b6"},
 							// ||
-							&AccessVar{Name: "var7"},
+							&Assigne{Name: "var7"},
 							&AccessVar{Name: "a7"},
 							&AccessVar{Name: "b7"},
 							// &&
-							&AccessVar{Name: "var8"},
+							&Assigne{Name: "var8"},
 							&AccessVar{Name: "a8"},
 							&AccessVar{Name: "b8"},
 							// >
-							&AccessVar{Name: "var9"},
+							&Assigne{Name: "var9"},
 							&AccessVar{Name: "a9"},
 							&AccessVar{Name: "b9"},
 						}},
@@ -687,15 +687,15 @@ void func()
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							// <<
-							&AccessVar{Name: "var1"},
+							&Assigne{Name: "var1"},
 							&AccessVar{Name: "a1"},
 							&AccessVar{Name: "b1"},
 							// >>
-							&AccessVar{Name: "var2"},
+							&Assigne{Name: "var2"},
 							&AccessVar{Name: "a2"},
 							&AccessVar{Name: "b2"},
 							// ^
-							&AccessVar{Name: "var3"},
+							&Assigne{Name: "var3"},
 							&AccessVar{Name: "a3"},
 							&AccessVar{Name: "b3"},
 						}},
@@ -723,28 +723,28 @@ void func()
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							// +=
-							&AccessVar{Name: "var1"},
+							&Assigne{Name: "var1"},
 							&AccessVar{Name: "a1"},
 							// -=
-							&AccessVar{Name: "var2"},
+							&Assigne{Name: "var2"},
 							&AccessVar{Name: "a2"},
 							// /=
-							&AccessVar{Name: "var3"},
+							&Assigne{Name: "var3"},
 							&AccessVar{Name: "a3"},
 							// *=
-							&AccessVar{Name: "var4"},
+							&Assigne{Name: "var4"},
 							&AccessVar{Name: "a4"},
 							// |=
-							&AccessVar{Name: "var5"},
+							&Assigne{Name: "var5"},
 							&AccessVar{Name: "a5"},
 							// &=
-							&AccessVar{Name: "var6"},
+							&Assigne{Name: "var6"},
 							&AccessVar{Name: "a6"},
 							// <<=
-							&AccessVar{Name: "var7"},
+							&Assigne{Name: "var7"},
 							&AccessVar{Name: "a7"},
 							// >>=
-							&AccessVar{Name: "var8"},
+							&Assigne{Name: "var8"},
 							&AccessVar{Name: "a8"},
 						}},
 				},
@@ -764,7 +764,7 @@ void func()
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							// +=
-							&AccessVar{Name: "var1"},
+							&Assigne{Name: "var1"},
 							&AccessVar{Name: "a1"},
 							&AccessVar{Name: "b1"},
 							&AccessVar{Name: "c1"},
@@ -791,30 +791,30 @@ void func()
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							// 1
-							&AccessVar{Name: "var1"},
+							&Assigne{Name: "var1"},
 							&AccessVar{Name: "a1"},
 							// 2
-							&AccessVar{Name: "var2"},
+							&Assigne{Name: "var2"},
 							&AccessVar{Name: "a2"},
 							&AccessVar{Name: "b2"},
 							// 3
-							&AccessVar{Name: "var3"},
+							&Assigne{Name: "var3"},
 							&AccessVar{Name: "a3"},
 							&AccessVar{Name: "b3"},
 							&AccessVar{Name: "c3"},
 							// 4
-							&AccessVar{Name: "var4"},
+							&Assigne{Name: "var4"},
 							&AccessVar{Name: "a4"},
 							&AccessVar{Name: "b4"},
 							&AccessVar{Name: "c4"},
 							// 5
-							&AccessVar{Name: "var5"},
+							&Assigne{Name: "var5"},
 							&AccessVar{Name: "a5"},
 							&AccessVar{Name: "b5"},
 							&AccessVar{Name: "c5"},
 							&AccessVar{Name: "d5"},
 							// 6
-							&AccessVar{Name: "var6"},
+							&Assigne{Name: "var6"},
 							&AccessVar{Name: "a6"},
 							&AccessVar{Name: "b6"},
 							&AccessVar{Name: "c6"},
@@ -850,6 +850,27 @@ void func()
 							&AccessVar{Name: "b"},
 							&AccessVar{Name: "c"},
 							&AccessVar{Name: "c"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"expression 7",
+			`
+void func()
+{
+    &hoge;
+    (unsigned char)fuga;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&AccessVar{Name: "hoge"},
+							&AccessVar{Name: "fuga"},
 						},
 					},
 				},
@@ -1002,7 +1023,7 @@ void func(int a)
 				[]Statement{
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}},
 					},
 				},
 			},
@@ -1019,7 +1040,7 @@ void func(int a)
 				[]Statement{
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}, &AccessVar{Name: "fuga"}},
 					},
 				},
 			},
@@ -1036,7 +1057,7 @@ void func(int a)
 				[]Statement{
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}, &AccessVar{Name: "fuga"}},
 					},
 				},
 			},
@@ -1053,7 +1074,7 @@ void func(int a)
 				[]Statement{
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}, &AccessVar{Name: "fuga"}, &AccessVar{Name: "piyo"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}, &AccessVar{Name: "fuga"}, &AccessVar{Name: "piyo"}},
 					},
 				},
 			},
@@ -1070,7 +1091,7 @@ void func(int a)
 				[]Statement{
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&AccessVar{Name: "hoge"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}},
 					},
 				},
 			},
@@ -1090,7 +1111,7 @@ void func(void)
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							&VariableDef{Name: "c"},
-							&AccessVar{Name: "c"},
+							&Assigne{Name: "c"},
 						},
 					},
 				},
@@ -1110,8 +1131,8 @@ void func(void)
 					&FunctionDef{Name: "func",
 						Params: []*VariableDef{},
 						Statements: []Statement{
-							&AccessVar{Name: "hoge.a1"},
-							&AccessVar{Name: "fuga->b1"},
+							&Assigne{Name: "hoge.a1"},
+							&Assigne{Name: "fuga->b1"},
 						},
 					},
 				},
@@ -1213,11 +1234,11 @@ int muruchi_piyomi(char *s) {
 						Statements: []Statement{
 							&VariableDef{Name: "purin"},
 							&VariableDef{Name: "p"},
-							&AccessVar{Name: "purin.aaa"},
-							&AccessVar{Name: "purin.bbb.xxx"},
-							&AccessVar{Name: "p"},
+							&Assigne{Name: "purin.aaa"},
+							&Assigne{Name: "purin.bbb.xxx"},
+							&Assigne{Name: "p"},
 							&AccessVar{Name: "purin"},
-							&AccessVar{Name: "p->aaa"},
+							&Assigne{Name: "p->aaa"},
 							&AccessVar{Name: "purin.aaa"},
 						}},
 				},
@@ -1363,7 +1384,7 @@ void func(void)
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							&AccessVar{Name: "hoge"},
-							&AccessVar{Name: "fuga"},
+							&Assigne{Name: "fuga"},
 							&AccessVar{Name: "a"},
 						},
 					},
@@ -1407,6 +1428,65 @@ void func(void)
 							&AccessVar{Name: "i"},
 							&AccessVar{Name: "i"},
 							&AccessVar{Name: "i"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("got=%v, expect=%v", got, tt.expect)
+		}
+	}
+}
+
+// TestAssigne
+func TestAssigne(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"assigne 1",
+			`
+void func(void)
+{
+    hoge = 1;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{"hoge"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"assigne 2",
+			`
+void func(void)
+{
+    hoge = a;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{"hoge"},
+							&AccessVar{"a"},
 						},
 					},
 				},
