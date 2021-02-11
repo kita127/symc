@@ -47,6 +47,8 @@ const (
 	str
 	letter
 	arrow
+	leftShift
+	rightShift
 	keyReturn
 	keyIf
 	keyElse
@@ -144,9 +146,17 @@ func (l *Lexer) nextToken() *Token {
 	case '<':
 		tk = &Token{tokenType: lt, literal: "<"}
 		l.pos++
+		if l.input[l.pos] == '<' {
+			tk = &Token{tokenType: leftShift, literal: "<<"}
+			l.pos++
+		}
 	case '>':
 		tk = &Token{tokenType: gt, literal: ">"}
 		l.pos++
+		if l.input[l.pos] == '>' {
+			tk = &Token{tokenType: rightShift, literal: ">>"}
+			l.pos++
+		}
 	case ';':
 		tk = &Token{tokenType: semicolon, literal: ";"}
 		l.pos++
@@ -413,6 +423,26 @@ func (t *Token) isOperator() bool {
 	case vertical:
 	case colon:
 	case question:
+	case leftShift:
+	case rightShift:
+	default:
+		return false
+	}
+	return true
+}
+
+func (t *Token) isPreAssigneOperator() bool {
+	switch t.tokenType {
+	case plus:
+	case minus:
+	case asterisk:
+	case slash:
+	case ampersand:
+	case tilde:
+	case caret:
+	case vertical:
+	case leftShift:
+	case rightShift:
 	default:
 		return false
 	}

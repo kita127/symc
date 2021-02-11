@@ -587,8 +587,12 @@ func (p *Parser) parseAssigne() []Statement {
 	if !p.curToken().isToken(word) {
 		return nil
 	}
-	id := p.curToken().literal
-	p.pos++
+	id := p.fetchID()
+
+	if p.curToken().isPreAssigneOperator() {
+		// 代入の前に置くことができる演算子 e.g. +=
+		p.pos++
+	}
 
 	if !p.curToken().isToken(assign) {
 		return nil
@@ -706,7 +710,7 @@ func (p *Parser) parseExpressionStatement() []Statement {
 }
 
 func (p *Parser) parseExpression() []Statement {
-	var ss []Statement = nil
+	ss := []Statement{}
 
 	if p.curToken().isToken(minus) && p.peekToken().isToken(minus) {
 		// --前置式の場合の処理
@@ -743,6 +747,14 @@ func (p *Parser) parseExpression() []Statement {
 				// rparen
 				p.pos++
 			}
+		case ampersand:
+			p.pos++
+			ls := p.parseExpression()
+			if ls == nil {
+				p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+				return nil
+			}
+			ss = append(ss, ls...)
 		case word:
 			prePos := p.pos
 			l := p.parseCallFunc()
@@ -814,13 +826,11 @@ func (p *Parser) parseCallFunc() Statement {
 
 func (p *Parser) parseCast() []Statement {
 	if p.curToken().tokenType != lparen {
-		p.posReset()
 		return nil
 	}
 	p.pos++
 	for p.curToken().tokenType != rparen {
 		if p.curToken().tokenType != word {
-			p.posReset()
 			return nil
 		}
 		p.pos++
