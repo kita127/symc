@@ -65,7 +65,7 @@ func (v *VariableDef) String() string {
 	return fmt.Sprintf("VariableDef : Name=%s", v.Name)
 }
 func (v *VariableDef) PrettyString() string {
-	return fmt.Sprintf("var %s", v.Name)
+	return fmt.Sprintf("VAR %s", v.Name)
 }
 
 type VariableDecl struct {
@@ -145,7 +145,7 @@ func (v *Assigne) String() string {
 	return fmt.Sprintf("Assigne : Name=%s", v.Name)
 }
 func (v *Assigne) PrettyString() string {
-	return fmt.Sprintf("assigne %s", v.Name)
+	return fmt.Sprintf("ASSIGNE %s", v.Name)
 }
 
 type CallFunc struct {
