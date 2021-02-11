@@ -124,15 +124,15 @@ func (v *FunctionDef) PrettyString() string {
 	return txt
 }
 
-type AccessVar struct {
+type RefVar struct {
 	Name string
 }
 
-func (v *AccessVar) statementNode() {}
-func (v *AccessVar) String() string {
-	return fmt.Sprintf("AccessVar : Name=%s", v.Name)
+func (v *RefVar) statementNode() {}
+func (v *RefVar) String() string {
+	return fmt.Sprintf("RefVar : Name=%s", v.Name)
 }
-func (v *AccessVar) PrettyString() string {
+func (v *RefVar) PrettyString() string {
 	return fmt.Sprintf("%s", v.Name)
 }
 
@@ -760,7 +760,7 @@ func (p *Parser) parseExpression() []Statement {
 			l := p.parseCallFunc()
 			if l == nil {
 				p.pos = prePos
-				l = p.parseAccessVar()
+				l = p.parseRefVar()
 			}
 			ss = append(ss, l)
 		case str:
@@ -842,14 +842,14 @@ func (p *Parser) parseCast() []Statement {
 	return ss
 }
 
-func (p *Parser) parseAccessVar() Statement {
+func (p *Parser) parseRefVar() Statement {
 	if p.curToken().tokenType != word {
 		p.posReset()
 		return nil
 	}
 	n := p.fetchID()
 
-	return &AccessVar{Name: n}
+	return &RefVar{Name: n}
 }
 
 func (p *Parser) parseParameter() []*VariableDef {
