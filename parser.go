@@ -703,6 +703,7 @@ func (p *Parser) parseExpressionStatement() []Statement {
 }
 
 func (p *Parser) parseExpression() []Statement {
+	var varName string
 	ss := []Statement{}
 
 	if p.curToken().isPrefixExpression() {
@@ -734,17 +735,17 @@ func (p *Parser) parseExpression() []Statement {
 		ss = append(ss, ls...)
 	case word:
 		prePos := p.pos
-		ls := p.parseAssigne()
-		if ls == nil {
-			p.pos = prePos
-			ls = p.parseCallFunc()
-		}
+		ls := p.parseCallFunc()
 		if ls == nil {
 			p.pos = prePos
 			ls = p.parseRefVar()
 			if p.curToken().isInfixExpression() {
 				p.pos++
 			}
+			// parseRefVar が返す型は *RefVar であることが保証されている
+			// 代入式の場合 Assigne に変更するため変数名を取得しておく
+			refv, _ := ls[len(ls)-1].(*RefVar)
+			varName = refv.Name
 		}
 		ss = append(ss, ls...)
 	case str:
@@ -759,11 +760,16 @@ func (p *Parser) parseExpression() []Statement {
 	}
 
 	if p.curToken().isOperator() {
+		op := p.curToken()
 		p.pos++
 		r := p.parseExpression()
 		if r == nil {
 			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
 			return nil
+		}
+		if op.isToken(assign) {
+			// assign の場合は最後の Statement を Assigne に変更する
+			ss[len(ss)-1] = &Assigne{varName}
 		}
 		ss = append(ss, r...)
 	}
