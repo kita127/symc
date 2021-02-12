@@ -492,7 +492,7 @@ void func(int a)
 				[]Statement{
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&RefVar{Name: "hoge"}, &RefVar{Name: "fuga"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}, &RefVar{Name: "fuga"}},
 					},
 				},
 			},
@@ -715,6 +715,9 @@ void func()
     var6 &= a6;
     var7 <<= a7;
     var8 >>= a8;
+    var9 ~= a9;
+    var10 ^= a10;
+    var11 %= a11;
 }
 `,
 			&Module{
@@ -746,6 +749,15 @@ void func()
 							// >>=
 							&Assigne{Name: "var8"},
 							&RefVar{Name: "a8"},
+							// ~=
+							&Assigne{Name: "var9"},
+							&RefVar{Name: "a9"},
+							// ^=
+							&Assigne{Name: "var10"},
+							&RefVar{Name: "a10"},
+							// %=
+							&Assigne{Name: "var11"},
+							&RefVar{Name: "a11"},
 						}},
 				},
 			},
@@ -1258,9 +1270,9 @@ void hoge(void){
 					&FunctionDef{Name: "hoge",
 						Params: []*VariableDef{},
 						Statements: []Statement{
-							&RefVar{Name: "_p->_p"},
+							&Assigne{Name: "_p->_p"},
 							&RefVar{Name: "_c"},
-							&RefVar{Name: "_p->_p"},
+							&Assigne{Name: "_p->_p"},
 							&RefVar{Name: "_c"},
 						}},
 				},

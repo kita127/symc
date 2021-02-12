@@ -574,37 +574,6 @@ func (p *Parser) parseBlockStatement() []Statement {
 	return ss
 }
 
-// parseAssigne
-func (p *Parser) parseAssigne() []Statement {
-	ss := []Statement{}
-
-	if !p.curToken().isToken(word) {
-		return nil
-	}
-	id := p.fetchID()
-
-	if p.curToken().isPreAssigneOperator() {
-		// 代入の前に置くことができる演算子 e.g. +=
-		p.pos++
-	}
-
-	if !p.curToken().isToken(assign) {
-		return nil
-	}
-	p.pos++
-
-	exps := p.parseExpression()
-	if exps == nil {
-		return nil
-	}
-
-	ss = append(ss, &Assigne{id})
-	ss = append(ss, exps...)
-
-	return ss
-
-}
-
 func (p *Parser) parseForStatement() []Statement {
 	ss := []Statement{}
 
@@ -703,6 +672,7 @@ func (p *Parser) parseExpressionStatement() []Statement {
 }
 
 func (p *Parser) parseExpression() []Statement {
+	var varName string
 	ss := []Statement{}
 
 	if p.curToken().isPrefixExpression() {
@@ -734,11 +704,7 @@ func (p *Parser) parseExpression() []Statement {
 		ss = append(ss, ls...)
 	case word:
 		prePos := p.pos
-		ls := p.parseAssigne()
-		if ls == nil {
-			p.pos = prePos
-			ls = p.parseCallFunc()
-		}
+		ls := p.parseCallFunc()
 		if ls == nil {
 			p.pos = prePos
 			ls = p.parseRefVar()
@@ -759,11 +725,21 @@ func (p *Parser) parseExpression() []Statement {
 	}
 
 	if p.curToken().isOperator() {
+		op := p.curToken()
 		p.pos++
 		r := p.parseExpression()
 		if r == nil {
 			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
 			return nil
+		}
+		if op.isToken(assign) || op.isCompoundOp() {
+			// 代入は最後の Statement を Assigne に変更する
+
+			// 代入式の場合、直前の値の型は *RefVar であることが保証されている
+			// Assigne に変更するため変数名を取得しておく
+			refv, _ := ss[len(ss)-1].(*RefVar)
+			varName = refv.Name
+			ss[len(ss)-1] = &Assigne{varName}
 		}
 		ss = append(ss, r...)
 	}
