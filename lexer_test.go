@@ -143,7 +143,7 @@ func TestLexicalize(t *testing.T) {
 		},
 		{
 			"test5",
-			` = + - ! * / < > ; ( ) , { } [ ] `,
+			` = + - ! * / % < > ; ( ) , { } [ ] `,
 			[]*Token{
 				{
 					assign,
@@ -168,6 +168,10 @@ func TestLexicalize(t *testing.T) {
 				{
 					slash,
 					"/",
+				},
+				{
+					percent,
+					"%",
 				},
 				{
 					lt,
@@ -290,6 +294,60 @@ func TestLexicalize(t *testing.T) {
 				{
 					lteq,
 					`<=`,
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
+		{
+			"test7",
+			`+= -= *= /= |= &= <<= >>= ~= ^= %=`,
+			[]*Token{
+				{
+					plusAssigne,
+					"+=",
+				},
+				{
+					minusAssigne,
+					"-=",
+				},
+				{
+					asteriskAssigne,
+					"*=",
+				},
+				{
+					slashAssigne,
+					"/=",
+				},
+				{
+					verticalAssigne,
+					"|=",
+				},
+				{
+					ampersandAssigne,
+					"&=",
+				},
+				{
+					leftShiftAssigne,
+					"<<=",
+				},
+				{
+					rightShiftAssigne,
+					">>=",
+				},
+				{
+					tildeAssigne,
+					"~=",
+				},
+				{
+					caretAssigne,
+					"^=",
+				},
+				{
+					percentAssigne,
+					"%=",
 				},
 				{
 					eof,

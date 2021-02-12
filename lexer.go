@@ -26,6 +26,7 @@ const (
 	bang
 	asterisk
 	slash
+	percent
 	lt
 	gt
 	eq
@@ -56,6 +57,17 @@ const (
 	decrement
 	and
 	or
+	plusAssigne
+	minusAssigne
+	asteriskAssigne
+	slashAssigne
+	verticalAssigne
+	ampersandAssigne
+	leftShiftAssigne
+	rightShiftAssigne
+	tildeAssigne
+	caretAssigne
+	percentAssigne
 	keyReturn
 	keyIf
 	keyElse
@@ -139,6 +151,9 @@ func (l *Lexer) nextToken() *Token {
 		} else if l.input[l.pos] == '+' {
 			tk = &Token{tokenType: increment, literal: "++"}
 			l.pos++
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: plusAssigne, literal: "+="}
+			l.pos++
 		}
 	case '-':
 		tk = &Token{tokenType: minus, literal: "-"}
@@ -151,6 +166,9 @@ func (l *Lexer) nextToken() *Token {
 		} else if l.input[l.pos] == '-' {
 			tk = &Token{tokenType: decrement, literal: "--"}
 			l.pos++
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: minusAssigne, literal: "-="}
+			l.pos++
 		}
 	case '!':
 		tk = &Token{tokenType: bang, literal: "!"}
@@ -158,9 +176,19 @@ func (l *Lexer) nextToken() *Token {
 	case '*':
 		tk = &Token{tokenType: asterisk, literal: "*"}
 		l.pos++
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: asteriskAssigne, literal: "*="}
+			l.pos++
+		}
 	case '/':
 		tk = &Token{tokenType: slash, literal: "/"}
 		l.pos++
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: slashAssigne, literal: "/="}
+			l.pos++
+		}
 	case '<':
 		tk = &Token{tokenType: lt, literal: "<"}
 		l.pos++
@@ -168,6 +196,11 @@ func (l *Lexer) nextToken() *Token {
 		} else if l.input[l.pos] == '<' {
 			tk = &Token{tokenType: leftShift, literal: "<<"}
 			l.pos++
+			if l.pos >= len(l.input) {
+			} else if l.input[l.pos] == '=' {
+				tk = &Token{tokenType: leftShiftAssigne, literal: "<<="}
+				l.pos++
+			}
 		} else if l.input[l.pos] == '=' {
 			tk = &Token{tokenType: lteq, literal: "<="}
 			l.pos++
@@ -179,6 +212,11 @@ func (l *Lexer) nextToken() *Token {
 		} else if l.input[l.pos] == '>' {
 			tk = &Token{tokenType: rightShift, literal: ">>"}
 			l.pos++
+			if l.pos >= len(l.input) {
+			} else if l.input[l.pos] == '=' {
+				tk = &Token{tokenType: rightShiftAssigne, literal: ">>="}
+				l.pos++
+			}
 		} else if l.input[l.pos] == '=' {
 			tk = &Token{tokenType: gteq, literal: ">="}
 			l.pos++
@@ -214,19 +252,43 @@ func (l *Lexer) nextToken() *Token {
 		} else if l.input[l.pos] == '&' {
 			tk = &Token{tokenType: and, literal: "&&"}
 			l.pos++
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: ampersandAssigne, literal: "&="}
+			l.pos++
 		}
 	case '~':
 		tk = &Token{tokenType: tilde, literal: "~"}
 		l.pos++
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: tildeAssigne, literal: "~="}
+			l.pos++
+		}
 	case '^':
 		tk = &Token{tokenType: caret, literal: "^"}
 		l.pos++
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: caretAssigne, literal: "^="}
+			l.pos++
+		}
 	case '|':
 		tk = &Token{tokenType: vertical, literal: "|"}
 		l.pos++
 		if l.pos >= len(l.input) {
 		} else if l.input[l.pos] == '|' {
 			tk = &Token{tokenType: or, literal: "||"}
+			l.pos++
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: verticalAssigne, literal: "|="}
+			l.pos++
+		}
+	case '%':
+		tk = &Token{tokenType: percent, literal: "%"}
+		l.pos++
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: percentAssigne, literal: "%="}
 			l.pos++
 		}
 	case ':':
@@ -465,6 +527,17 @@ func (t *Token) isOperator() bool {
 	case decrement:
 	case or:
 	case and:
+	case plusAssigne:
+	case minusAssigne:
+	case asteriskAssigne:
+	case slashAssigne:
+	case verticalAssigne:
+	case ampersandAssigne:
+	case leftShiftAssigne:
+	case rightShiftAssigne:
+	case tildeAssigne:
+	case caretAssigne:
+	case percentAssigne:
 	default:
 		return false
 	}
@@ -503,6 +576,25 @@ func (t *Token) isInfixExpression() bool {
 	switch t.tokenType {
 	case increment:
 	case decrement:
+	default:
+		return false
+	}
+	return true
+}
+
+func (t *Token) isCompoundOp() bool {
+	switch t.tokenType {
+	case plusAssigne:
+	case minusAssigne:
+	case asteriskAssigne:
+	case slashAssigne:
+	case verticalAssigne:
+	case ampersandAssigne:
+	case leftShiftAssigne:
+	case rightShiftAssigne:
+	case tildeAssigne:
+	case caretAssigne:
+	case percentAssigne:
 	default:
 		return false
 	}

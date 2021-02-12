@@ -742,10 +742,6 @@ func (p *Parser) parseExpression() []Statement {
 			if p.curToken().isInfixExpression() {
 				p.pos++
 			}
-			// parseRefVar が返す型は *RefVar であることが保証されている
-			// 代入式の場合 Assigne に変更するため変数名を取得しておく
-			refv, _ := ls[len(ls)-1].(*RefVar)
-			varName = refv.Name
 		}
 		ss = append(ss, ls...)
 	case str:
@@ -767,8 +763,13 @@ func (p *Parser) parseExpression() []Statement {
 			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
 			return nil
 		}
-		if op.isToken(assign) {
-			// assign の場合は最後の Statement を Assigne に変更する
+		if op.isToken(assign) || op.isCompoundOp() {
+			// 代入は最後の Statement を Assigne に変更する
+
+			// 代入式の場合、直前の値の型は *RefVar であることが保証されている
+			// Assigne に変更するため変数名を取得しておく
+			refv, _ := ss[len(ss)-1].(*RefVar)
+			varName = refv.Name
 			ss[len(ss)-1] = &Assigne{varName}
 		}
 		ss = append(ss, r...)
