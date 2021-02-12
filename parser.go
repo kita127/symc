@@ -574,37 +574,6 @@ func (p *Parser) parseBlockStatement() []Statement {
 	return ss
 }
 
-// parseAssigne
-func (p *Parser) parseAssigne() []Statement {
-	ss := []Statement{}
-
-	if !p.curToken().isToken(word) {
-		return nil
-	}
-	id := p.fetchID()
-
-	if p.curToken().isPreAssigneOperator() {
-		// 代入の前に置くことができる演算子 e.g. +=
-		p.pos++
-	}
-
-	if !p.curToken().isToken(assign) {
-		return nil
-	}
-	p.pos++
-
-	exps := p.parseExpression()
-	if exps == nil {
-		return nil
-	}
-
-	ss = append(ss, &Assigne{id})
-	ss = append(ss, exps...)
-
-	return ss
-
-}
-
 func (p *Parser) parseForStatement() []Statement {
 	ss := []Statement{}
 

@@ -544,24 +544,6 @@ func (t *Token) isOperator() bool {
 	return true
 }
 
-func (t *Token) isPreAssigneOperator() bool {
-	switch t.tokenType {
-	case plus:
-	case minus:
-	case asterisk:
-	case slash:
-	case ampersand:
-	case tilde:
-	case caret:
-	case vertical:
-	case leftShift:
-	case rightShift:
-	default:
-		return false
-	}
-	return true
-}
-
 func (t *Token) isPrefixExpression() bool {
 	switch t.tokenType {
 	case increment:
