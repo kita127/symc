@@ -546,6 +546,24 @@ void func()
 			},
 		},
 		{
+			"function def 13",
+			`
+void func()
+{
+    (hoge);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{"hoge"},
+						}},
+				},
+			},
+		},
+		{
 			"function parameter 1",
 			`
 void f_hoge(int a){}
@@ -884,6 +902,23 @@ void func()
 							&RefVar{Name: "hoge"},
 							&RefVar{Name: "fuga"},
 						},
+					},
+				},
+			},
+		},
+		{
+			"expression 8",
+			`
+void func()
+{
+    ;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
 					},
 				},
 			},
@@ -1441,6 +1476,24 @@ void func(void)
 							&RefVar{Name: "i"},
 							&RefVar{Name: "i"},
 						},
+					},
+				},
+			},
+		},
+		{
+			"for 2",
+			`
+void func(void)
+{
+    for (;;){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
 					},
 				},
 			},

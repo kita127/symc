@@ -549,10 +549,19 @@ func (p *Parser) parseBlockStatement() []Statement {
 			ts = append(ts, p.parseBlockStatement()...)
 		case keyReturn:
 			ts = p.parseReturn()
+			if ts == nil {
+				return nil
+			}
 		case keyIf:
 			ts = p.parseIfStatement()
+			if ts == nil {
+				return nil
+			}
 		case keyFor:
 			ts = p.parseForStatement()
+			if ts == nil {
+				return nil
+			}
 		default:
 			if ts == nil {
 				p.pos = prevPos
@@ -574,6 +583,7 @@ func (p *Parser) parseBlockStatement() []Statement {
 	return ss
 }
 
+// parseForStatement
 func (p *Parser) parseForStatement() []Statement {
 	ss := []Statement{}
 
@@ -591,14 +601,12 @@ func (p *Parser) parseForStatement() []Statement {
 			return nil
 		}
 		ss = append(ss, ts...)
+		if p.curToken().isToken(semicolon) {
+			p.pos++
+		}
 		if p.curToken().isToken(rparen) {
 			p.pos++
 			break
-		} else if p.curToken().isToken(semicolon) {
-			p.pos++
-		} else {
-			p.updateErrLog(fmt.Sprintf("parseForStatement:token[%s]", p.curToken().literal))
-			return nil
 		}
 	}
 
@@ -681,6 +689,8 @@ func (p *Parser) parseExpression() []Statement {
 	}
 
 	switch p.curToken().tokenType {
+	case semicolon:
+		// 空式
 	case lparen:
 		prePos := p.pos
 		ts := p.parseCast()
@@ -796,6 +806,10 @@ func (p *Parser) parseCast() []Statement {
 	}
 
 	p.pos++
+
+	if p.curToken().isToken(semicolon) {
+		return nil
+	}
 	ss := p.parseExpression()
 
 	return ss
