@@ -1226,7 +1226,7 @@ void f_zzz(void)
 		p := NewParser(l)
 		got := p.Parse()
 		if !reflect.DeepEqual(got, tt.expect) {
-			t.Errorf("got=%v, expect=%v", got, tt.expect)
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
 		}
 	}
 }

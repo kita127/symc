@@ -188,6 +188,13 @@ type Parser struct {
 	pos     int
 	prevPos int
 	errLog  string
+	leftVarInfo
+}
+
+// 代入先識別子情報
+type leftVarInfo struct {
+	idIndex int
+	idName  string
 }
 
 func NewParser(l *Lexer) *Parser {
@@ -679,8 +686,8 @@ func (p *Parser) parseExpressionStatement() []Statement {
 	return ss
 }
 
+// parseExpression
 func (p *Parser) parseExpression() []Statement {
-	var varName string
 	ss := []Statement{}
 
 	if p.curToken().isPrefixExpression() {
@@ -718,11 +725,22 @@ func (p *Parser) parseExpression() []Statement {
 		if ls == nil {
 			p.pos = prePos
 			ls = p.parseRefVar()
+
 			if p.curToken().isInfixExpression() {
 				p.pos++
 			}
 		}
+		if ls == nil {
+			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+			return nil
+		}
 		ss = append(ss, ls...)
+
+		// RefVar の場合あとで assigne に変更する時のためにインデックスと変数名を記憶する
+		if refv, ok := ss[len(ss)-1].(*RefVar); ok {
+			p.leftVarInfo.idIndex = len(ss) - 1
+			p.leftVarInfo.idName = refv.Name
+		}
 	case str:
 		fallthrough
 	case letter:
@@ -735,21 +753,15 @@ func (p *Parser) parseExpression() []Statement {
 	}
 
 	if p.curToken().isOperator() {
-		op := p.curToken()
+		if p.curToken().isToken(assign) || p.curToken().isCompoundOp() {
+			// 代入式の場合は対象の識別子を Assigne 型に変更
+			ss[p.leftVarInfo.idIndex] = &Assigne{p.leftVarInfo.idName}
+		}
 		p.pos++
 		r := p.parseExpression()
 		if r == nil {
 			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
 			return nil
-		}
-		if op.isToken(assign) || op.isCompoundOp() {
-			// 代入は最後の Statement を Assigne に変更する
-
-			// 代入式の場合、直前の値の型は *RefVar であることが保証されている
-			// Assigne に変更するため変数名を取得しておく
-			refv, _ := ss[len(ss)-1].(*RefVar)
-			varName = refv.Name
-			ss[len(ss)-1] = &Assigne{varName}
 		}
 		ss = append(ss, r...)
 	}
