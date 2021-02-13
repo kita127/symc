@@ -1577,6 +1577,32 @@ void func(void)
 				},
 			},
 		},
+		{
+			"assigne 4",
+			`
+void func(void)
+{
+    arrVar2[i][j] = 0xAA;
+    arrVar3[i][j][k] = 0xAA;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{"arrVar2"},
+							&RefVar{"i"},
+							&RefVar{"j"},
+							&Assigne{"arrVar3"},
+							&RefVar{"i"},
+							&RefVar{"j"},
+							&RefVar{"k"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

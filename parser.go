@@ -734,7 +734,7 @@ func (p *Parser) parseExpression() []Statement {
 				p.leftVarInfo.idName = refv.Name
 			}
 
-			if p.curToken().isToken(lbracket) {
+			for p.curToken().isToken(lbracket) {
 				// 配列の場合
 				p.pos++
 				// leftVarInfo 上書き防止
