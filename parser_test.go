@@ -1498,6 +1498,33 @@ void func(void)
 				},
 			},
 		},
+		{
+			"for 3",
+			`
+void func(void)
+{
+    for (i = 0; i < 10; i++){
+        arrVar[i] = i * x;
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "i"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "i"},
+							&Assigne{Name: "arrVar"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "x"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
@@ -1506,7 +1533,7 @@ void func(void)
 		p := NewParser(l)
 		got := p.Parse()
 		if !reflect.DeepEqual(got, tt.expect) {
-			t.Errorf("got=%v, expect=%v", got, tt.expect)
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
 		}
 	}
 }

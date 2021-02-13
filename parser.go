@@ -599,6 +599,7 @@ func (p *Parser) parseForStatement() []Statement {
 	p.pos++
 
 	if !p.curToken().isToken(lparen) {
+		p.updateErrLog(fmt.Sprintf("parseForStatement:token[%s]", p.curToken().literal))
 		return nil
 	}
 	p.pos++
@@ -606,6 +607,7 @@ func (p *Parser) parseForStatement() []Statement {
 	for {
 		ts := p.parseExpression()
 		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseForStatement:token[%s]", p.curToken().literal))
 			return nil
 		}
 		ss = append(ss, ts...)
@@ -618,8 +620,13 @@ func (p *Parser) parseForStatement() []Statement {
 		}
 	}
 
-	p.progUntil(rbrace)
-	p.pos++
+	ts := p.parseBlockStatement()
+	if ts == nil {
+		p.updateErrLog(fmt.Sprintf("parseForStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	ss = append(ss, ts...)
+
 	return ss
 }
 
