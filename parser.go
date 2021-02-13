@@ -296,6 +296,7 @@ func (p *Parser) extractVarName() (string, error) {
 
 }
 
+// parseVariableDef
 func (p *Parser) parseVariableDef() Statement {
 
 	// 変数定義か確認する
@@ -417,11 +418,11 @@ FOR:
 }
 
 func (p *Parser) isVariabeDef() bool {
-	// セミコロンもしくはイコールまでの間に型を表すトークンが2つ以上なければ変数定義ではない
+	// セミコロン、イコール、ブラケットまでの間に型を表すトークンが2つ以上なければ変数定義ではない
 	wordCnt := 0
 	pPrev := p.pos
 	t := p.curToken()
-	for t.tokenType != semicolon && t.tokenType != assign && t.tokenType != eof {
+	for !t.isToken(semicolon) && !t.isToken(assign) && !t.isToken(lbracket) && !t.isToken(eof) {
 		if t.isTypeToken() {
 			wordCnt++
 		}
@@ -725,22 +726,39 @@ func (p *Parser) parseExpression() []Statement {
 		if ls == nil {
 			p.pos = prePos
 			ls = p.parseRefVar()
+			ss = append(ss, ls...)
+
+			// RefVar の場合あとで assigne に変更する時のためにインデックスと変数名を記憶する
+			if refv, ok := ss[len(ss)-1].(*RefVar); ok {
+				p.leftVarInfo.idIndex = len(ss) - 1
+				p.leftVarInfo.idName = refv.Name
+			}
+
+			if p.curToken().isToken(lbracket) {
+				// 配列の場合
+				p.pos++
+				// leftVarInfo 上書き防止
+				idIndex := p.leftVarInfo.idIndex
+				idName := p.leftVarInfo.idName
+				ts := p.parseExpression()
+				p.leftVarInfo.idIndex = idIndex
+				p.leftVarInfo.idName = idName
+				p.pos++
+				ss = append(ss, ts...)
+			}
 
 			if p.curToken().isInfixExpression() {
 				p.pos++
 			}
+		} else {
+			ss = append(ss, ls...)
 		}
+
 		if ls == nil {
 			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
 			return nil
 		}
-		ss = append(ss, ls...)
 
-		// RefVar の場合あとで assigne に変更する時のためにインデックスと変数名を記憶する
-		if refv, ok := ss[len(ss)-1].(*RefVar); ok {
-			p.leftVarInfo.idIndex = len(ss) - 1
-			p.leftVarInfo.idName = refv.Name
-		}
 	case str:
 		fallthrough
 	case letter:
