@@ -1313,50 +1313,6 @@ void hoge(void){
 				},
 			},
 		},
-		//		{
-		//			"testx",
-		//			`
-		//# 1 "hoge.c"
-		//# 1 "<built-in>" 1
-		//# 1 "<built-in>" 3
-		//# 366 "<built-in>" 3
-		//# 1 "<command line>" 1
-		//# 1 "<built-in>" 2
-		//# 1 "hoge.c" 2
-		//
-		//int func(int a)
-		//{
-		//    int hoge = 0;
-		//    hoge++;
-		//    a = a + (10);
-		//    return a;
-		//}
-		//`,
-		//			&Module{
-		//				[]Statement{
-		//					&FunctionDef{Name: "func",
-		//						Params: []*VariableDef{{Name: "a"}},
-		//						Block: &BlockStatement{Statements: []Statement{
-		//							&VariableDef{Name: "hoge"},
-		//							&AccessVar{Name: "hoge"},
-		//							&AccessVar{Name: "a"},
-		//							&AccessVar{Name: "a"},
-		//							&AccessVar{Name: "a"},
-		//						},
-		//						},
-		//					},
-		//				},
-		//			},
-		//		},
-		//		{
-		//			"test err1",
-		//			`int hoge`,
-		//			&Module{
-		//				[]Statement{
-		//					&InvalidStatement{Contents: "parse, err parse function def, err parse prototype decl, err parse variable def"},
-		//				},
-		//			},
-		//		},
 	}
 
 	for _, tt := range testTbl {
@@ -1365,7 +1321,7 @@ void hoge(void){
 		p := NewParser(l)
 		got := p.Parse()
 		if !reflect.DeepEqual(got, tt.expect) {
-			t.Errorf("got=%v, expect=%v", got, tt.expect)
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
 		}
 	}
 }
@@ -1453,6 +1409,28 @@ void func(void)
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							&RefVar{Name: "hoge"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"if 5",
+			`
+void func(void)
+{
+ if (flag)
+  return 1;
+ else
+  return 0;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "flag"},
 						},
 					},
 				},
@@ -1650,7 +1628,8 @@ func TestGcc(t *testing.T) {
 		src     string
 		expect  *Module
 	}{
-		{"test gcc 1",
+		{
+			"test gcc 1",
 			`
 FILE *fopen(const char * restrict __filename, const char * restrict __mode) __asm("_" "fopen" );
 `,
@@ -1660,7 +1639,8 @@ FILE *fopen(const char * restrict __filename, const char * restrict __mode) __as
 				},
 			},
 		},
-		{"test gcc 2",
+		{
+			"test gcc 2",
 			`
 inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
 }
@@ -1678,6 +1658,17 @@ inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
 				},
 			},
 		},
+		{
+			"test gcc 3",
+			`
+FILE *fdopen(int, const char *) __asm("_" "fdopen" );
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "fdopen"},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
@@ -1686,7 +1677,7 @@ inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
 		p := NewParser(l)
 		got := p.Parse()
 		if !reflect.DeepEqual(got, tt.expect) {
-			t.Errorf("got=%v, expect=%v", got, tt.expect)
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
 		}
 	}
 }

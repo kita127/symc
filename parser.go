@@ -256,7 +256,8 @@ func (p *Parser) parseStatement() Statement {
 			s = p.parsePrototypeDecl()
 		}
 		if s == nil {
-			s = p.parseVariableDef()
+			ss := p.parseVariableDef()
+			s = ss[0]
 		}
 		if s == nil {
 			return &InvalidStatement{Contents: p.errLog, Tk: p.curToken()}
@@ -297,7 +298,7 @@ func (p *Parser) extractVarName() (string, error) {
 }
 
 // parseVariableDef
-func (p *Parser) parseVariableDef() Statement {
+func (p *Parser) parseVariableDef() []Statement {
 
 	// 変数定義か確認する
 	if !p.isVariabeDef() {
@@ -322,7 +323,7 @@ func (p *Parser) parseVariableDef() Statement {
 		return nil
 	}
 
-	return s
+	return []Statement{s}
 }
 
 func (p *Parser) parseVariableDefSub() Statement {
@@ -545,49 +546,71 @@ func (p *Parser) parseFunctionDef() Statement {
 
 // parseBlockStatement
 func (p *Parser) parseBlockStatement() []Statement {
-	p.pos++
-
 	ss := []Statement{}
 
+	p.pos++
+
 	for p.curToken().tokenType != rbrace {
-		var ts []Statement = nil
-		prevPos := p.pos
-		switch p.curToken().tokenType {
-		case lbrace:
-			ts = append(ts, p.parseBlockStatement()...)
-		case keyReturn:
-			ts = p.parseReturn()
-			if ts == nil {
-				return nil
-			}
-		case keyIf:
-			ts = p.parseIfStatement()
-			if ts == nil {
-				return nil
-			}
-		case keyFor:
-			ts = p.parseForStatement()
-			if ts == nil {
-				return nil
-			}
-		default:
-			if ts == nil {
-				p.pos = prevPos
-				if s := p.parseVariableDef(); s != nil {
-					ts = append(ts, s)
-				}
-			}
-			if ts == nil {
-				p.pos = prevPos
-				// other statement
-				ts = p.parseExpressionStatement()
-			}
+		ts := p.parseInnerStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseBlockStatement:token[%s]", p.curToken().literal))
+			return nil
 		}
 		ss = append(ss, ts...)
 	}
 
 	p.pos++
 
+	return ss
+}
+
+// parseInnerStatement
+func (p *Parser) parseInnerStatement() []Statement {
+	ss := []Statement{}
+
+	switch p.curToken().tokenType {
+	case lbrace:
+		ts := p.parseBlockStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
+	case keyReturn:
+		ts := p.parseReturn()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
+	case keyIf:
+		ts := p.parseIfStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
+	case keyFor:
+		ts := p.parseForStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
+	default:
+		prevPos := p.pos
+		ts := p.parseVariableDef()
+		if ts == nil {
+			p.pos = prevPos
+			// other statement
+			ts = p.parseExpressionStatement()
+		}
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
+	}
 	return ss
 }
 
@@ -641,6 +664,7 @@ func (p *Parser) parseIfStatement() []Statement {
 	// 条件式
 	ts := p.parseExpression()
 	if ts == nil {
+		p.updateErrLog(fmt.Sprintf("parseIfStatement:token[%s]", p.curToken().literal))
 		return nil
 	}
 	ss = append(ss, ts...)
@@ -652,16 +676,29 @@ func (p *Parser) parseIfStatement() []Statement {
 		// ブロック文
 		ts := p.parseBlockStatement()
 		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseIfStatement:token[%s]", p.curToken().literal))
 			return nil
 		}
 		ss = append(ss, ts...)
 	} else {
 		// １行命令
-		ts := p.parseExpressionStatement()
+		ts := p.parseInnerStatement()
 		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseIfStatement:token[%s]", p.curToken().literal))
 			return nil
 		}
 		ss = append(ss, ts...)
+
+		if p.curToken().isToken(keyElse) {
+			// else 文あり
+			p.pos++
+			ts = p.parseInnerStatement()
+			if ts == nil {
+				p.updateErrLog(fmt.Sprintf("parseIfStatement:token[%s]", p.curToken().literal))
+				return nil
+			}
+			ss = append(ss, ts...)
+		}
 	}
 
 	return ss
