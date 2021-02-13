@@ -257,7 +257,9 @@ func (p *Parser) parseStatement() Statement {
 		}
 		if s == nil {
 			ss := p.parseVariableDef()
-			s = ss[0]
+			if ss != nil {
+				s = ss[0]
+			}
 		}
 		if s == nil {
 			return &InvalidStatement{Contents: p.errLog, Tk: p.curToken()}
@@ -764,6 +766,9 @@ func (p *Parser) parseExpression() []Statement {
 			return nil
 		}
 		ss = append(ss, ls...)
+	case asterisk:
+		p.pos++
+		fallthrough
 	case word:
 		prePos := p.pos
 		ls := p.parseCallFunc()
@@ -791,7 +796,7 @@ func (p *Parser) parseExpression() []Statement {
 				ss = append(ss, ts...)
 			}
 
-			if p.curToken().isInfixExpression() {
+			if p.curToken().isPostExpression() {
 				p.pos++
 			}
 		} else {

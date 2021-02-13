@@ -924,6 +924,29 @@ void func()
 			},
 		},
 		{
+			"expression 9",
+			`
+void func()
+{
+    a == b;
+    c != d;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "a"},
+							&RefVar{Name: "b"},
+							&RefVar{Name: "c"},
+							&RefVar{Name: "d"},
+						},
+					},
+				},
+			},
+		},
+		{
 			"call expression 1",
 			`
 void func()
@@ -1231,15 +1254,15 @@ void f_zzz(void)
 	}
 }
 
-// TestParseApp
-func TestParseApp(t *testing.T) {
+// TestApp
+func TestApp(t *testing.T) {
 	testTbl := []struct {
 		comment string
 		src     string
 		expect  *Module
 	}{
 		{
-			"app test 1",
+			"app 1",
 			`
 # 1 "hoge.c"
 # 1 "<built-in>" 1
@@ -1296,8 +1319,10 @@ int muruchi_piyomi(char *s) {
 			"app 2",
 			`
 void hoge(void){
-  _p->_p++ = _c;
-  _p->_p-- = _c;
+ if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\n'))
+  return (*_p->_p++ = _c);
+ else
+  return (__swbuf(_c, _p));
 }
 `,
 			&Module{
@@ -1305,10 +1330,19 @@ void hoge(void){
 					&FunctionDef{Name: "hoge",
 						Params: []*VariableDef{},
 						Statements: []Statement{
-							&Assigne{Name: "_p->_p"},
+							&RefVar{Name: "_p->_w"},
+							&RefVar{Name: "_p->_w"},
+							&RefVar{Name: "_p->_lbfsize"},
 							&RefVar{Name: "_c"},
 							&Assigne{Name: "_p->_p"},
 							&RefVar{Name: "_c"},
+							&CallFunc{
+								Name: "__swbuf",
+								Args: []Statement{
+									&RefVar{Name: "_c"},
+									&RefVar{Name: "_p"},
+								},
+							},
 						}},
 				},
 			},
@@ -1431,6 +1465,28 @@ void func(void)
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							&RefVar{Name: "flag"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"if 6",
+			`
+void func(void)
+{
+   if (a >= 0 || (b >= c && (char)d != '\n')){}
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "a"},
+							&RefVar{Name: "b"},
+							&RefVar{Name: "c"},
+							&RefVar{Name: "d"},
 						},
 					},
 				},
@@ -1608,7 +1664,46 @@ void func(void)
 				},
 			},
 		},
+		{
+			"assigne 5",
+			`
+void func(void)
+{
+    *_p->_p++ = _c;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{"_p->_p"},
+							&RefVar{"_c"},
+						},
+					},
+				},
+			},
+		},
 	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestRef
+func TestRef(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{}
 
 	for _, tt := range testTbl {
 		t.Logf("%s", tt.comment)

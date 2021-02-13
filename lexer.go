@@ -30,6 +30,7 @@ const (
 	lt
 	gt
 	eq
+	ne
 	gteq
 	lteq
 	semicolon
@@ -173,6 +174,11 @@ func (l *Lexer) nextToken() *Token {
 	case '!':
 		tk = &Token{tokenType: bang, literal: "!"}
 		l.pos++
+		if l.pos >= len(l.input) {
+		} else if l.input[l.pos] == '=' {
+			tk = &Token{tokenType: ne, literal: "!="}
+			l.pos++
+		}
 	case '*':
 		tk = &Token{tokenType: asterisk, literal: "*"}
 		l.pos++
@@ -428,7 +434,13 @@ func (l *Lexer) readLetter() *Token {
 
 	l.pos++
 	var s []byte
-	s = append(s, l.input[l.pos])
+	c := l.input[l.pos]
+	if c == '\\' {
+		s = append(s, c)
+		l.pos++
+		c = l.input[l.pos]
+	}
+	s = append(s, c)
 	l.pos++
 	l.pos++
 	return &Token{tokenType: letter, literal: string(s)}
@@ -515,6 +527,10 @@ func (t *Token) isOperator() bool {
 	case slash:
 	case lt:
 	case gt:
+	case eq:
+	case gteq:
+	case lteq:
+	case ne:
 	case ampersand:
 	case tilde:
 	case caret:
@@ -554,7 +570,7 @@ func (t *Token) isPrefixExpression() bool {
 	return true
 }
 
-func (t *Token) isInfixExpression() bool {
+func (t *Token) isPostExpression() bool {
 	switch t.tokenType {
 	case increment:
 	case decrement:
