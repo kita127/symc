@@ -518,7 +518,7 @@ func (p *Parser) parsePrototypeParameter() []Statement {
 		}
 
 		prePos := p.pos
-		xs := p.parseGccPrototypeParam()
+		xs := p.parseVariadicArgument()
 		if xs == nil {
 			p.pos = prePos
 			xs = p.parsePrototypeParamVar()
@@ -534,20 +534,20 @@ func (p *Parser) parsePrototypeParameter() []Statement {
 	}
 }
 
-// parseGccPrototypeParam
-func (p *Parser) parseGccPrototypeParam() []Statement {
+// parseVariadicArgument
+func (p *Parser) parseVariadicArgument() []Statement {
 	if !p.curToken().isToken(period) {
-		p.updateErrLog(fmt.Sprintf("parseGccPrototypeParam:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parseVariadicArgument:token[%s]", p.curToken().literal))
 		return nil
 	}
 	p.pos++
 	if !p.curToken().isToken(period) {
-		p.updateErrLog(fmt.Sprintf("parseGccPrototypeParam:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parseVariadicArgument:token[%s]", p.curToken().literal))
 		return nil
 	}
 	p.pos++
 	if !p.curToken().isToken(period) {
-		p.updateErrLog(fmt.Sprintf("parseGccPrototypeParam:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parseVariadicArgument:token[%s]", p.curToken().literal))
 		return nil
 	}
 	p.pos++
