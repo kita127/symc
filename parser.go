@@ -103,7 +103,7 @@ func (v *FunctionDef) String() string {
 	return fmt.Sprintf("FunctionDef : Name=%s, Params=%s, Statements=%s", v.Name, v.Params, v.Statements)
 }
 func (v *FunctionDef) PrettyString() string {
-	txt := fmt.Sprintf("FUNC %s (", v.Name)
+	txt := fmt.Sprintf("FUNC %s(", v.Name)
 
 	sep := ""
 	for _, p := range v.Params {

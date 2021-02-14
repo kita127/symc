@@ -204,24 +204,24 @@ PROTOTYPE boxfill8
 PROTOTYPE putfonts8_asc
 DECLARE keyfifo
 DECLARE mousefifo
-DECLARE init_pic
-DECLARE mysprintf
-DECLARE io_hlt
-DECLARE io_stihlt
-DECLARE io_load_eflags
-DECLARE io_store_eflags
-DECLARE io_out8
-DECLARE io_in8
-DECLARE io_cli
-DECLARE io_sti
-DECLARE load_gdtr
-DECLARE load_idtr
-DECLARE asm_inthandler21
-DECLARE asm_inthandler27
-DECLARE asm_inthandler2c
-DECLARE wait_KBC_sendready
-DECLARE init_keyboard
-DECLARE enable_mouse
+PROTOTYPE init_pic
+PROTOTYPE mysprintf
+PROTOTYPE io_hlt
+PROTOTYPE io_stihlt
+PROTOTYPE io_load_eflags
+PROTOTYPE io_store_eflags
+PROTOTYPE io_out8
+PROTOTYPE io_in8
+PROTOTYPE io_cli
+PROTOTYPE io_sti
+PROTOTYPE load_gdtr
+PROTOTYPE load_idtr
+PROTOTYPE asm_inthandler21
+PROTOTYPE asm_inthandler27
+PROTOTYPE asm_inthandler2c
+PROTOTYPE wait_KBC_sendready
+PROTOTYPE init_keyboard
+PROTOTYPE enable_mouse
 FUNC HariMain() {
     DEFINITION binfo
     DEFINITION s
@@ -248,7 +248,7 @@ FUNC HariMain() {
     init_mouse_cursor8(mcursor)
     putblock8_8(binfo->vram, binfo->scrnx, mx, my, mcursor)
     mysprintf(s, mx, my)
-    putfonts8_asc(binfo->vram, binfo->scrnx,s)
+    putfonts8_asc(binfo->vram, binfo->scrnx, s)
     enable_mouse()
     io_cli()
     fifo8_data_count(keyfifo)
@@ -277,7 +277,7 @@ FUNC wait_KBC_sendready() {
 FUNC init_keyboard() {
     wait_KBC_sendready()
     io_out8()
-    wait_KBC_sendready();
+    wait_KBC_sendready()
     io_out8()
 }
 
@@ -287,6 +287,7 @@ FUNC enable_mouse() {
     wait_KBC_sendready()
     io_out8()
 }
+
 `,
 		},
 	}
