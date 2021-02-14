@@ -1513,6 +1513,8 @@ void func(void)
 {
    if (condition1){
 
+   }else if (condition2){
+
    }else{
 
    }
@@ -1524,6 +1526,7 @@ void func(void)
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							&RefVar{Name: "condition1"},
+							&RefVar{Name: "condition2"},
 						},
 					},
 				},
