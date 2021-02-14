@@ -227,17 +227,20 @@ func (p *Parser) parseModule() *Module {
 	return m
 }
 
+// parseStatement
 func (p *Parser) parseStatement() Statement {
 	var s Statement = nil
-	p.prevPos = p.pos
 	switch p.curToken().tokenType {
 	case keyTypedef:
 		p.skipTypedef()
 	case keyExtern:
+		prePos := p.pos
 		if s == nil {
+			p.pos = prePos
 			s = p.parsePrototypeDecl()
 		}
 		if s == nil {
+			p.pos = prePos
 			s = p.parseVariableDecl()
 		}
 		if s == nil {
@@ -249,13 +252,17 @@ func (p *Parser) parseStatement() Statement {
 		p.pos++
 		p.skipParen()
 	default:
+		prePos := p.pos
 		if s == nil {
+			p.pos = prePos
 			s = p.parseFunctionDef()
 		}
 		if s == nil {
+			p.pos = prePos
 			s = p.parsePrototypeDecl()
 		}
 		if s == nil {
+			p.pos = prePos
 			ss := p.parseVariableDef()
 			if ss != nil {
 				s = ss[0]
@@ -455,6 +462,7 @@ func (p *Parser) parseVariableDecl() Statement {
 	return &VariableDecl{Name: id}
 }
 
+// parsePrototypeDecl
 func (p *Parser) parsePrototypeDecl() Statement {
 
 	if p.curToken().tokenType == keyExtern {
@@ -467,14 +475,14 @@ func (p *Parser) parsePrototypeDecl() Statement {
 
 	if p.curToken().tokenType != lparen {
 		// ( でなければプロトタイプ宣言ではない
-		p.posReset()
+		p.updateErrLog(fmt.Sprintf("parsePrototypeDecl_1:token[%s]", p.curToken().literal))
 		return nil
 	}
 
 	p.pos--
 
 	if p.curToken().tokenType != word {
-		p.posReset()
+		p.updateErrLog(fmt.Sprintf("parsePrototypeDecl_2:token[%s]", p.curToken().literal))
 		return nil
 	}
 
@@ -499,7 +507,7 @@ func (p *Parser) parsePrototypeDecl() Statement {
 			xs = p.prototypeFPointerVar()
 		}
 		if xs == nil {
-			p.posReset()
+			p.updateErrLog(fmt.Sprintf("parsePrototypeDecl_3:token[%s]", p.curToken().literal))
 			return nil
 		}
 	}
@@ -512,7 +520,7 @@ func (p *Parser) parsePrototypeDecl() Statement {
 		p.progUntil(semicolon)
 	} else if p.curToken().tokenType != semicolon {
 		// セミコロン意外はプロトタイプ宣言ではない
-		p.posReset()
+		p.updateErrLog(fmt.Sprintf("parsePrototypeDecl:token[%s]", p.curToken().literal))
 		return nil
 	}
 
