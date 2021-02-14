@@ -1611,8 +1611,29 @@ void func(void)
 			&Module{
 				[]Statement{
 					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
+		{
+			"while 2",
+			`
+void func(void)
+{
+    while(condition1){
+        var = 100;
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
 						Params: []*VariableDef{},
 						Statements: []Statement{
+							&RefVar{Name: "condition1"},
+							&Assigne{Name: "var"},
 						},
 					},
 				},
