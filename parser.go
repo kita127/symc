@@ -324,23 +324,30 @@ func (p *Parser) parseVariableDef() []Statement {
 		p.progUntil(semicolon)
 		p.pos++
 	case comma:
-		p.pos++
-		ts := p.parseExpression()
-		if ts == nil {
-			p.updateErrLog(fmt.Sprintf("parseVariableDef_3:token[%s]", p.curToken().literal))
-			return nil
+
+		for {
+			if p.curToken().isToken(comma) {
+				p.pos++
+			} else if p.curToken().isToken(semicolon) {
+				p.pos++
+				break
+			} else {
+				p.updateErrLog(fmt.Sprintf("parseVariableDef_5:token[%s]", p.curToken().literal))
+				return nil
+			}
+
+			ts := p.parseExpression()
+			if ts == nil {
+				p.updateErrLog(fmt.Sprintf("parseVariableDef_3:token[%s]", p.curToken().literal))
+				return nil
+			}
+			refv, ok := ts[0].(*RefVar)
+			if !ok {
+				p.updateErrLog(fmt.Sprintf("parseVariableDef_4:token[%s]", p.curToken().literal))
+				return nil
+			}
+			ss = append(ss, &VariableDef{Name: refv.Name})
 		}
-		refv, ok := ts[0].(*RefVar)
-		if !ok {
-			p.updateErrLog(fmt.Sprintf("parseVariableDef_4:token[%s]", p.curToken().literal))
-			return nil
-		}
-		if !p.curToken().isToken(semicolon) {
-			p.updateErrLog(fmt.Sprintf("parseVariableDef_5:token[%s]", p.curToken().literal))
-			return nil
-		}
-		p.pos++
-		ss = append(ss, &VariableDef{Name: refv.Name})
 	default:
 		p.updateErrLog(fmt.Sprintf("parseVariableDef_6:token[%s]", p.curToken().literal))
 		return nil

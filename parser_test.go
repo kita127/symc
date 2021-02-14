@@ -92,11 +92,15 @@ int hoge = 0;
 			"variable definition 8",
 			`
 int mx, my;
+char ma, mb, mc;
 `,
 			&Module{
 				[]Statement{
 					&VariableDef{Name: "mx"},
 					&VariableDef{Name: "my"},
+					&VariableDef{Name: "ma"},
+					&VariableDef{Name: "mb"},
+					&VariableDef{Name: "mc"},
 				},
 			},
 		},
