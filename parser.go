@@ -306,14 +306,12 @@ func (p *Parser) parseVariableDef() []Statement {
 
 	// 変数定義か確認する
 	if !p.isVariabeDef() {
-		p.posReset()
 		p.updateErrLog(fmt.Sprintf("parseVariableDef_1:token[%s]", p.curToken().literal))
 		return nil
 	}
 
 	s := p.parseVariableDefSub()
 	if s == nil {
-		p.posReset()
 		p.updateErrLog(fmt.Sprintf("parseVariableDef_2:token[%s]", p.curToken().literal))
 		return nil
 	}
@@ -329,25 +327,21 @@ func (p *Parser) parseVariableDef() []Statement {
 		p.pos++
 		ts := p.parseExpression()
 		if ts == nil {
-			p.posReset()
 			p.updateErrLog(fmt.Sprintf("parseVariableDef_3:token[%s]", p.curToken().literal))
 			return nil
 		}
 		refv, ok := ts[0].(*RefVar)
 		if !ok {
-			p.posReset()
 			p.updateErrLog(fmt.Sprintf("parseVariableDef_4:token[%s]", p.curToken().literal))
 			return nil
 		}
 		if !p.curToken().isToken(semicolon) {
-			p.posReset()
 			p.updateErrLog(fmt.Sprintf("parseVariableDef_5:token[%s]", p.curToken().literal))
 			return nil
 		}
 		p.pos++
 		ss = append(ss, &VariableDef{Name: refv.Name})
 	default:
-		p.posReset()
 		p.updateErrLog(fmt.Sprintf("parseVariableDef_6:token[%s]", p.curToken().literal))
 		return nil
 	}
