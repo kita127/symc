@@ -658,6 +658,7 @@ void func()
     var7 = a7 || b7;
     var8 = a8 && b8;
     var9 = a9 > b9;
+    var10 = a10 & b10;
 }
 `,
 			&Module{
@@ -701,6 +702,10 @@ void func()
 							&Assigne{Name: "var9"},
 							&RefVar{Name: "a9"},
 							&RefVar{Name: "b9"},
+							// %
+							&Assigne{Name: "var10"},
+							&RefVar{Name: "a10"},
+							&RefVar{Name: "b10"},
 						}},
 				},
 			},
