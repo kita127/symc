@@ -368,6 +368,7 @@ func (p *Parser) parseVariableDefSub() Statement {
 	return s
 }
 
+// parseFuncPointerVarDef
 func (p *Parser) parseFuncPointerVarDef() Statement {
 	for p.curToken().isTypeToken() {
 		p.pos++
@@ -386,45 +387,11 @@ func (p *Parser) parseFuncPointerVarDef() Statement {
 	if p.curToken().tokenType != lparen {
 		return nil
 	}
-	if x := p.parsePrototypeParameter(); x == nil {
+	if xs := p.parsePrototypeParameter(); xs == nil {
 		return nil
 	}
 
 	return s
-}
-
-// parsePrototypeParameter
-// プロトタイプ宣言、関数ポインタの定義で使用するパラメータのパース
-// 識別子がないパターンのパラメータ定義に対応する
-// パラメータの識別子は返さず構文チェックのみ行う
-func (p *Parser) parsePrototypeParameter() []Statement {
-	p.pos++
-
-FOR:
-	for {
-		t := p.curToken()
-		switch t.tokenType {
-		case keyVoid:
-		case asterisk:
-		case comma:
-		case rbracket:
-		case lbracket:
-		case word:
-		case rparen:
-			break FOR
-		default:
-			return nil
-		}
-		p.pos++
-	}
-
-	p.pos++
-
-	if !p.curToken().isToken(semicolon) {
-		return nil
-	}
-
-	return []Statement{}
 }
 
 func (p *Parser) isVariabeDef() bool {
@@ -491,7 +458,7 @@ func (p *Parser) parsePrototypeDecl() Statement {
 
 	p.pos++
 
-	xs := p.parsePrototypeParameter__()
+	xs := p.parsePrototypeParameter()
 	if xs == nil {
 		p.updateErrLog(fmt.Sprintf("parsePrototypeDecl_3:token[%s]", p.curToken().literal))
 		return nil
@@ -517,7 +484,7 @@ func (p *Parser) parsePrototypeDecl() Statement {
 
 // parsePrototypeParameter
 // 構文解析のみ行い成功か失敗かを返すのみ
-func (p *Parser) parsePrototypeParameter__() []Statement {
+func (p *Parser) parsePrototypeParameter() []Statement {
 
 	p.pos++
 
@@ -547,10 +514,32 @@ func (p *Parser) parsePrototypeParamVar() []Statement {
 	for p.curToken().isTypeToken() {
 		p.pos++
 	}
+
+	if p.curToken().isToken(lbracket) {
+		// 配列の場合
+		p.pos++
+
+		if p.curToken().isToken(rbracket) {
+			// 空の配列
+			p.pos++
+		} else {
+			xs := p.parseExpression()
+			if xs == nil {
+				p.updateErrLog(fmt.Sprintf("parsePrototypeParamVar_1:token[%s]", p.curToken().literal))
+				return nil
+			}
+			if !p.curToken().isToken(rbracket) {
+				p.updateErrLog(fmt.Sprintf("parsePrototypeParamVar_2:token[%s]", p.curToken().literal))
+				return nil
+			}
+			p.pos++
+		}
+	}
+
 	if p.curToken().isToken(comma) || p.curToken().isToken(rparen) {
 		return []Statement{}
 	} else {
-		p.updateErrLog(fmt.Sprintf("parsePrototypeParamVar:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parsePrototypeParamVar_3:token[%s]", p.curToken().literal))
 		return nil
 	}
 }
@@ -584,7 +573,7 @@ func (p *Parser) parsePrototypeFPointerVar() []Statement {
 		return nil
 	}
 
-	xs = p.parsePrototypeParameter__()
+	xs = p.parsePrototypeParameter()
 	if xs == nil {
 		p.updateErrLog(fmt.Sprintf("parsePrototypeFPointerVar_5:token[%s]", p.curToken().literal))
 		return nil
