@@ -197,6 +197,10 @@ type leftVarInfo struct {
 	idName  string
 }
 
+// -----------------------------------------------------------
+// 構文解析処理
+// -----------------------------------------------------------
+
 func NewParser(l *Lexer) *Parser {
 	tks := l.lexicalize()
 	return &Parser{lexer: l, tokens: tks, pos: 0, prevPos: 0}
@@ -310,12 +314,12 @@ func (p *Parser) parseVariableDef() []Statement {
 		return nil
 	}
 
-	s := p.parseVariableDefSub()
-	if s == nil {
+	ts := p.parseVariableDefSub()
+	if ts == nil {
 		p.updateErrLog(fmt.Sprintf("parseVariableDef_2:token[%s]", p.curToken().literal))
 		return nil
 	}
-	ss = append(ss, s)
+	ss = append(ss, ts...)
 
 	switch p.curToken().tokenType {
 	case semicolon:
@@ -356,13 +360,13 @@ func (p *Parser) parseVariableDef() []Statement {
 	return ss
 }
 
-func (p *Parser) parseVariableDefSub() Statement {
+func (p *Parser) parseVariableDefSub() []Statement {
 	prePos := p.pos
 
 	// はじめに関数ポインタか確認
-	s := p.parseFuncPointerVarDef()
+	ss := p.parseFuncPointerVarDef()
 
-	if s == nil {
+	if ss == nil {
 		// 関数ポインタ以外
 		p.pos = prePos
 
@@ -375,7 +379,7 @@ func (p *Parser) parseVariableDefSub() Statement {
 			return nil
 		}
 
-		s = &VariableDef{Name: p.curToken().literal}
+		s := &VariableDef{Name: p.curToken().literal}
 
 		p.pos++
 
@@ -384,13 +388,14 @@ func (p *Parser) parseVariableDefSub() Statement {
 			p.progUntil(rbracket)
 			p.pos++
 		}
+		ss = append(ss, s)
 	}
 
-	return s
+	return ss
 }
 
 // parseFuncPointerVarDef
-func (p *Parser) parseFuncPointerVarDef() Statement {
+func (p *Parser) parseFuncPointerVarDef() []Statement {
 	for p.curToken().isTypeToken() {
 		p.pos++
 	}
@@ -398,8 +403,11 @@ func (p *Parser) parseFuncPointerVarDef() Statement {
 		return nil
 	}
 	p.pos++
-	s := p.parseVariableDefSub()
-	if s == nil {
+	ss := p.parseVariableDefSub()
+	if ss == nil {
+		return nil
+	}
+	if len(ss) != 1 {
 		return nil
 	}
 	// rparen
@@ -412,7 +420,7 @@ func (p *Parser) parseFuncPointerVarDef() Statement {
 		return nil
 	}
 
-	return s
+	return ss
 }
 
 func (p *Parser) isVariabeDef() bool {
@@ -1125,10 +1133,14 @@ func (p *Parser) parseParameter() []*VariableDef {
 	}
 
 	for {
-		s := p.parseVariableDefSub()
-		if s == nil {
+		ts := p.parseVariableDefSub()
+		if ts == nil {
 			return nil
 		}
+		if len(ts) != 1 {
+			return nil
+		}
+		s := ts[0]
 		v, ok := s.(*VariableDef)
 		if !ok {
 			return nil
