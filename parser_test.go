@@ -1599,6 +1599,25 @@ void func(void)
 				},
 			},
 		},
+		{
+			"while 1",
+			`
+void func(void)
+{
+    while(1){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

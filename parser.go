@@ -707,6 +707,13 @@ func (p *Parser) parseInnerStatement() []Statement {
 			return nil
 		}
 		ss = append(ss, ts...)
+	case keyWhile:
+		ts := p.parseWhileStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
 	default:
 		prevPos := p.pos
 		ts := p.parseVariableDef()
@@ -722,6 +729,38 @@ func (p *Parser) parseInnerStatement() []Statement {
 		ss = append(ss, ts...)
 	}
 	return ss
+}
+
+// parseWhileStatement
+func (p *Parser) parseWhileStatement() []Statement {
+
+	p.pos++
+
+	if !p.curToken().isToken(lparen) {
+		p.updateErrLog(fmt.Sprintf("parseWhileStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+
+	xs := p.parseExpression()
+	if xs == nil {
+		p.updateErrLog(fmt.Sprintf("parseWhileStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	if !p.curToken().isToken(rparen) {
+		p.updateErrLog(fmt.Sprintf("parseWhileStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+
+	ts := p.parseBlockStatement()
+	if ts == nil {
+		p.updateErrLog(fmt.Sprintf("parseWhileStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	return []Statement{}
 }
 
 // parseForStatement
