@@ -490,12 +490,41 @@ func (p *Parser) parsePrototypeDecl() Statement {
 	id := p.curToken().literal
 
 	p.pos++
+
+	xs := p.parsePrototypeParameter__()
+	if xs == nil {
+		p.updateErrLog(fmt.Sprintf("parsePrototypeDecl_3:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	if p.curToken().tokenType == keyAttribute {
+		// attribute の場合はセミコロンまでスキップ
+		p.progUntil(semicolon)
+	} else if p.curToken().isToken(keyAsm) {
+		// __asm の場合はセミコロンまでスキップ
+		p.progUntil(semicolon)
+	} else if p.curToken().tokenType != semicolon {
+		// セミコロン意外はプロトタイプ宣言ではない
+		p.updateErrLog(fmt.Sprintf("parsePrototypeDecl_4:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	p.pos++
+	// next
+	return &PrototypeDecl{Name: id}
+
+}
+
+// parsePrototypeParameter
+// 構文解析のみ行い成功か失敗かを返すのみ
+func (p *Parser) parsePrototypeParameter__() []Statement {
+
 	p.pos++
 
 	for {
 		if p.curToken().isToken(rparen) {
 			p.pos++
-			break
+			return []Statement{}
 		} else if p.curToken().isToken(comma) {
 			p.pos++
 		}
@@ -507,27 +536,10 @@ func (p *Parser) parsePrototypeDecl() Statement {
 			xs = p.prototypeFPointerVar()
 		}
 		if xs == nil {
-			p.updateErrLog(fmt.Sprintf("parsePrototypeDecl_3:token[%s]", p.curToken().literal))
+			p.updateErrLog(fmt.Sprintf("parsePrototypeParameter:token[%s]", p.curToken().literal))
 			return nil
 		}
 	}
-
-	if p.curToken().tokenType == keyAttribute {
-		// attribute の場合はセミコロンまでスキップ
-		p.progUntil(semicolon)
-	} else if p.curToken().isToken(keyAsm) {
-		// __asm の場合はセミコロンまでスキップ
-		p.progUntil(semicolon)
-	} else if p.curToken().tokenType != semicolon {
-		// セミコロン意外はプロトタイプ宣言ではない
-		p.updateErrLog(fmt.Sprintf("parsePrototypeDecl:token[%s]", p.curToken().literal))
-		return nil
-	}
-
-	p.pos++
-	// next
-	return &PrototypeDecl{Name: id}
-
 }
 
 // prototypeParamVar
@@ -571,32 +583,17 @@ func (p *Parser) prototypeFPointerVar() []Statement {
 		p.updateErrLog(fmt.Sprintf("prototypeFPointerVar_4:token[%s]", p.curToken().literal))
 		return nil
 	}
-	p.pos++
 
-	for {
-		if p.curToken().isToken(rparen) {
-			break
-		} else if p.curToken().isToken(comma) {
-			p.pos++
-		}
-
-		xs = p.prototypeParamVar()
-		if xs == nil {
-			p.updateErrLog(fmt.Sprintf("prototypeFPointerVar_5:token[%s]", p.curToken().literal))
-			return nil
-		}
-	}
-
-	if !p.curToken().isToken(rparen) {
-		p.updateErrLog(fmt.Sprintf("prototypeFPointerVar_6:token[%s]", p.curToken().literal))
+	xs = p.parsePrototypeParameter__()
+	if xs == nil {
+		p.updateErrLog(fmt.Sprintf("prototypeFPointerVar_5:token[%s]", p.curToken().literal))
 		return nil
 	}
-	p.pos++
 
 	if p.curToken().isToken(comma) || p.curToken().isToken(rparen) {
 		return []Statement{}
 	} else {
-		p.updateErrLog(fmt.Sprintf("prototypeFPointerVar_7:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("prototypeFPointerVar_6:token[%s]", p.curToken().literal))
 		return nil
 	}
 
