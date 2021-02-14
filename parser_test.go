@@ -1314,7 +1314,6 @@ int muruchi_piyomi(char *s) {
 				},
 			},
 		},
-
 		{
 			"app 2",
 			`
@@ -1344,6 +1343,21 @@ void hoge(void){
 								},
 							},
 						}},
+				},
+			},
+		},
+		{
+			"app 3",
+			`
+FILE *funopen(const void *,
+                 int (* _Nullable)(void *, char *, int),
+                 int (* _Nullable)(void *, const char *, int),
+                 fpos_t (* _Nullable)(void *, fpos_t, int),
+                 int (* _Nullable)(void *));
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "funopen"},
 				},
 			},
 		},
