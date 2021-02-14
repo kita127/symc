@@ -763,6 +763,7 @@ func (p *Parser) parseForStatement() []Statement {
 	return ss
 }
 
+// parseIfStatement
 func (p *Parser) parseIfStatement() []Statement {
 	// if
 	p.pos++
@@ -774,7 +775,7 @@ func (p *Parser) parseIfStatement() []Statement {
 	// 条件式
 	ts := p.parseExpression()
 	if ts == nil {
-		p.updateErrLog(fmt.Sprintf("parseIfStatement:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parseIfStatement_1:token[%s]", p.curToken().literal))
 		return nil
 	}
 	ss = append(ss, ts...)
@@ -786,15 +787,26 @@ func (p *Parser) parseIfStatement() []Statement {
 		// ブロック文
 		ts := p.parseBlockStatement()
 		if ts == nil {
-			p.updateErrLog(fmt.Sprintf("parseIfStatement:token[%s]", p.curToken().literal))
+			p.updateErrLog(fmt.Sprintf("parseIfStatement_2:token[%s]", p.curToken().literal))
 			return nil
 		}
 		ss = append(ss, ts...)
+
+		if p.curToken().isToken(keyElse) {
+			// else 文あり
+			p.pos++
+			ts = p.parseBlockStatement()
+			if ts == nil {
+				p.updateErrLog(fmt.Sprintf("parseIfStatement_3:token[%s]", p.curToken().literal))
+				return nil
+			}
+			ss = append(ss, ts...)
+		}
 	} else {
 		// １行命令
 		ts := p.parseInnerStatement()
 		if ts == nil {
-			p.updateErrLog(fmt.Sprintf("parseIfStatement:token[%s]", p.curToken().literal))
+			p.updateErrLog(fmt.Sprintf("parseIfStatement_4:token[%s]", p.curToken().literal))
 			return nil
 		}
 		ss = append(ss, ts...)
@@ -804,7 +816,7 @@ func (p *Parser) parseIfStatement() []Statement {
 			p.pos++
 			ts = p.parseInnerStatement()
 			if ts == nil {
-				p.updateErrLog(fmt.Sprintf("parseIfStatement:token[%s]", p.curToken().literal))
+				p.updateErrLog(fmt.Sprintf("parseIfStatement_5:token[%s]", p.curToken().literal))
 				return nil
 			}
 			ss = append(ss, ts...)

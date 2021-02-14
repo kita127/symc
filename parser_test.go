@@ -1507,6 +1507,29 @@ void func(void)
 			},
 		},
 		{
+			"if 7",
+			`
+void func(void)
+{
+   if (condition1){
+
+   }else{
+
+   }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "condition1"},
+						},
+					},
+				},
+			},
+		},
+		{
 			"for 1",
 			`
 void func(void)
