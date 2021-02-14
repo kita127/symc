@@ -1778,6 +1778,17 @@ FILE *fdopen(int, const char *) __asm("_" "fdopen" );
 				},
 			},
 		},
+		{
+			"test gcc 4",
+			`
+int fprintf(FILE * restrict, const char * restrict, ...);
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "fprintf"},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

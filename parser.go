@@ -497,7 +497,11 @@ func (p *Parser) parsePrototypeParameter() []Statement {
 		}
 
 		prePos := p.pos
-		xs := p.parsePrototypeParamVar()
+		xs := p.parseGccPrototypeParam()
+		if xs == nil {
+			p.pos = prePos
+			xs = p.parsePrototypeParamVar()
+		}
 		if xs == nil {
 			p.pos = prePos
 			xs = p.parsePrototypeFPointerVar()
@@ -507,6 +511,26 @@ func (p *Parser) parsePrototypeParameter() []Statement {
 			return nil
 		}
 	}
+}
+
+// parseGccPrototypeParam
+func (p *Parser) parseGccPrototypeParam() []Statement {
+	if !p.curToken().isToken(period) {
+		p.updateErrLog(fmt.Sprintf("parseGccPrototypeParam:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+	if !p.curToken().isToken(period) {
+		p.updateErrLog(fmt.Sprintf("parseGccPrototypeParam:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+	if !p.curToken().isToken(period) {
+		p.updateErrLog(fmt.Sprintf("parseGccPrototypeParam:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+	return []Statement{}
 }
 
 // parsePrototypeParamVar
