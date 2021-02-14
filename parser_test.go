@@ -89,6 +89,18 @@ int hoge = 0;
 			},
 		},
 		{
+			"variable definition 8",
+			`
+int mx, my;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "mx"},
+					&VariableDef{Name: "my"},
+				},
+			},
+		},
+		{
 			"function pointer def 1",
 			`
 void (* p_f)();

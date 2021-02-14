@@ -65,7 +65,7 @@ func (v *VariableDef) String() string {
 	return fmt.Sprintf("VariableDef : Name=%s", v.Name)
 }
 func (v *VariableDef) PrettyString() string {
-	return fmt.Sprintf("VAR %s", v.Name)
+	return fmt.Sprintf("DEFINITION %s", v.Name)
 }
 
 type VariableDecl struct {
@@ -77,7 +77,7 @@ func (v *VariableDecl) String() string {
 	return fmt.Sprintf("VariableDecl : Name=%s", v.Name)
 }
 func (v *VariableDecl) PrettyString() string {
-	return fmt.Sprintf("dec %s", v.Name)
+	return fmt.Sprintf("DECLARE %s", v.Name)
 }
 
 type PrototypeDecl struct {
@@ -89,7 +89,7 @@ func (v *PrototypeDecl) String() string {
 	return fmt.Sprintf("PrototypeDecl : Name=%s", v.Name)
 }
 func (v *PrototypeDecl) PrettyString() string {
-	return fmt.Sprintf("prototype %s", v.Name)
+	return fmt.Sprintf("PROTOTYPE %s", v.Name)
 }
 
 type FunctionDef struct {
@@ -103,7 +103,7 @@ func (v *FunctionDef) String() string {
 	return fmt.Sprintf("FunctionDef : Name=%s, Params=%s, Statements=%s", v.Name, v.Params, v.Statements)
 }
 func (v *FunctionDef) PrettyString() string {
-	txt := fmt.Sprintf("func %s (", v.Name)
+	txt := fmt.Sprintf("FUNC %s (", v.Name)
 
 	sep := ""
 	for _, p := range v.Params {
@@ -209,15 +209,18 @@ func (p *Parser) Parse() *Module {
 
 func (p *Parser) parseModule() *Module {
 	ss := []Statement{}
+FOR:
 	for p.curToken().tokenType != eof {
 		if p.curToken().tokenType == comment {
 			p.pos++
 			continue
 		}
-		if s := p.parseStatement(); s != nil {
-			ss = append(ss, s)
-			if _, yes := s.(*InvalidStatement); yes {
-				break
+		if ts := p.parseStatement(); ts != nil {
+			ss = append(ss, ts...)
+			for _, v := range ts {
+				if _, yes := v.(*InvalidStatement); yes {
+					break FOR
+				}
 			}
 		}
 		// エラーログを初期化
@@ -228,23 +231,20 @@ func (p *Parser) parseModule() *Module {
 }
 
 // parseStatement
-func (p *Parser) parseStatement() Statement {
-	var s Statement = nil
+func (p *Parser) parseStatement() []Statement {
+	ss := []Statement{}
 	switch p.curToken().tokenType {
 	case keyTypedef:
 		p.skipTypedef()
 	case keyExtern:
 		prePos := p.pos
-		if s == nil {
+		ss = p.parsePrototypeDecl()
+		if ss == nil {
 			p.pos = prePos
-			s = p.parsePrototypeDecl()
+			ss = p.parseVariableDecl()
 		}
-		if s == nil {
-			p.pos = prePos
-			s = p.parseVariableDecl()
-		}
-		if s == nil {
-			return &InvalidStatement{Contents: p.errLog, Tk: p.curToken()}
+		if ss == nil {
+			return []Statement{&InvalidStatement{Contents: p.errLog, Tk: p.curToken()}}
 		}
 	case keyStruct:
 		p.skipStruct()
@@ -253,26 +253,20 @@ func (p *Parser) parseStatement() Statement {
 		p.skipParen()
 	default:
 		prePos := p.pos
-		if s == nil {
+		ss = p.parseFunctionDef()
+		if ss == nil {
 			p.pos = prePos
-			s = p.parseFunctionDef()
+			ss = p.parsePrototypeDecl()
 		}
-		if s == nil {
+		if ss == nil {
 			p.pos = prePos
-			s = p.parsePrototypeDecl()
+			ss = p.parseVariableDef()
 		}
-		if s == nil {
-			p.pos = prePos
-			ss := p.parseVariableDef()
-			if ss != nil {
-				s = ss[0]
-			}
-		}
-		if s == nil {
-			return &InvalidStatement{Contents: p.errLog, Tk: p.curToken()}
+		if ss == nil {
+			return []Statement{&InvalidStatement{Contents: p.errLog, Tk: p.curToken()}}
 		}
 	}
-	return s
+	return ss
 }
 
 func (p *Parser) extractVarName() (string, error) {
@@ -308,18 +302,22 @@ func (p *Parser) extractVarName() (string, error) {
 
 // parseVariableDef
 func (p *Parser) parseVariableDef() []Statement {
+	ss := []Statement{}
 
 	// 変数定義か確認する
 	if !p.isVariabeDef() {
 		p.posReset()
+		p.updateErrLog(fmt.Sprintf("parseVariableDef_1:token[%s]", p.curToken().literal))
 		return nil
 	}
 
 	s := p.parseVariableDefSub()
 	if s == nil {
 		p.posReset()
+		p.updateErrLog(fmt.Sprintf("parseVariableDef_2:token[%s]", p.curToken().literal))
 		return nil
 	}
+	ss = append(ss, s)
 
 	switch p.curToken().tokenType {
 	case semicolon:
@@ -327,12 +325,34 @@ func (p *Parser) parseVariableDef() []Statement {
 	case assign:
 		p.progUntil(semicolon)
 		p.pos++
+	case comma:
+		p.pos++
+		ts := p.parseExpression()
+		if ts == nil {
+			p.posReset()
+			p.updateErrLog(fmt.Sprintf("parseVariableDef_3:token[%s]", p.curToken().literal))
+			return nil
+		}
+		refv, ok := ts[0].(*RefVar)
+		if !ok {
+			p.posReset()
+			p.updateErrLog(fmt.Sprintf("parseVariableDef_4:token[%s]", p.curToken().literal))
+			return nil
+		}
+		if !p.curToken().isToken(semicolon) {
+			p.posReset()
+			p.updateErrLog(fmt.Sprintf("parseVariableDef_5:token[%s]", p.curToken().literal))
+			return nil
+		}
+		p.pos++
+		ss = append(ss, &VariableDef{Name: refv.Name})
 	default:
 		p.posReset()
+		p.updateErrLog(fmt.Sprintf("parseVariableDef_6:token[%s]", p.curToken().literal))
 		return nil
 	}
 
-	return []Statement{s}
+	return ss
 }
 
 func (p *Parser) parseVariableDefSub() Statement {
@@ -410,7 +430,7 @@ func (p *Parser) isVariabeDef() bool {
 	return wordCnt >= 2
 }
 
-func (p *Parser) parseVariableDecl() Statement {
+func (p *Parser) parseVariableDecl() []Statement {
 	// extern
 	p.pos++
 
@@ -426,11 +446,11 @@ func (p *Parser) parseVariableDecl() Statement {
 	p.pos++
 	// next
 
-	return &VariableDecl{Name: id}
+	return []Statement{&VariableDecl{Name: id}}
 }
 
 // parsePrototypeDecl
-func (p *Parser) parsePrototypeDecl() Statement {
+func (p *Parser) parsePrototypeDecl() []Statement {
 
 	if p.curToken().tokenType == keyExtern {
 		p.pos++
@@ -478,7 +498,7 @@ func (p *Parser) parsePrototypeDecl() Statement {
 
 	p.pos++
 	// next
-	return &PrototypeDecl{Name: id}
+	return []Statement{&PrototypeDecl{Name: id}}
 
 }
 
@@ -613,7 +633,7 @@ func (p *Parser) parsePrototypeFPointerVar() []Statement {
 }
 
 // parseFunctionDef
-func (p *Parser) parseFunctionDef() Statement {
+func (p *Parser) parseFunctionDef() []Statement {
 	// lparen or eof の手前まで pos を進める
 	n := p.peekToken()
 	for n.isTypeToken() {
@@ -651,7 +671,7 @@ func (p *Parser) parseFunctionDef() Statement {
 		return nil
 	}
 
-	return &FunctionDef{Name: id, Params: ps, Statements: ss}
+	return []Statement{&FunctionDef{Name: id, Params: ps, Statements: ss}}
 }
 
 // parseBlockStatement
