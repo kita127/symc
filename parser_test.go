@@ -1639,6 +1639,23 @@ void func(void)
 				},
 			},
 		},
+		{
+			"break 1",
+			`
+void func(void)
+{
+    break;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

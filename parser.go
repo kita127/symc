@@ -714,6 +714,13 @@ func (p *Parser) parseInnerStatement() []Statement {
 			return nil
 		}
 		ss = append(ss, ts...)
+	case keyBreak:
+		p.pos++
+		if !p.curToken().isToken(semicolon) {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		p.pos++
 	default:
 		prevPos := p.pos
 		ts := p.parseVariableDef()
