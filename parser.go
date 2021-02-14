@@ -530,10 +530,10 @@ func (p *Parser) parsePrototypeParameter__() []Statement {
 		}
 
 		prePos := p.pos
-		xs := p.prototypeParamVar()
+		xs := p.parsePrototypeParamVar()
 		if xs == nil {
 			p.pos = prePos
-			xs = p.prototypeFPointerVar()
+			xs = p.parsePrototypeFPointerVar()
 		}
 		if xs == nil {
 			p.updateErrLog(fmt.Sprintf("parsePrototypeParameter:token[%s]", p.curToken().literal))
@@ -542,58 +542,58 @@ func (p *Parser) parsePrototypeParameter__() []Statement {
 	}
 }
 
-// prototypeParamVar
-func (p *Parser) prototypeParamVar() []Statement {
+// parsePrototypeParamVar
+func (p *Parser) parsePrototypeParamVar() []Statement {
 	for p.curToken().isTypeToken() {
 		p.pos++
 	}
 	if p.curToken().isToken(comma) || p.curToken().isToken(rparen) {
 		return []Statement{}
 	} else {
-		p.updateErrLog(fmt.Sprintf("prototypeParamVar:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parsePrototypeParamVar:token[%s]", p.curToken().literal))
 		return nil
 	}
 }
 
-// prototypeFPointerVar
-func (p *Parser) prototypeFPointerVar() []Statement {
+// parsePrototypeFPointerVar
+func (p *Parser) parsePrototypeFPointerVar() []Statement {
 	for p.curToken().isTypeToken() {
 		p.pos++
 	}
 
 	if !p.curToken().isToken(lparen) {
-		p.updateErrLog(fmt.Sprintf("prototypeFPointerVar_1:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parsePrototypeFPointerVar_1:token[%s]", p.curToken().literal))
 		return nil
 	}
 	p.pos++
 
-	xs := p.prototypeParamVar()
+	xs := p.parsePrototypeParamVar()
 	if xs == nil {
-		p.updateErrLog(fmt.Sprintf("prototypeFPointerVar_2:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parsePrototypeFPointerVar_2:token[%s]", p.curToken().literal))
 		return nil
 	}
 
 	if !p.curToken().isToken(rparen) {
-		p.updateErrLog(fmt.Sprintf("prototypeFPointerVar_3:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parsePrototypeFPointerVar_3:token[%s]", p.curToken().literal))
 		return nil
 	}
 	p.pos++
 
 	if !p.curToken().isToken(lparen) {
-		p.updateErrLog(fmt.Sprintf("prototypeFPointerVar_4:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parsePrototypeFPointerVar_4:token[%s]", p.curToken().literal))
 		return nil
 	}
 
 	xs = p.parsePrototypeParameter__()
 	if xs == nil {
-		p.updateErrLog(fmt.Sprintf("prototypeFPointerVar_5:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parsePrototypeFPointerVar_5:token[%s]", p.curToken().literal))
 		return nil
 	}
 
 	if p.curToken().isToken(comma) || p.curToken().isToken(rparen) {
 		return []Statement{}
 	} else {
-		p.updateErrLog(fmt.Sprintf("prototypeFPointerVar_6:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parsePrototypeFPointerVar_6:token[%s]", p.curToken().literal))
 		return nil
 	}
 
