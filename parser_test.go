@@ -160,6 +160,17 @@ int (*_Nullable _read)(void *, char *, int);
 			},
 		},
 		{
+			"function pointer def 6",
+			`
+int (* fp)(void *, char *, int, ...);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "fp"},
+				},
+			},
+		},
+		{
 			"variable decl 1",
 			`
 extern char fuga;`,
