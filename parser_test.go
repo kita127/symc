@@ -1269,6 +1269,39 @@ BOOTINFO *binfo = (BOOTINFO *)(0x00000ff0);
 			},
 		},
 		{
+			"variable definition 11",
+			`
+int hoge[3][3] = { {0x0a, 0x0b, 0x0c}, {0x00, 0x01, 0x02}, {0x00, 0x01, 0x09} };
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable definition 12",
+			`
+int hoge[2][3][4] = {
+                      {
+                        {0x00 ,0x00 ,0x00, 0x00},
+                        {0x00 ,0x00 ,0x00, 0x00},
+                        {0x00 ,0x00 ,0x00, 0x00}
+                      },
+                      {
+                        {0x00 ,0x00 ,0x00, 0x00},
+                        {0x00 ,0x00 ,0x00, 0x00},
+                        {0x00 ,0x00 ,0x00, 0x00}
+                      },
+                    };
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
 			"function pointer def 1",
 			`
 void (* p_f)();

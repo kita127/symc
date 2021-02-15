@@ -371,7 +371,7 @@ func (p *Parser) parseNormalVarDef() []Statement {
 		id := p.curToken().literal
 		p.pos++
 
-		if p.curToken().isToken(lbracket) {
+		for p.curToken().isToken(lbracket) {
 			// 配列
 			p.pos++
 			if !p.curToken().isToken(rbracket) {
@@ -381,6 +381,7 @@ func (p *Parser) parseNormalVarDef() []Statement {
 					return nil
 				}
 			}
+			// rbracket
 			p.pos++
 		}
 
@@ -413,12 +414,17 @@ func (p *Parser) checkExists2word() bool {
 
 // parseInitialValue
 func (p *Parser) parseInitialValue() []Statement {
-	prePos := p.pos
-	xs := p.parseArrValue()
-	if xs == nil {
-		p.pos = prePos
-		xs = p.parseExpression()
+
+	if p.curToken().isToken(lbrace) {
+		// 配列の初期化子
+		xs := p.parseArrValue()
+		if xs == nil {
+			p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
+			return nil
+		}
 	}
+
+	xs := p.parseExpression()
 	if xs == nil {
 		p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
 		return nil
@@ -428,18 +434,35 @@ func (p *Parser) parseInitialValue() []Statement {
 
 // parseArrValue
 func (p *Parser) parseArrValue() []Statement {
-	if !p.curToken().isToken(lbrace) {
-		p.updateErrLog(fmt.Sprintf("parseArrValue:token[%s]", p.curToken().literal))
-		return nil
-	}
-	for !p.curToken().isToken(rbrace) && !p.curToken().isToken(semicolon) && !p.curToken().isToken(eof) {
+
+	switch p.curToken().tokenType {
+	case lbrace:
 		p.pos++
+		xs := p.parseArrValue()
+		if xs == nil {
+			p.updateErrLog(fmt.Sprintf("parseArrValue:token[%s]", p.curToken().literal))
+			return nil
+		}
+		if !p.curToken().isToken(rbrace) {
+			p.updateErrLog(fmt.Sprintf("parseArrValue:token[%s]", p.curToken().literal))
+			return nil
+		}
+		p.pos++
+
+		if p.curToken().isToken(comma) {
+			p.pos++
+			xs = p.parseArrValue()
+			if xs == nil {
+				p.updateErrLog(fmt.Sprintf("parseArrValue:token[%s]", p.curToken().literal))
+				return nil
+			}
+		}
+	default:
+		for !p.curToken().isToken(rbrace) && !p.curToken().isToken(semicolon) && !p.curToken().isToken(eof) {
+			p.pos++
+		}
 	}
-	if !p.curToken().isToken(rbrace) {
-		p.updateErrLog(fmt.Sprintf("parseArrValue:token[%s]", p.curToken().literal))
-		return nil
-	}
-	p.pos++
+
 	return []Statement{}
 }
 
