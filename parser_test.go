@@ -645,6 +645,21 @@ void func(void){}
 			},
 		},
 		{
+			"function parameter 6",
+			`
+void func(int a, ...){}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{
+							{Name: "a"},
+						},
+						Statements: []Statement{}},
+				},
+			},
+		},
+		{
 			"expression 1",
 			`
 void func()

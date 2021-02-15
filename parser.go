@@ -1113,8 +1113,9 @@ func (p *Parser) parseRefVar() []Statement {
 	return []Statement{&RefVar{Name: n}}
 }
 
+// parseParameter
 func (p *Parser) parseParameter() []*VariableDef {
-	vs := []*VariableDef{}
+	ss := []*VariableDef{}
 	// lparen
 	p.pos++
 
@@ -1122,40 +1123,48 @@ func (p *Parser) parseParameter() []*VariableDef {
 		// パラメータになにもなし
 		p.pos++
 		// next
-		return vs
+		return ss
 	} else if p.curToken().tokenType == keyVoid {
 		// void
 		p.pos++
 		// rparen
 		p.pos++
 		// next
-		return vs
+		return ss
 	}
 
 	for {
-		ts := p.parseVariableDefSub()
-		if ts == nil {
-			return nil
+		prePos := p.pos
+		xs := p.parseVariadicArgument()
+		if xs == nil {
+			p.pos = prePos
+			ts := p.parseVariableDefSub()
+			if ts == nil {
+				p.updateErrLog(fmt.Sprintf("parseParameter:token[%s]", p.curToken().literal))
+				return nil
+			}
+			if len(ts) != 1 {
+				p.updateErrLog(fmt.Sprintf("parseParameter:token[%s]", p.curToken().literal))
+				return nil
+			}
+			v, ok := ts[0].(*VariableDef)
+			if !ok {
+				p.updateErrLog(fmt.Sprintf("parseParameter:token[%s]", p.curToken().literal))
+				return nil
+			}
+			ss = append(ss, v)
 		}
-		if len(ts) != 1 {
-			return nil
-		}
-		s := ts[0]
-		v, ok := s.(*VariableDef)
-		if !ok {
-			return nil
-		}
-		vs = append(vs, v)
 
 		switch p.curToken().tokenType {
 		case rparen:
 			p.pos++
 			// next
-			return vs
+			return ss
 		case comma:
 			p.pos++
 			// next
 		default:
+			p.updateErrLog(fmt.Sprintf("parseParameter:token[%s]", p.curToken().literal))
 			return nil
 		}
 	}
