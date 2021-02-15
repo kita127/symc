@@ -842,6 +842,13 @@ func (p *Parser) parseInnerStatement() []Statement {
 			return nil
 		}
 		ss = append(ss, ts...)
+	case keyCase:
+		ts := p.parseCaseStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
 	case keyDefault:
 		ts := p.parseDefaultStatement()
 		if ts == nil {
@@ -871,6 +878,26 @@ func (p *Parser) parseInnerStatement() []Statement {
 		ss = append(ss, ts...)
 	}
 	return ss
+}
+
+// parseCaseStatement
+func (p *Parser) parseCaseStatement() []Statement {
+	// case
+	p.pos++
+
+	xs := p.parseExpression()
+	if xs == nil {
+		p.updateErrLog(fmt.Sprintf("parseCaseStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	if !p.curToken().isToken(colon) {
+		p.updateErrLog(fmt.Sprintf("parseCaseStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+
+	return []Statement{}
 }
 
 // parseDefaultStatement

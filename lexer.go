@@ -535,7 +535,6 @@ func (t *Token) isOperator() bool {
 	case tilde:
 	case caret:
 	case vertical:
-	case colon:
 	case question:
 	case leftShift:
 	case rightShift:

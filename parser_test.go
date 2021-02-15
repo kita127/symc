@@ -1833,6 +1833,32 @@ void func(void)
 				},
 			},
 		},
+		{
+			"switch 3",
+			`
+void func(void)
+{
+    switch (c) {
+        case 0x01:
+            var1++;
+            break;
+        default:
+            break;
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "c"},
+							&RefVar{Name: "var1"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
