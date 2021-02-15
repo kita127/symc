@@ -323,12 +323,7 @@ func (p *Parser) parseVariableDef() []Statement {
 
 	if p.curToken().isToken(assign) {
 		p.pos++
-		prePos := p.pos
-		xs := p.parseArrValue()
-		if xs == nil {
-			p.pos = prePos
-			xs = p.parseExpression()
-		}
+		xs := p.parseInitialValue()
 		if xs == nil {
 			p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
 			return nil
@@ -343,6 +338,15 @@ func (p *Parser) parseVariableDef() []Statement {
 			p.pos++
 			ts := p.parseVariableDefSub()
 			ss = append(ss, ts...)
+
+			if p.curToken().isToken(assign) {
+				p.pos++
+				xs := p.parseInitialValue()
+				if xs == nil {
+					p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
+					return nil
+				}
+			}
 		}
 		// semicolon
 		p.pos++
@@ -352,6 +356,21 @@ func (p *Parser) parseVariableDef() []Statement {
 	}
 
 	return ss
+}
+
+// parseInitialValue
+func (p *Parser) parseInitialValue() []Statement {
+	prePos := p.pos
+	xs := p.parseArrValue()
+	if xs == nil {
+		p.pos = prePos
+		xs = p.parseExpression()
+	}
+	if xs == nil {
+		p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
+		return nil
+	}
+	return []Statement{}
 }
 
 // parseArrValue

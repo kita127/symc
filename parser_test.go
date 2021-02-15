@@ -108,11 +108,14 @@ char ma, mb, mc;
 			"variable definition 9",
 			`
 int len = 0, len_buf;
+int var_a = 0, var_b = 100;
 `,
 			&Module{
 				[]Statement{
 					&VariableDef{Name: "len"},
 					&VariableDef{Name: "len_buf"},
+					&VariableDef{Name: "var_a"},
+					&VariableDef{Name: "var_b"},
 				},
 			},
 		},
