@@ -346,8 +346,11 @@ func (p *Parser) parseNormalVarDef() []Statement {
 		// 配列
 		p.pos++
 		if !p.curToken().isToken(rbracket) {
-			p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
-			return nil
+			p.parseExpression()
+			if !p.curToken().isToken(rbracket) {
+				p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
+				return nil
+			}
 		}
 		p.pos++
 	}

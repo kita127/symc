@@ -1259,17 +1259,17 @@ int hoge[] = {0x00, 0x01, 0x02};
 				},
 			},
 		},
-//		{
-//			"variable definition 5",
-//			`
-//int hoge[3] = {0x00, 0x01, 0x02};
-//`,
-//			&Module{
-//				[]Statement{
-//					&VariableDef{Name: "hoge"},
-//				},
-//			},
-//		},
+		{
+			"variable definition 5",
+			`
+int hoge[3] = {0x00, 0x01, 0x02};
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
 //		{
 //			"variable definition 6",
 //			`
