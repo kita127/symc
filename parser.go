@@ -308,54 +308,45 @@ func (p *Parser) extractVarName() (string, error) {
 func (p *Parser) parseVariableDef() []Statement {
 	ss := []Statement{}
 
-	// 変数定義か確認する
-	if !p.isVariabeDef() {
-		p.updateErrLog(fmt.Sprintf("parseVariableDef_1:token[%s]", p.curToken().literal))
-		return nil
-	}
+	for {
+		if p.curToken().isToken(semicolon) {
+			p.pos++
+			break
+		} else if p.curToken().isToken(comma) {
+			p.pos++
+		}
 
-	ts := p.parseVariableDefSub()
-	if ts == nil {
-		p.updateErrLog(fmt.Sprintf("parseVariableDef_2:token[%s]", p.curToken().literal))
-		return nil
-	}
-	ss = append(ss, ts...)
-
-	if p.curToken().isToken(assign) {
-		p.pos++
-		xs := p.parseInitialValue()
-		if xs == nil {
+		ts := p.parseNormalVarDef()
+		if ts == nil {
 			p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
 			return nil
 		}
+		ss = append(ss, ts...)
 	}
+	return ss
+}
 
-	switch p.curToken().tokenType {
-	case semicolon:
+// parseNormalVarDef
+func (p *Parser) parseNormalVarDef() []Statement {
+	for p.curToken().isTypeToken() {
 		p.pos++
-	case comma:
-		for p.curToken().isToken(comma) {
-			p.pos++
-			ts := p.parseVariableDefSub()
-			ss = append(ss, ts...)
-
-			if p.curToken().isToken(assign) {
-				p.pos++
-				xs := p.parseInitialValue()
-				if xs == nil {
-					p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
-					return nil
-				}
-			}
-		}
-		// semicolon
-		p.pos++
-	default:
-		p.updateErrLog(fmt.Sprintf("parseVariableDef_6:token[%s]", p.curToken().literal))
+	}
+	if !p.curToken().isToken(semicolon) &&
+		!p.curToken().isToken(comma) &&
+		!p.curToken().isToken(assign) {
+		p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
 		return nil
 	}
+	p.pos--
+	id := p.curToken().literal
+	p.pos++
 
-	return ss
+	if p.curToken().isToken(assign) {
+		// 初期化子あり
+		p.pos++
+		p.parseInitialValue()
+	}
+	return []Statement{&VariableDef{Name: id}}
 }
 
 // parseInitialValue
@@ -390,6 +381,7 @@ func (p *Parser) parseArrValue() []Statement {
 	return []Statement{}
 }
 
+// parseVariableDefSub
 func (p *Parser) parseVariableDefSub() []Statement {
 	prePos := p.pos
 
