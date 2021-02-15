@@ -1248,17 +1248,17 @@ int hoge = 100;
 				},
 			},
 		},
-//		{
-//			"variable definition 4",
-//			`
-//int hoge[] = {0x00, 0x01, 0x02};
-//`,
-//			&Module{
-//				[]Statement{
-//					&VariableDef{Name: "hoge"},
-//				},
-//			},
-//		},
+		{
+			"variable definition 4",
+			`
+int hoge[] = {0x00, 0x01, 0x02};
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
 //		{
 //			"variable definition 5",
 //			`

@@ -333,13 +333,24 @@ func (p *Parser) parseNormalVarDef() []Statement {
 	}
 	if !p.curToken().isToken(semicolon) &&
 		!p.curToken().isToken(comma) &&
-		!p.curToken().isToken(assign) {
+		!p.curToken().isToken(assign) &&
+		!p.curToken().isToken(lbracket) {
 		p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
 		return nil
 	}
 	p.pos--
 	id := p.curToken().literal
 	p.pos++
+
+	if p.curToken().isToken(lbracket) {
+		// 配列
+		p.pos++
+		if !p.curToken().isToken(rbracket) {
+			p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
+			return nil
+		}
+		p.pos++
+	}
 
 	if p.curToken().isToken(assign) {
 		// 初期化子あり
