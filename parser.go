@@ -308,64 +308,123 @@ func (p *Parser) extractVarName() (string, error) {
 func (p *Parser) parseVariableDef() []Statement {
 	ss := []Statement{}
 
-	// 変数定義か確認する
-	if !p.isVariabeDef() {
-		p.updateErrLog(fmt.Sprintf("parseVariableDef_1:token[%s]", p.curToken().literal))
-		return nil
-	}
-
-	ts := p.parseVariableDefSub()
+	prePos := p.pos
+	ts := p.parseFuncPointerVarDef()
 	if ts == nil {
-		p.updateErrLog(fmt.Sprintf("parseVariableDef_2:token[%s]", p.curToken().literal))
+		p.pos = prePos
+		ts = p.parseNormalVarDef()
+	}
+	if ts == nil {
+		p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
 		return nil
 	}
 	ss = append(ss, ts...)
+	return ss
+}
 
-	if p.curToken().isToken(assign) {
+// parseFuncPointerVarDef
+func (p *Parser) parseFuncPointerVarDef() []Statement {
+
+	ss := p.parseFuncPointerVarDefSub()
+	if ss == nil {
+		p.updateErrLog(fmt.Sprintf("parseFuncPointerVarDef:token[%s]", p.curToken().literal))
+		return nil
+	}
+	if !p.curToken().isToken(semicolon) {
+		p.updateErrLog(fmt.Sprintf("parseFuncPointerVarDef:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+	return ss
+}
+
+// parseNormalVarDef
+func (p *Parser) parseNormalVarDef() []Statement {
+	ss := []Statement{}
+
+	if !p.checkExists2word() {
+		// 型名と変数名の合計が2以上なければ変数定義ではない
+		p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	for {
+
+		if p.curToken().isToken(semicolon) {
+			p.pos++
+			break
+		} else if p.curToken().isToken(comma) {
+			p.pos++
+		}
+
+		for p.curToken().isTypeToken() {
+			p.pos++
+		}
+		if !p.curToken().isToken(semicolon) &&
+			!p.curToken().isToken(comma) &&
+			!p.curToken().isToken(assign) &&
+			!p.curToken().isToken(lbracket) {
+			p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
+			return nil
+		}
+		p.pos--
+		id := p.curToken().literal
 		p.pos++
-		xs := p.parseInitialValue()
+
+		for p.curToken().isToken(lbracket) {
+			// 配列
+			p.pos++
+			if !p.curToken().isToken(rbracket) {
+				p.parseExpression()
+				if !p.curToken().isToken(rbracket) {
+					p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
+					return nil
+				}
+			}
+			// rbracket
+			p.pos++
+		}
+
+		if p.curToken().isToken(assign) {
+			// 初期化子あり
+			p.pos++
+			p.parseInitialValue()
+		}
+
+		ss = append(ss, &VariableDef{Name: id})
+	}
+	return ss
+}
+
+// checkExists2word
+func (p *Parser) checkExists2word() bool {
+	prePos := p.pos
+
+	wordCnt := 0
+	for p.curToken().isTypeToken() {
+		if p.curToken().isToken(word) {
+			wordCnt++
+		}
+		p.pos++
+	}
+
+	p.pos = prePos
+	return wordCnt >= 2
+}
+
+// parseInitialValue
+func (p *Parser) parseInitialValue() []Statement {
+
+	if p.curToken().isToken(lbrace) {
+		// 配列の初期化子
+		xs := p.parseArrValue()
 		if xs == nil {
 			p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
 			return nil
 		}
 	}
 
-	switch p.curToken().tokenType {
-	case semicolon:
-		p.pos++
-	case comma:
-		for p.curToken().isToken(comma) {
-			p.pos++
-			ts := p.parseVariableDefSub()
-			ss = append(ss, ts...)
-
-			if p.curToken().isToken(assign) {
-				p.pos++
-				xs := p.parseInitialValue()
-				if xs == nil {
-					p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
-					return nil
-				}
-			}
-		}
-		// semicolon
-		p.pos++
-	default:
-		p.updateErrLog(fmt.Sprintf("parseVariableDef_6:token[%s]", p.curToken().literal))
-		return nil
-	}
-
-	return ss
-}
-
-// parseInitialValue
-func (p *Parser) parseInitialValue() []Statement {
-	prePos := p.pos
-	xs := p.parseArrValue()
-	if xs == nil {
-		p.pos = prePos
-		xs = p.parseExpression()
-	}
+	xs := p.parseExpression()
 	if xs == nil {
 		p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
 		return nil
@@ -375,26 +434,44 @@ func (p *Parser) parseInitialValue() []Statement {
 
 // parseArrValue
 func (p *Parser) parseArrValue() []Statement {
-	if !p.curToken().isToken(lbrace) {
-		p.updateErrLog(fmt.Sprintf("parseArrValue:token[%s]", p.curToken().literal))
-		return nil
-	}
-	for !p.curToken().isToken(rbrace) && !p.curToken().isToken(semicolon) && !p.curToken().isToken(eof) {
+
+	switch p.curToken().tokenType {
+	case lbrace:
 		p.pos++
+		xs := p.parseArrValue()
+		if xs == nil {
+			p.updateErrLog(fmt.Sprintf("parseArrValue:token[%s]", p.curToken().literal))
+			return nil
+		}
+		if !p.curToken().isToken(rbrace) {
+			p.updateErrLog(fmt.Sprintf("parseArrValue:token[%s]", p.curToken().literal))
+			return nil
+		}
+		p.pos++
+
+		if p.curToken().isToken(comma) {
+			p.pos++
+			xs = p.parseArrValue()
+			if xs == nil {
+				p.updateErrLog(fmt.Sprintf("parseArrValue:token[%s]", p.curToken().literal))
+				return nil
+			}
+		}
+	default:
+		for !p.curToken().isToken(rbrace) && !p.curToken().isToken(semicolon) && !p.curToken().isToken(eof) {
+			p.pos++
+		}
 	}
-	if !p.curToken().isToken(rbrace) {
-		p.updateErrLog(fmt.Sprintf("parseArrValue:token[%s]", p.curToken().literal))
-		return nil
-	}
-	p.pos++
+
 	return []Statement{}
 }
 
+// parseVariableDefSub
 func (p *Parser) parseVariableDefSub() []Statement {
 	prePos := p.pos
 
 	// はじめに関数ポインタか確認
-	ss := p.parseFuncPointerVarDef()
+	ss := p.parseFuncPointerVarDefSub()
 
 	if ss == nil {
 		// 関数ポインタ以外
@@ -424,8 +501,8 @@ func (p *Parser) parseVariableDefSub() []Statement {
 	return ss
 }
 
-// parseFuncPointerVarDef
-func (p *Parser) parseFuncPointerVarDef() []Statement {
+// parseFuncPointerVarDefSub
+func (p *Parser) parseFuncPointerVarDefSub() []Statement {
 	for p.curToken().isTypeToken() {
 		p.pos++
 	}
@@ -438,6 +515,7 @@ func (p *Parser) parseFuncPointerVarDef() []Statement {
 		return nil
 	}
 	if len(ss) != 1 {
+		// 関数ポインタの識別子が一つだけあるはず
 		return nil
 	}
 	// rparen
@@ -451,22 +529,6 @@ func (p *Parser) parseFuncPointerVarDef() []Statement {
 	}
 
 	return ss
-}
-
-func (p *Parser) isVariabeDef() bool {
-	// セミコロン、イコール、ブラケットまでの間に型を表すトークンが2つ以上なければ変数定義ではない
-	wordCnt := 0
-	pPrev := p.pos
-	t := p.curToken()
-	for !t.isToken(semicolon) && !t.isToken(assign) && !t.isToken(lbracket) && !t.isToken(eof) {
-		if t.isTypeToken() {
-			wordCnt++
-		}
-		p.pos++
-		t = p.curToken()
-	}
-	p.pos = pPrev
-	return wordCnt >= 2
 }
 
 func (p *Parser) parseVariableDecl() []Statement {
@@ -773,6 +835,27 @@ func (p *Parser) parseInnerStatement() []Statement {
 			return nil
 		}
 		ss = append(ss, ts...)
+	case keySwitch:
+		ts := p.parseSwitchStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
+	case keyCase:
+		ts := p.parseCaseStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
+	case keyDefault:
+		ts := p.parseDefaultStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
 	case keyBreak:
 		p.pos++
 		if !p.curToken().isToken(semicolon) {
@@ -794,6 +877,80 @@ func (p *Parser) parseInnerStatement() []Statement {
 		}
 		ss = append(ss, ts...)
 	}
+	return ss
+}
+
+// parseCaseStatement
+func (p *Parser) parseCaseStatement() []Statement {
+	// case
+	p.pos++
+
+	xs := p.parseExpression()
+	if xs == nil {
+		p.updateErrLog(fmt.Sprintf("parseCaseStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	if !p.curToken().isToken(colon) {
+		p.updateErrLog(fmt.Sprintf("parseCaseStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+
+	return []Statement{}
+}
+
+// parseDefaultStatement
+func (p *Parser) parseDefaultStatement() []Statement {
+	// default
+	p.pos++
+
+	if !p.curToken().isToken(colon) {
+		p.updateErrLog(fmt.Sprintf("parseDefaultStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+
+	return []Statement{}
+}
+
+// parseSwitchStatement
+func (p *Parser) parseSwitchStatement() []Statement {
+	ss := []Statement{}
+
+	// switch
+	p.pos++
+
+	if !p.curToken().isToken(lparen) {
+		p.updateErrLog(fmt.Sprintf("parseSwitchStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+
+	ts := p.parseExpression()
+	if ts == nil {
+		p.updateErrLog(fmt.Sprintf("parseSwitchStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	ss = append(ss, ts...)
+
+	if !p.curToken().isToken(rparen) {
+		p.updateErrLog(fmt.Sprintf("parseSwitchStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+
+	if !p.curToken().isToken(lbrace) {
+		p.updateErrLog(fmt.Sprintf("parseSwitchStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	ts = p.parseBlockStatement()
+	if ts == nil {
+		p.updateErrLog(fmt.Sprintf("parseSwitchStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	ss = append(ss, ts...)
+
 	return ss
 }
 

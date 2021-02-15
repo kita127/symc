@@ -12,72 +12,6 @@ func TestParse(t *testing.T) {
 		expect  *Module
 	}{
 		{
-			"function pointer def 1",
-			`
-void (* p_f)();
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "p_f"},
-				},
-			},
-		},
-		{
-			"function pointer def 2",
-			`
-int (* p_f)();
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "p_f"},
-				},
-			},
-		},
-		{
-			"function pointer def 3",
-			`
-int (* p_f)(void);
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "p_f"},
-				},
-			},
-		},
-		{
-			"function pointer def 4",
-			`
-const * AnyType (* p_f)(int a, char b[]);
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "p_f"},
-				},
-			},
-		},
-		{
-			"function pointer def 5",
-			`
-int (*_Nullable _read)(void *, char *, int);
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "_read"},
-				},
-			},
-		},
-		{
-			"function pointer def 6",
-			`
-int (* fp)(void *, char *, int, ...);
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "fp"},
-				},
-			},
-		},
-		{
 			"variable decl 1",
 			`
 extern char fuga;`,
@@ -1334,6 +1268,94 @@ BOOTINFO *binfo = (BOOTINFO *)(0x00000ff0);
 				},
 			},
 		},
+		{
+			"variable definition 11",
+			`
+int hoge[3][3] = { {0x0a, 0x0b, 0x0c}, {0x00, 0x01, 0x02}, {0x00, 0x01, 0x09} };
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable definition 12",
+			`
+int hoge[2][3][4] = {
+                      {
+                        {0x00 ,0x00 ,0x00, 0x00},
+                        {0x00 ,0x00 ,0x00, 0x00},
+                        {0x00 ,0x00 ,0x00, 0x00}
+                      },
+                      {
+                        {0x00 ,0x00 ,0x00, 0x00},
+                        {0x00 ,0x00 ,0x00, 0x00},
+                        {0x00 ,0x00 ,0x00, 0x00}
+                      },
+                    };
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"function pointer def 1",
+			`
+void (* p_f)();
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
+			"function pointer def 3",
+			`
+int (* p_f)(void);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
+			"function pointer def 4",
+			`
+const * AnyType (* p_f)(int a, char b[]);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
+			"function pointer def 5",
+			`
+int (*_Nullable _read)(void *, char *, int);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "_read"},
+				},
+			},
+		},
+		{
+			"function pointer def 6",
+			`
+int (* fp)(void *, char *, int, ...);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "fp"},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
@@ -1745,6 +1767,94 @@ void func(void)
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{},
 						Statements: []Statement{},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestSwitch
+func TestSwitch(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"switch 1",
+			`
+void func(void)
+{
+    switch (c) {
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "c"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"switch 2",
+			`
+void func(void)
+{
+    switch (c) {
+        default:
+            break;
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "c"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"switch 3",
+			`
+void func(void)
+{
+    switch (c) {
+        case 0x01:
+            var1++;
+            break;
+        default:
+            break;
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "c"},
+							&RefVar{Name: "var1"},
+						},
 					},
 				},
 			},
