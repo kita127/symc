@@ -308,7 +308,27 @@ func (p *Parser) extractVarName() (string, error) {
 func (p *Parser) parseVariableDef() []Statement {
 	ss := []Statement{}
 
+	ts := p.parseNormalVarDef()
+	if ts == nil {
+		p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
+		return nil
+	}
+	ss = append(ss, ts...)
+	return ss
+}
+
+// parseNormalVarDef
+func (p *Parser) parseNormalVarDef() []Statement {
+	ss := []Statement{}
+
+	if !p.checkExists2word() {
+		// 型名と変数名の合計が2以上なければ変数定義ではない
+		p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
+		return nil
+	}
+
 	for {
+
 		if p.curToken().isToken(semicolon) {
 			p.pos++
 			break
@@ -316,51 +336,58 @@ func (p *Parser) parseVariableDef() []Statement {
 			p.pos++
 		}
 
-		ts := p.parseNormalVarDef()
-		if ts == nil {
-			p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
+		for p.curToken().isTypeToken() {
+			p.pos++
+		}
+		if !p.curToken().isToken(semicolon) &&
+			!p.curToken().isToken(comma) &&
+			!p.curToken().isToken(assign) &&
+			!p.curToken().isToken(lbracket) {
+			p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
 			return nil
 		}
-		ss = append(ss, ts...)
+		p.pos--
+		id := p.curToken().literal
+		p.pos++
+
+		if p.curToken().isToken(lbracket) {
+			// 配列
+			p.pos++
+			if !p.curToken().isToken(rbracket) {
+				p.parseExpression()
+				if !p.curToken().isToken(rbracket) {
+					p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
+					return nil
+				}
+			}
+			p.pos++
+		}
+
+		if p.curToken().isToken(assign) {
+			// 初期化子あり
+			p.pos++
+			p.parseInitialValue()
+		}
+
+		ss = append(ss, &VariableDef{Name: id})
 	}
 	return ss
 }
 
-// parseNormalVarDef
-func (p *Parser) parseNormalVarDef() []Statement {
-	for p.curToken().isTypeToken() {
-		p.pos++
-	}
-	if !p.curToken().isToken(semicolon) &&
-		!p.curToken().isToken(comma) &&
-		!p.curToken().isToken(assign) &&
-		!p.curToken().isToken(lbracket) {
-		p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
-		return nil
-	}
-	p.pos--
-	id := p.curToken().literal
-	p.pos++
+// checkExists2word
+func (p *Parser) checkExists2word() bool {
+	prePos := p.pos
 
-	if p.curToken().isToken(lbracket) {
-		// 配列
-		p.pos++
-		if !p.curToken().isToken(rbracket) {
-			p.parseExpression()
-			if !p.curToken().isToken(rbracket) {
-				p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
-				return nil
-			}
+	wordCnt := 0
+	for p.curToken().isTypeToken() {
+		if p.curToken().isToken(word) {
+			wordCnt++
 		}
 		p.pos++
 	}
 
-	if p.curToken().isToken(assign) {
-		// 初期化子あり
-		p.pos++
-		p.parseInitialValue()
-	}
-	return []Statement{&VariableDef{Name: id}}
+	p.pos = prePos
+	return wordCnt >= 2
 }
 
 // parseInitialValue
