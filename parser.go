@@ -309,7 +309,7 @@ func (p *Parser) parseVariableDef() []Statement {
 	ss := []Statement{}
 
 	prePos := p.pos
-	ts := p.parseFuncPointerVarDef__()
+	ts := p.parseFuncPointerVarDef()
 	if ts == nil {
 		p.pos = prePos
 		ts = p.parseNormalVarDef()
@@ -322,9 +322,10 @@ func (p *Parser) parseVariableDef() []Statement {
 	return ss
 }
 
-func (p *Parser) parseFuncPointerVarDef__() []Statement {
+// parseFuncPointerVarDef
+func (p *Parser) parseFuncPointerVarDef() []Statement {
 
-	ss := p.parseFuncPointerVarDef()
+	ss := p.parseFuncPointerVarDefSub()
 	if ss == nil {
 		p.updateErrLog(fmt.Sprintf("parseFuncPointerVarDef:token[%s]", p.curToken().literal))
 		return nil
@@ -447,7 +448,7 @@ func (p *Parser) parseVariableDefSub() []Statement {
 	prePos := p.pos
 
 	// はじめに関数ポインタか確認
-	ss := p.parseFuncPointerVarDef()
+	ss := p.parseFuncPointerVarDefSub()
 
 	if ss == nil {
 		// 関数ポインタ以外
@@ -477,8 +478,8 @@ func (p *Parser) parseVariableDefSub() []Statement {
 	return ss
 }
 
-// parseFuncPointerVarDef
-func (p *Parser) parseFuncPointerVarDef() []Statement {
+// parseFuncPointerVarDefSub
+func (p *Parser) parseFuncPointerVarDefSub() []Statement {
 	for p.curToken().isTypeToken() {
 		p.pos++
 	}
@@ -491,6 +492,7 @@ func (p *Parser) parseFuncPointerVarDef() []Statement {
 		return nil
 	}
 	if len(ss) != 1 {
+		// 関数ポインタの識別子が一つだけあるはず
 		return nil
 	}
 	// rparen
