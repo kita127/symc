@@ -842,6 +842,13 @@ func (p *Parser) parseInnerStatement() []Statement {
 			return nil
 		}
 		ss = append(ss, ts...)
+	case keyDefault:
+		ts := p.parseDefaultStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
 	case keyBreak:
 		p.pos++
 		if !p.curToken().isToken(semicolon) {
@@ -864,6 +871,20 @@ func (p *Parser) parseInnerStatement() []Statement {
 		ss = append(ss, ts...)
 	}
 	return ss
+}
+
+// parseDefaultStatement
+func (p *Parser) parseDefaultStatement() []Statement {
+	// default
+	p.pos++
+
+	if !p.curToken().isToken(colon) {
+		p.updateErrLog(fmt.Sprintf("parseDefaultStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+
+	return []Statement{}
 }
 
 // parseSwitchStatement

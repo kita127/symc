@@ -1811,6 +1811,28 @@ void func(void)
 				},
 			},
 		},
+		{
+			"switch 2",
+			`
+void func(void)
+{
+    switch (c) {
+        default:
+            break;
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "c"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
