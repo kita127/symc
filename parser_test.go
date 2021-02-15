@@ -1323,17 +1323,17 @@ int var_a = 0, var_b = 100;
 				},
 			},
 		},
-//		{
-//			"variable definition 10",
-//			`
-//BOOTINFO *binfo = (BOOTINFO *)(0x00000ff0);
-//`,
-//			&Module{
-//				[]Statement{
-//					&VariableDef{Name: "binfo"},
-//				},
-//			},
-//		},
+		{
+			"variable definition 10",
+			`
+BOOTINFO *binfo = (BOOTINFO *)(0x00000ff0);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "binfo"},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
