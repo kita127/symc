@@ -105,6 +105,29 @@ char ma, mb, mc;
 			},
 		},
 		{
+			"variable definition 9",
+			`
+int len = 0, len_buf;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "len"},
+					&VariableDef{Name: "len_buf"},
+				},
+			},
+		},
+		{
+			"variable definition 10",
+			`
+BOOTINFO *binfo = (BOOTINFO *)(0x00000ff0);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "binfo"},
+				},
+			},
+		},
+		{
 			"function pointer def 1",
 			`
 void (* p_f)();

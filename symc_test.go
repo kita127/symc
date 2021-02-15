@@ -290,6 +290,48 @@ FUNC enable_mouse() {
 
 `,
 		},
+		{
+			"test module 2 mystdio.c",
+			`
+# 1 "examples/Kitax/lib/mystdio.c"
+# 1 "<built-in>" 1
+# 1 "<built-in>" 3
+# 366 "<built-in>" 3
+# 1 "<command line>" 1
+# 1 "<built-in>" 2
+# 1 "examples/Kitax/lib/mystdio.c" 2
+# 1 "/Library/Developer/CommandLineTools/usr/lib/clang/12.0.0/include/stdarg.h" 1 3
+# 14 "/Library/Developer/CommandLineTools/usr/lib/clang/12.0.0/include/stdarg.h" 3
+typedef __builtin_va_list va_list;
+# 32 "/Library/Developer/CommandLineTools/usr/lib/clang/12.0.0/include/stdarg.h" 3
+typedef __builtin_va_list __gnuc_va_list;
+# 2 "examples/Kitax/lib/mystdio.c" 2
+
+
+int dec2asc(char *str, int dec) {
+    int len = 0, len_buf;
+    int buf[10];
+    while (1) {
+        buf[len++] = dec % 10;
+        if (dec < 10)
+            break;
+        dec /= 10;
+    }
+}
+`,
+			`FUNC dec2asc(DEFINITION str, DEFINITION dec) {
+    DEFINITION len
+    DEFINITION len_buf
+    DEFINITION buf
+    ASSIGNE buf
+    len
+    dec
+    dec
+    ASSIGNE dec
+}
+
+`,
+		},
 	}
 
 	for _, tt := range testTbl {

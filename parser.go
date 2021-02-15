@@ -109,7 +109,7 @@ func (v *FunctionDef) PrettyString() string {
 	for _, p := range v.Params {
 		txt += sep
 		txt += p.PrettyString()
-		sep = " ,"
+		sep = ", "
 	}
 
 	txt += ") {\n"
@@ -321,43 +321,54 @@ func (p *Parser) parseVariableDef() []Statement {
 	}
 	ss = append(ss, ts...)
 
+	if p.curToken().isToken(assign) {
+		p.pos++
+		prePos := p.pos
+		xs := p.parseArrValue()
+		if xs == nil {
+			p.pos = prePos
+			xs = p.parseExpression()
+		}
+		if xs == nil {
+			p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
+			return nil
+		}
+	}
+
 	switch p.curToken().tokenType {
 	case semicolon:
 		p.pos++
-	case assign:
-		p.progUntil(semicolon)
-		p.pos++
 	case comma:
-
-		for {
-			if p.curToken().isToken(comma) {
-				p.pos++
-			} else if p.curToken().isToken(semicolon) {
-				p.pos++
-				break
-			} else {
-				p.updateErrLog(fmt.Sprintf("parseVariableDef_5:token[%s]", p.curToken().literal))
-				return nil
-			}
-
-			ts := p.parseExpression()
-			if ts == nil {
-				p.updateErrLog(fmt.Sprintf("parseVariableDef_3:token[%s]", p.curToken().literal))
-				return nil
-			}
-			refv, ok := ts[0].(*RefVar)
-			if !ok {
-				p.updateErrLog(fmt.Sprintf("parseVariableDef_4:token[%s]", p.curToken().literal))
-				return nil
-			}
-			ss = append(ss, &VariableDef{Name: refv.Name})
+		for p.curToken().isToken(comma) {
+			p.pos++
+			ts := p.parseVariableDefSub()
+			ss = append(ss, ts...)
 		}
+		// semicolon
+		p.pos++
 	default:
 		p.updateErrLog(fmt.Sprintf("parseVariableDef_6:token[%s]", p.curToken().literal))
 		return nil
 	}
 
 	return ss
+}
+
+// parseArrValue
+func (p *Parser) parseArrValue() []Statement {
+	if !p.curToken().isToken(lbrace) {
+		p.updateErrLog(fmt.Sprintf("parseArrValue:token[%s]", p.curToken().literal))
+		return nil
+	}
+	for !p.curToken().isToken(rbrace) && !p.curToken().isToken(semicolon) && !p.curToken().isToken(eof) {
+		p.pos++
+	}
+	if !p.curToken().isToken(rbrace) {
+		p.updateErrLog(fmt.Sprintf("parseArrValue:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+	return []Statement{}
 }
 
 func (p *Parser) parseVariableDefSub() []Statement {
@@ -1081,13 +1092,16 @@ func (p *Parser) parseCallFunc() []Statement {
 	return []Statement{&CallFunc{Name: id, Args: ss}}
 }
 
+// parseCast
 func (p *Parser) parseCast() []Statement {
 	if p.curToken().tokenType != lparen {
+		p.updateErrLog(fmt.Sprintf("parseCast:token[%s]", p.curToken().literal))
 		return nil
 	}
 	p.pos++
 	for p.curToken().tokenType != rparen {
-		if p.curToken().tokenType != word {
+		if !p.curToken().isToken(word) && !p.curToken().isToken(asterisk) {
+			p.updateErrLog(fmt.Sprintf("parseCast:token[%s]", p.curToken().literal))
 			return nil
 		}
 		p.pos++
@@ -1096,6 +1110,7 @@ func (p *Parser) parseCast() []Statement {
 	p.pos++
 
 	if p.curToken().isToken(semicolon) {
+		p.updateErrLog(fmt.Sprintf("parseCast:token[%s]", p.curToken().literal))
 		return nil
 	}
 	ss := p.parseExpression()
