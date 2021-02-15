@@ -12,72 +12,6 @@ func TestParse(t *testing.T) {
 		expect  *Module
 	}{
 		{
-			"function pointer def 1",
-			`
-void (* p_f)();
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "p_f"},
-				},
-			},
-		},
-		{
-			"function pointer def 2",
-			`
-int (* p_f)();
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "p_f"},
-				},
-			},
-		},
-		{
-			"function pointer def 3",
-			`
-int (* p_f)(void);
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "p_f"},
-				},
-			},
-		},
-		{
-			"function pointer def 4",
-			`
-const * AnyType (* p_f)(int a, char b[]);
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "p_f"},
-				},
-			},
-		},
-		{
-			"function pointer def 5",
-			`
-int (*_Nullable _read)(void *, char *, int);
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "_read"},
-				},
-			},
-		},
-		{
-			"function pointer def 6",
-			`
-int (* fp)(void *, char *, int, ...);
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "fp"},
-				},
-			},
-		},
-		{
 			"variable decl 1",
 			`
 extern char fuga;`,
@@ -1331,6 +1265,61 @@ BOOTINFO *binfo = (BOOTINFO *)(0x00000ff0);
 			&Module{
 				[]Statement{
 					&VariableDef{Name: "binfo"},
+				},
+			},
+		},
+		{
+			"function pointer def 1",
+			`
+void (* p_f)();
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
+			"function pointer def 3",
+			`
+int (* p_f)(void);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
+			"function pointer def 4",
+			`
+const * AnyType (* p_f)(int a, char b[]);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "p_f"},
+				},
+			},
+		},
+		{
+			"function pointer def 5",
+			`
+int (*_Nullable _read)(void *, char *, int);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "_read"},
+				},
+			},
+		},
+		{
+			"function pointer def 6",
+			`
+int (* fp)(void *, char *, int, ...);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "fp"},
 				},
 			},
 		},

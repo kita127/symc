@@ -308,12 +308,32 @@ func (p *Parser) extractVarName() (string, error) {
 func (p *Parser) parseVariableDef() []Statement {
 	ss := []Statement{}
 
-	ts := p.parseNormalVarDef()
+	prePos := p.pos
+	ts := p.parseFuncPointerVarDef__()
+	if ts == nil {
+		p.pos = prePos
+		ts = p.parseNormalVarDef()
+	}
 	if ts == nil {
 		p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
 		return nil
 	}
 	ss = append(ss, ts...)
+	return ss
+}
+
+func (p *Parser) parseFuncPointerVarDef__() []Statement {
+
+	ss := p.parseFuncPointerVarDef()
+	if ss == nil {
+		p.updateErrLog(fmt.Sprintf("parseFuncPointerVarDef:token[%s]", p.curToken().literal))
+		return nil
+	}
+	if !p.curToken().isToken(semicolon) {
+		p.updateErrLog(fmt.Sprintf("parseFuncPointerVarDef:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
 	return ss
 }
 
