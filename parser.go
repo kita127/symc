@@ -531,22 +531,6 @@ func (p *Parser) parseFuncPointerVarDefSub() []Statement {
 	return ss
 }
 
-func (p *Parser) isVariabeDef() bool {
-	// セミコロン、イコール、ブラケットまでの間に型を表すトークンが2つ以上なければ変数定義ではない
-	wordCnt := 0
-	pPrev := p.pos
-	t := p.curToken()
-	for !t.isToken(semicolon) && !t.isToken(assign) && !t.isToken(lbracket) && !t.isToken(eof) {
-		if t.isTypeToken() {
-			wordCnt++
-		}
-		p.pos++
-		t = p.curToken()
-	}
-	p.pos = pPrev
-	return wordCnt >= 2
-}
-
 func (p *Parser) parseVariableDecl() []Statement {
 	// extern
 	p.pos++
@@ -851,6 +835,13 @@ func (p *Parser) parseInnerStatement() []Statement {
 			return nil
 		}
 		ss = append(ss, ts...)
+	case keySwitch:
+		ts := p.parseSwitchStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
 	case keyBreak:
 		p.pos++
 		if !p.curToken().isToken(semicolon) {
@@ -872,6 +863,46 @@ func (p *Parser) parseInnerStatement() []Statement {
 		}
 		ss = append(ss, ts...)
 	}
+	return ss
+}
+
+// parseSwitchStatement
+func (p *Parser) parseSwitchStatement() []Statement {
+	ss := []Statement{}
+
+	// switch
+	p.pos++
+
+	if !p.curToken().isToken(lparen) {
+		p.updateErrLog(fmt.Sprintf("parseSwitchStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+
+	ts := p.parseExpression()
+	if ts == nil {
+		p.updateErrLog(fmt.Sprintf("parseSwitchStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	ss = append(ss, ts...)
+
+	if !p.curToken().isToken(rparen) {
+		p.updateErrLog(fmt.Sprintf("parseSwitchStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+
+	if !p.curToken().isToken(lbrace) {
+		p.updateErrLog(fmt.Sprintf("parseSwitchStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	ts = p.parseBlockStatement()
+	if ts == nil {
+		p.updateErrLog(fmt.Sprintf("parseSwitchStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	ss = append(ss, ts...)
+
 	return ss
 }
 
