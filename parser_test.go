@@ -12,125 +12,6 @@ func TestParse(t *testing.T) {
 		expect  *Module
 	}{
 		{
-			"variable definition 1",
-			`
-int hoge;
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "hoge"},
-				},
-			},
-		},
-		{
-			"variable definition 2",
-			`
-const int *hoge;
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "hoge"},
-				},
-			},
-		},
-		{
-			"variable definition 3",
-			`
-int hoge = 100;
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "hoge"},
-				},
-			},
-		},
-		{
-			"variable definition 4",
-			`
-int hoge[] = {0x00, 0x01, 0x02};
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "hoge"},
-				},
-			},
-		},
-		{
-			"variable definition 5",
-			`
-int hoge[3] = {0x00, 0x01, 0x02};
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "hoge"},
-				},
-			},
-		},
-		{
-			"variable definition 6",
-			`
-char hoge[] = "hello";
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "hoge"},
-				},
-			},
-		},
-		{
-			"variable definition 7",
-			`
-int hoge = 0;
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "hoge"},
-				},
-			},
-		},
-		{
-			"variable definition 8",
-			`
-int mx, my;
-char ma, mb, mc;
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "mx"},
-					&VariableDef{Name: "my"},
-					&VariableDef{Name: "ma"},
-					&VariableDef{Name: "mb"},
-					&VariableDef{Name: "mc"},
-				},
-			},
-		},
-		{
-			"variable definition 9",
-			`
-int len = 0, len_buf;
-int var_a = 0, var_b = 100;
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "len"},
-					&VariableDef{Name: "len_buf"},
-					&VariableDef{Name: "var_a"},
-					&VariableDef{Name: "var_b"},
-				},
-			},
-		},
-		{
-			"variable definition 10",
-			`
-BOOTINFO *binfo = (BOOTINFO *)(0x00000ff0);
-`,
-			&Module{
-				[]Statement{
-					&VariableDef{Name: "binfo"},
-				},
-			},
-		},
-		{
 			"function pointer def 1",
 			`
 void (* p_f)();
@@ -1327,6 +1208,145 @@ void f_zzz(void)
 	}
 }
 
+// TestParseVardef
+func TestParseVardef(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"variable definition 1",
+			`
+int hoge;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable definition 2",
+			`
+const int *hoge;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable definition 3",
+			`
+int hoge = 100;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable definition 4",
+			`
+int hoge[] = {0x00, 0x01, 0x02};
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable definition 5",
+			`
+int hoge[3] = {0x00, 0x01, 0x02};
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable definition 6",
+			`
+char hoge[] = "hello";
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable definition 7",
+			`
+int hoge = 0;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable definition 8",
+			`
+int mx, my;
+char ma, mb, mc;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "mx"},
+					&VariableDef{Name: "my"},
+					&VariableDef{Name: "ma"},
+					&VariableDef{Name: "mb"},
+					&VariableDef{Name: "mc"},
+				},
+			},
+		},
+		{
+			"variable definition 9",
+			`
+int len = 0, len_buf;
+int var_a = 0, var_b = 100;
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "len"},
+					&VariableDef{Name: "len_buf"},
+					&VariableDef{Name: "var_a"},
+					&VariableDef{Name: "var_b"},
+				},
+			},
+		},
+		{
+			"variable definition 10",
+			`
+BOOTINFO *binfo = (BOOTINFO *)(0x00000ff0);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "binfo"},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
 // TestApp
 func TestApp(t *testing.T) {
 	testTbl := []struct {
@@ -1942,6 +1962,37 @@ int fprintf(FILE * restrict, const char * restrict, ...);
 			&Module{
 				[]Statement{
 					&PrototypeDecl{Name: "fprintf"},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestTmp
+func TestTmp(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"tmp 1",
+			`
+int hoge[] = {100, 200};
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{"hoge"},
 				},
 			},
 		},
