@@ -721,7 +721,6 @@ func (p *Parser) parseFunctionDef() []Statement {
 	}
 	if n.tokenType != lparen {
 		p.updateErrLog(fmt.Sprintf("parseFunctionDef:token[%s]", p.curToken().literal))
-		p.posReset()
 		return nil
 	}
 
@@ -736,14 +735,12 @@ func (p *Parser) parseFunctionDef() []Statement {
 	// lbrace かチェック
 	if p.curToken().tokenType != lbrace {
 		p.updateErrLog(fmt.Sprintf("parseFunctionDef:token[%s]", p.curToken().literal))
-		p.posReset()
 		return nil
 	}
 
 	ss := p.parseBlockStatement()
 	if ss == nil {
 		p.updateErrLog(fmt.Sprintf("parseFunctionDef:token[%s]", p.curToken().literal))
-		p.posReset()
 		return nil
 	}
 
@@ -1349,9 +1346,10 @@ func (p *Parser) parseCast() []Statement {
 	return ss
 }
 
+// parseRefVar
 func (p *Parser) parseRefVar() []Statement {
 	if p.curToken().tokenType != word {
-		p.posReset()
+		p.updateErrLog(fmt.Sprintf("parseRefVar:token[%s]", p.curToken().literal))
 		return nil
 	}
 	n := p.fetchID()
@@ -1456,10 +1454,6 @@ func (p *Parser) progUntilPrev(tkType int) {
 		p.pos++
 		n = p.peekToken()
 	}
-}
-
-func (p *Parser) posReset() {
-	p.pos = p.prevPos
 }
 
 func (p *Parser) skipStruct() {
