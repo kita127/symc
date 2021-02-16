@@ -273,37 +273,6 @@ func (p *Parser) parseStatement() []Statement {
 	return ss
 }
 
-func (p *Parser) extractVarName() (string, error) {
-	e := fmt.Errorf("fail extractVarName token=%s", p.curToken().literal)
-
-	for {
-		if p.curToken().tokenType == lparen {
-			p.pos++
-			s, err := p.extractVarName()
-			if err != nil {
-				return "", e
-			}
-			// rparen
-			p.pos++
-			return s, nil
-		} else if !p.curToken().isTypeToken() {
-			break
-		}
-		p.pos++
-	}
-
-	p.pos--
-
-	if p.curToken().tokenType != word {
-		return "", e
-	}
-
-	s := p.curToken().literal
-	p.pos++
-	return s, nil
-
-}
-
 // parseVariableDef
 func (p *Parser) parseVariableDef() []Statement {
 	ss := []Statement{}
@@ -536,19 +505,24 @@ func (p *Parser) parseVariableDecl() []Statement {
 	// extern
 	p.pos++
 
-	id, err := p.extractVarName()
-	if err != nil {
-		p.posReset()
+	ss := p.parseVariableDef()
+	if ss == nil {
+		p.updateErrLog(fmt.Sprintf("parseVariableDecl:token[%s]", p.curToken().literal))
 		return nil
 	}
 
-	// セミコロンまでスキップ
-	p.progUntil(semicolon)
-
-	p.pos++
 	// next
 
-	return []Statement{&VariableDecl{Name: id}}
+	if len(ss) != 1 {
+		p.updateErrLog(fmt.Sprintf("parseVariableDecl:token[%s]", p.curToken().literal))
+		return nil
+	}
+	defv, ok := ss[0].(*VariableDef)
+	if !ok {
+		p.updateErrLog(fmt.Sprintf("parseVariableDecl:token[%s]", p.curToken().literal))
+		return nil
+	}
+	return []Statement{&VariableDecl{Name: defv.Name}}
 }
 
 // parsePrototypeDecl
