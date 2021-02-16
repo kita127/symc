@@ -885,7 +885,7 @@ func (p *Parser) parseCaseStatement() []Statement {
 	// case
 	p.pos++
 
-	xs := p.parseExpression()
+	xs := p.parseValue()
 	if xs == nil {
 		p.updateErrLog(fmt.Sprintf("parseCaseStatement:token[%s]", p.curToken().literal))
 		return nil
@@ -898,6 +898,18 @@ func (p *Parser) parseCaseStatement() []Statement {
 	p.pos++
 
 	return []Statement{}
+}
+
+// parseValue
+func (p *Parser) parseValue() []Statement {
+	ss := []Statement{}
+	switch p.curToken().tokenType {
+	case integer:
+		p.pos++
+		return ss
+	default:
+		return nil
+	}
 }
 
 // parseDefaultStatement
