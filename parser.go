@@ -904,6 +904,10 @@ func (p *Parser) parseCaseStatement() []Statement {
 func (p *Parser) parseValue() []Statement {
 	ss := []Statement{}
 	switch p.curToken().tokenType {
+	case float:
+		fallthrough
+	case letter:
+		fallthrough
 	case integer:
 		p.pos++
 		return ss

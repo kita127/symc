@@ -1842,6 +1842,8 @@ void func(void)
         case 0x01:
             var1++;
             break;
+        case 'a':
+        case 0.01:
         default:
             break;
     }
