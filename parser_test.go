@@ -2089,6 +2089,25 @@ extern int (* p_f)(void);
 				},
 			},
 		},
+		{
+			"local variable decl 1",
+			`
+void func(void)
+{
+    extern char hankaku;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&VariableDecl{Name: "hankaku"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

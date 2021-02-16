@@ -531,6 +531,7 @@ func (p *Parser) parseFuncPointerVarDefSub() []Statement {
 	return ss
 }
 
+// parseVariableDecl
 func (p *Parser) parseVariableDecl() []Statement {
 	// extern
 	p.pos++
@@ -802,6 +803,13 @@ func (p *Parser) parseInnerStatement() []Statement {
 	switch p.curToken().tokenType {
 	case lbrace:
 		ts := p.parseBlockStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
+	case keyExtern:
+		ts := p.parseVariableDecl()
 		if ts == nil {
 			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
 			return nil
