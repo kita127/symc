@@ -1812,6 +1812,29 @@ void func(void)
 				},
 			},
 		},
+		{
+			"do while 2",
+			`
+void func(void)
+{
+    do {
+        var = 100;
+    } while(a = read(buf));
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "var"},
+							&Assigne{Name: "a"},
+							&CallFunc{Name: "read", Args: []Statement{&RefVar{Name: "buf"}}},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
