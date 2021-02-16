@@ -1791,6 +1791,27 @@ void func(void)
 				},
 			},
 		},
+		{
+			"do while 1",
+			`
+void func(void)
+{
+    do {
+        var = 100;
+    } while(0);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "var"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

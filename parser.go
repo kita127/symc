@@ -835,6 +835,13 @@ func (p *Parser) parseInnerStatement() []Statement {
 			return nil
 		}
 		ss = append(ss, ts...)
+	case keyDo:
+		ts := p.parseDoWhileStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseInnerStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
 	case keySwitch:
 		ts := p.parseSwitchStatement()
 		if ts == nil {
@@ -877,6 +884,56 @@ func (p *Parser) parseInnerStatement() []Statement {
 		}
 		ss = append(ss, ts...)
 	}
+	return ss
+}
+
+// parseDoWhileStatement
+func (p *Parser) parseDoWhileStatement() []Statement {
+	ss := []Statement{}
+	// do
+	p.pos++
+
+	ts := p.parseBlockStatement()
+	if ts == nil {
+		p.updateErrLog(fmt.Sprintf("parseDoWhileStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	if !p.curToken().isToken(keyWhile) {
+		p.updateErrLog(fmt.Sprintf("parseDoWhileStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	p.pos++
+	// lparen
+	if !p.curToken().isToken(lparen) {
+		p.updateErrLog(fmt.Sprintf("parseDoWhileStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	p.pos++
+
+	us := p.parseExpression()
+	if us == nil {
+		p.updateErrLog(fmt.Sprintf("parseDoWhileStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	if !p.curToken().isToken(rparen) {
+		p.updateErrLog(fmt.Sprintf("parseDoWhileStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	p.pos++
+	if !p.curToken().isToken(semicolon) {
+		p.updateErrLog(fmt.Sprintf("parseDoWhileStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+
+	ss = append(ss, ts...)
+	ss = append(ss, us...)
+
 	return ss
 }
 
