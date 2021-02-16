@@ -12,38 +12,6 @@ func TestParse(t *testing.T) {
 		expect  *Module
 	}{
 		{
-			"variable decl 1",
-			`
-extern char fuga;`,
-			&Module{
-				[]Statement{
-					&VariableDecl{Name: "fuga"},
-				},
-			},
-		},
-		{
-			"variable decl 2",
-			`
-extern const int *hoge;
-`,
-			&Module{
-				[]Statement{
-					&VariableDecl{Name: "hoge"},
-				},
-			},
-		},
-		{
-			"variable decl 3",
-			`
-extern int (* p_f)(void);
-`,
-			&Module{
-				[]Statement{
-					&VariableDecl{Name: "p_f"},
-				},
-			},
-		},
-		{
 			"prototype dec 1",
 			`
 void func_a( void );
@@ -2070,6 +2038,58 @@ func TestRef(t *testing.T) {
 		src     string
 		expect  *Module
 	}{}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestVarDecl
+func TestVarDecl(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"variable decl 1",
+			`
+extern char fuga;`,
+			&Module{
+				[]Statement{
+					&VariableDecl{Name: "fuga"},
+				},
+			},
+		},
+		{
+			"variable decl 2",
+			`
+extern const int *hoge;
+`,
+			&Module{
+				[]Statement{
+					&VariableDecl{Name: "hoge"},
+				},
+			},
+		},
+		{
+			"variable decl 3",
+			`
+extern int (* p_f)(void);
+`,
+			&Module{
+				[]Statement{
+					&VariableDecl{Name: "p_f"},
+				},
+			},
+		},
+	}
 
 	for _, tt := range testTbl {
 		t.Logf("%s", tt.comment)
