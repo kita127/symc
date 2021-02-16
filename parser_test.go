@@ -339,15 +339,28 @@ void func(int a)
 void func(int a)
 {
     unsigned char aaa;
-    hoge = 10;
-    fuga = 20;
+    a = 10;
+    b = 0x00;
+    c = 10U;
+    d = 100UL;
+    e = 0.001;
+    f = 0.002f;
+    g = 0.01F;
 }
 `,
 			&Module{
 				[]Statement{
 					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&VariableDef{Name: "aaa"}, &Assigne{Name: "hoge"}, &Assigne{Name: "fuga"}},
+						Params: []*VariableDef{{Name: "a"}},
+						Statements: []Statement{
+							&VariableDef{Name: "aaa"},
+							&Assigne{Name: "a"},
+							&Assigne{Name: "b"},
+							&Assigne{Name: "c"},
+							&Assigne{Name: "d"},
+							&Assigne{Name: "e"},
+							&Assigne{Name: "f"},
+							&Assigne{Name: "g"}},
 					},
 				},
 			},

@@ -1256,6 +1256,8 @@ func (p *Parser) parseExpression() []Statement {
 			return nil
 		}
 
+	case float:
+		fallthrough
 	case str:
 		fallthrough
 	case letter:
