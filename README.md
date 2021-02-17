@@ -1,20 +1,21 @@
 # symc ![Go](https://github.com/kita127/symc/workflows/Go/badge.svg)
-symc is a library that extracts identifiers
 
-symc は 変数名、関数名の定義および参照箇所を抽出するライブラリ
+symc is a library that extracts definitions, declarations and references of variables and functions.
 
 
 ## Description
 
 * ライブラリとして機能を提供する
-* プリプロ展開済みのCソースを入力とする
+* It serves as a library
+* Input preprocessed C source
 * モジュール内の以下の情報を解析しデータ化する
-    * 変数の定義
-    * 変数の宣言
-    * 関数の定義
-    * 関数のプロトタイプ宣言
-    * 関数内で参照している変数
-    * 関数内での関数コール
+* Analyze the following information and convert it to data.
+    * Variable definitions
+    * Variable declarations
+    * Function definitions
+    * Function prototype declarations
+    * Variables referenced in the function
+    * Function call
 
 
 ## Usage
