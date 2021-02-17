@@ -1,48 +1,54 @@
 # symc ![Go](https://github.com/kita127/symc/workflows/Go/badge.svg)
 symc is a library that extracts identifiers
 
-## Input
+symc は 変数名、関数名の定義および参照箇所を抽出するライブラリ
 
-プリプロ展開済みのCソース
 
 ## Description
 
 * ライブラリとして機能を提供する
 * プリプロ展開済みのCソースを入力とする
-* モジュール内の関数が参照する識別子の情報をデータ化して提供する
-* データの内容は以下
-    * モジュールが定義する変数情報
-        * 識別子名
-    * モジュールが定義する関数情報
-        * 関数名
-        * 関数が参照する変数
-        * 関数が参照する関数
+* モジュール内の以下の情報を解析しデータ化する
+    * 変数の定義
+    * 変数の宣言
+    * 関数の定義
+    * 関数のプロトタイプ宣言
+    * 関数内で参照している変数
+    * 関数内での関数コール
 
 
 ## Usage
 
 ```go
+package main
 
-src := `
-extern ex_var;
-int main(void){
-    ex_var++;
+import (
+	"fmt"
+
+	"github.com/kita127/symc"
+)
+
+func main() {
+
+	cSrc := `
+int variable;
+
+int func( void ){
+
+    variable++;
+
+    return 0;
 }
+
 `
 
-data := ModName.Parse(src)
-
+	module := symc.ParseModule(string(cSrc))
+	fmt.Println(module)
+}
 ```
 
+    >go build && ./main
+    Module : Statements={ VariableDef : Name=variable, FunctionDef : Name=func, Params=[], Statements=[RefVar : Name=variable] }
 
-## フォルダ構成
-
-symc
-    外部公開用
-
-lexer
-parser
-
-cmd
-    symc
-        Cソースをパースする
+## License
+This software is released under the MIT License, see LICENSE.
