@@ -46,6 +46,7 @@ type Statement interface {
 type InvalidStatement struct {
 	Contents string
 	Tk       *Token
+	Remain   []*Token
 }
 
 func (v *InvalidStatement) statementNode() {}
@@ -248,7 +249,7 @@ func (p *Parser) parseStatement() []Statement {
 			ss = p.parseVariableDecl()
 		}
 		if ss == nil {
-			return []Statement{&InvalidStatement{Contents: p.errLog, Tk: p.curToken()}}
+			return []Statement{&InvalidStatement{Contents: p.errLog, Tk: p.curToken(), Remain: p.tokens[p.pos:]}}
 		}
 	case keyUnion:
 		p.skipStructureLike()
@@ -269,7 +270,7 @@ func (p *Parser) parseStatement() []Statement {
 			ss = p.parseVariableDef()
 		}
 		if ss == nil {
-			return []Statement{&InvalidStatement{Contents: p.errLog, Tk: p.curToken()}}
+			return []Statement{&InvalidStatement{Contents: p.errLog, Tk: p.curToken(), Remain: p.tokens[p.pos:]}}
 		}
 	}
 	return ss
