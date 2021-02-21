@@ -2300,18 +2300,18 @@ int  _read(void *, char *, int);
 				},
 			},
 		},
-//		{
-//			"prototype dec 6",
-//			`
-//void(*signal(int, void (*)(int)))(int);
-//
-//`,
-//			&Module{
-//				[]Statement{
-//					&VariableDef{Name: "signal"},
-//				},
-//			},
-//		},
+		{
+			"prototype dec 6",
+			`
+void(*signal(int, void (*)(int)))(int);
+
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "signal"},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

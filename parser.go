@@ -535,29 +535,8 @@ func (p *Parser) parsePrototypeDecl() []Statement {
 		p.pos++
 	}
 
-	for p.curToken().isTypeToken() {
-		p.pos++
-	}
+	xs := p.parsePrototypeDeclSub()
 
-	if p.curToken().tokenType != lparen {
-		// ( でなければプロトタイプ宣言ではない
-		p.updateErrLog(fmt.Sprintf("parsePrototypeDecl_1:token[%s]", p.curToken().literal))
-		return nil
-	}
-
-	p.pos--
-
-	if p.curToken().tokenType != word {
-		p.updateErrLog(fmt.Sprintf("parsePrototypeDecl_2:token[%s]", p.curToken().literal))
-		return nil
-	}
-
-	// Name
-	id := p.curToken().literal
-
-	p.pos++
-
-	xs := p.parsePrototypeParameter()
 	if xs == nil {
 		p.updateErrLog(fmt.Sprintf("parsePrototypeDecl_3:token[%s]", p.curToken().literal))
 		return nil
@@ -577,6 +556,68 @@ func (p *Parser) parsePrototypeDecl() []Statement {
 
 	p.pos++
 	// next
+	return xs
+
+}
+
+//parsePrototypeDeclSub
+func (p *Parser) parsePrototypeDeclSub() []Statement {
+	for p.curToken().isTypeToken() {
+		p.pos++
+	}
+
+	if p.curToken().tokenType != lparen {
+		// ( でなければプロトタイプ宣言ではない
+		p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	p.pos--
+
+	if !p.curToken().isTypeToken() {
+		p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	// Name
+	// 仮の識別子名を取得
+	id := p.curToken().literal
+	p.pos++
+
+	// 入れ子のプロトタイプ宣言のパターンを解析する
+	// 以下の様な関数ポインタを返り値とする関数など
+	// void(*signal(int, void (*)(int)))(int);
+	// プロトタイプパラメータは lparen から解析開始するためこの位置で前回のポジションを記憶する
+	prePos := p.pos
+	p.pos++
+	xs := p.parsePrototypeDeclSub()
+	if xs == nil {
+		p.pos = prePos
+		xs = p.parsePrototypeParameter()
+	}
+
+	if xs == nil {
+		p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub:token[%s]", p.curToken().literal))
+		return nil
+	}
+
+	// 入れ子のプロトタイプ宣言の場合識別名を更新
+	if len(xs) == 1 {
+		if v, ok := xs[0].(*PrototypeDecl); ok {
+			id = v.Name
+			if !p.curToken().isToken(rparen) {
+				p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub:token[%s]", p.curToken().literal))
+				return nil
+			}
+			p.pos++
+			xs = p.parsePrototypeParameter()
+			if xs == nil {
+				p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub:token[%s]", p.curToken().literal))
+				return nil
+			}
+		}
+	}
+
 	return []Statement{&PrototypeDecl{Name: id}}
 
 }
@@ -584,7 +625,7 @@ func (p *Parser) parsePrototypeDecl() []Statement {
 // parsePrototypeParameter
 // 構文解析のみ行い成功か失敗かを返すのみ
 func (p *Parser) parsePrototypeParameter() []Statement {
-
+	// lparen
 	p.pos++
 
 	for {
