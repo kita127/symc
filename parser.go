@@ -250,8 +250,10 @@ func (p *Parser) parseStatement() []Statement {
 		if ss == nil {
 			return []Statement{&InvalidStatement{Contents: p.errLog, Tk: p.curToken()}}
 		}
+	case keyUnion:
+		p.skipStructureLike()
 	case keyStruct:
-		p.skipStruct()
+		p.skipStructureLike()
 	case keyAttribute:
 		p.pos++
 		p.skipParen()
@@ -1458,7 +1460,7 @@ func (p *Parser) progUntilPrev(tkType int) {
 	}
 }
 
-func (p *Parser) skipStruct() {
+func (p *Parser) skipStructureLike() {
 	p.progUntil(rbrace)
 	p.progUntil(semicolon)
 	p.pos++

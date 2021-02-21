@@ -2118,6 +2118,39 @@ typedef union {
 	}
 }
 
+// TestUnion
+func TestUnion(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"union 1",
+			`
+union unionType {
+
+ int int_var;
+ void *void_ptr;
+};
+`,
+			&Module{
+				[]Statement{},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
 // TestCast
 func TestCast(t *testing.T) {
 	testTbl := []struct {
