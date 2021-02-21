@@ -12,62 +12,6 @@ func TestParse(t *testing.T) {
 		expect  *Module
 	}{
 		{
-			"prototype dec 1",
-			`
-void func_a( void );
-`,
-			&Module{
-				[]Statement{
-					&PrototypeDecl{Name: "func_a"},
-				},
-			},
-		},
-		{
-			"prototype dec 2",
-			`
-extern void func_a( void );
-`,
-			&Module{
-				[]Statement{
-					&PrototypeDecl{Name: "func_a"},
-				},
-			},
-		},
-		{
-			"prototype dec 3",
-			`
-int renameat(int, const char *, int, const char *) __attribute__((availability(macosx,introduced=10.10)));
-`,
-			&Module{
-				[]Statement{
-					&PrototypeDecl{Name: "renameat"},
-				},
-			},
-		},
-		{
-			"prototype dec 4",
-			`
-extern int __vsnprintf_chk (char * restrict, size_t, int, size_t,
-       const char * restrict, va_list);
-`,
-			&Module{
-				[]Statement{
-					&PrototypeDecl{Name: "__vsnprintf_chk"},
-				},
-			},
-		},
-		{
-			"prototype dec 5",
-			`
-int  _read(void *, char *, int);
-`,
-			&Module{
-				[]Statement{
-					&PrototypeDecl{Name: "_read"},
-				},
-			},
-		},
-		{
 			"struct 1",
 			`
 struct __darwin_pthread_handler_rec {
@@ -166,228 +110,6 @@ __attribute__ ((__always_inline__)) int hoge;
 			&Module{
 				[]Statement{
 					&VariableDef{Name: "hoge"},
-				},
-			},
-		},
-		{
-			"function def 1",
-			`
-void func_name( void ) {}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func_name",
-						Params:     []*VariableDef{},
-						Statements: []Statement{},
-					},
-				},
-			},
-		},
-		{
-			"function def 2",
-			`
-void func(int a)
-{
-    {
-        {}
-    }
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{},
-					},
-				},
-			},
-		},
-		{
-			"function def 4",
-			`
-void func(int a)
-{
-    int hoge;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&VariableDef{Name: "hoge"}},
-					},
-				},
-			},
-		},
-		{
-			"function def 5",
-			`
-void func(int a)
-{
-    {
-        int hoge;
-    }
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&VariableDef{Name: "hoge"}},
-					},
-				},
-			},
-		},
-		{
-			"function def 6",
-			`
-void func(int a)
-{
-    hoge;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&RefVar{Name: "hoge"}},
-					},
-				},
-			},
-		},
-		{
-			"function def 7",
-			`
-void func(int a)
-{
-    hoge = 10;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&Assigne{Name: "hoge"}},
-					},
-				},
-			},
-		},
-		{
-			"function def 8",
-			`
-void func(int a)
-{
-    hoge = fuga;
-    p_var = &address;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{{Name: "a"}},
-						Statements: []Statement{
-							&Assigne{Name: "hoge"},
-							&RefVar{Name: "fuga"},
-							&Assigne{Name: "p_var"},
-							&RefVar{Name: "address"},
-						},
-					},
-				},
-			},
-		},
-		{
-			"function def 9",
-			`
-void func(int a)
-{
-    (hoge) = (fuga);
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&Assigne{Name: "hoge"}, &RefVar{Name: "fuga"}},
-					},
-				},
-			},
-		},
-		{
-			"function def 10",
-			`
-void func(int a)
-{
-    unsigned char aaa;
-    a = 10;
-    b = 0x00;
-    c = 10U;
-    d = 100UL;
-    e = 0.001;
-    f = 0.002f;
-    g = 0.01F;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{{Name: "a"}},
-						Statements: []Statement{
-							&VariableDef{Name: "aaa"},
-							&Assigne{Name: "a"},
-							&Assigne{Name: "b"},
-							&Assigne{Name: "c"},
-							&Assigne{Name: "d"},
-							&Assigne{Name: "e"},
-							&Assigne{Name: "f"},
-							&Assigne{Name: "g"}},
-					},
-				},
-			},
-		},
-		{
-			"function def 11",
-			`
-inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "__sputc",
-						Params:     []*VariableDef{{Name: "_c"}, {Name: "_p"}},
-						Statements: []Statement{}},
-				},
-			},
-		},
-		{
-			"function def 12",
-			`
-void func()
-{
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{},
-						Statements: []Statement{}},
-				},
-			},
-		},
-		{
-			"function def 13",
-			`
-void func()
-{
-    (hoge);
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&RefVar{"hoge"},
-						}},
 				},
 			},
 		},
@@ -2260,6 +1982,336 @@ void func(void)
 				},
 			},
 		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestFunctionDef
+func TestFunctionDef(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"function def 1",
+			`
+void func_name( void ) {}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func_name",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
+		{
+			"function def 2",
+			`
+void func(int a)
+{
+    {
+        {}
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
+		{
+			"function def 4",
+			`
+void func(int a)
+{
+    int hoge;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&VariableDef{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 5",
+			`
+void func(int a)
+{
+    {
+        int hoge;
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&VariableDef{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 6",
+			`
+void func(int a)
+{
+    hoge;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&RefVar{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 7",
+			`
+void func(int a)
+{
+    hoge = 10;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 8",
+			`
+void func(int a)
+{
+    hoge = fuga;
+    p_var = &address;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{{Name: "a"}},
+						Statements: []Statement{
+							&Assigne{Name: "hoge"},
+							&RefVar{Name: "fuga"},
+							&Assigne{Name: "p_var"},
+							&RefVar{Name: "address"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"function def 9",
+			`
+void func(int a)
+{
+    (hoge) = (fuga);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}, &RefVar{Name: "fuga"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 10",
+			`
+void func(int a)
+{
+    unsigned char aaa;
+    a = 10;
+    b = 0x00;
+    c = 10U;
+    d = 100UL;
+    e = 0.001;
+    f = 0.002f;
+    g = 0.01F;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{{Name: "a"}},
+						Statements: []Statement{
+							&VariableDef{Name: "aaa"},
+							&Assigne{Name: "a"},
+							&Assigne{Name: "b"},
+							&Assigne{Name: "c"},
+							&Assigne{Name: "d"},
+							&Assigne{Name: "e"},
+							&Assigne{Name: "f"},
+							&Assigne{Name: "g"}},
+					},
+				},
+			},
+		},
+		{
+			"function def 11",
+			`
+inline __attribute__ ((__always_inline__)) int __sputc(int _c, FILE *_p) {
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "__sputc",
+						Params:     []*VariableDef{{Name: "_c"}, {Name: "_p"}},
+						Statements: []Statement{}},
+				},
+			},
+		},
+		{
+			"function def 12",
+			`
+void func()
+{
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{}},
+				},
+			},
+		},
+		{
+			"function def 13",
+			`
+void func()
+{
+    (hoge);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{"hoge"},
+						}},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestPrototypeDecl
+func TestPrototypeDecl(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"prototype dec 1",
+			`
+void func_a( void );
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "func_a"},
+				},
+			},
+		},
+		{
+			"prototype dec 2",
+			`
+extern void func_a( void );
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "func_a"},
+				},
+			},
+		},
+		{
+			"prototype dec 3",
+			`
+int renameat(int, const char *, int, const char *) __attribute__((availability(macosx,introduced=10.10)));
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "renameat"},
+				},
+			},
+		},
+		{
+			"prototype dec 4",
+			`
+extern int __vsnprintf_chk (char * restrict, size_t, int, size_t,
+       const char * restrict, va_list);
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "__vsnprintf_chk"},
+				},
+			},
+		},
+		{
+			"prototype dec 5",
+			`
+int  _read(void *, char *, int);
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "_read"},
+				},
+			},
+		},
+//		{
+//			"prototype dec 6",
+//			`
+//void(*signal(int, void (*)(int)))(int);
+//
+//`,
+//			&Module{
+//				[]Statement{
+//					&VariableDef{Name: "signal"},
+//				},
+//			},
+//		},
 	}
 
 	for _, tt := range testTbl {
