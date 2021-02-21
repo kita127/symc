@@ -514,8 +514,22 @@ func isDec(c byte) bool {
 	return '0' <= c && c <= '9'
 }
 
+// isTypeToken
 func (t *Token) isTypeToken() bool {
-	return (t.tokenType == word || t.tokenType == asterisk || t.tokenType == keyConst || t.tokenType == keyAttribute || t.tokenType == keyVoid)
+
+	switch t.tokenType {
+	case word:
+	case asterisk:
+	case keyConst:
+	case keyAttribute:
+	case keyVoid:
+	case keyStruct:
+	case keyUnion:
+	default:
+		return false
+	}
+
+	return true
 }
 
 func (t *Token) isOperator() bool {

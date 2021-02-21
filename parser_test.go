@@ -68,27 +68,6 @@ int  _read(void *, char *, int);
 			},
 		},
 		{
-			"typedef 1",
-			`
-typedef unsigned char __uint8_t;
-`,
-			&Module{
-				[]Statement{},
-			},
-		},
-		{
-			"typedef 2",
-			`
-typedef union {
- char __mbstate8[128];
- long long _mbstateL;
-} __mbstate_t;
-`,
-			&Module{
-				[]Statement{},
-			},
-		},
-		{
 			"struct 1",
 			`
 struct __darwin_pthread_handler_rec {
@@ -946,91 +925,6 @@ void func()
 								Args: []Statement{},
 							},
 						},
-					},
-				},
-			},
-		},
-		{
-			"cast 1",
-			`
-void func(int a)
-{
-    hoge = (char)10;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&Assigne{Name: "hoge"}},
-					},
-				},
-			},
-		},
-		{
-			"cast 2",
-			`
-void func(int a)
-{
-    hoge = (char)fuga;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&Assigne{Name: "hoge"}, &RefVar{Name: "fuga"}},
-					},
-				},
-			},
-		},
-		{
-			"cast 3",
-			`
-void func(int a)
-{
-    hoge = (char)(fuga);
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&Assigne{Name: "hoge"}, &RefVar{Name: "fuga"}},
-					},
-				},
-			},
-		},
-		{
-			"cast 4",
-			`
-void func(int a)
-{
-    hoge = (char)(fuga + piyo);
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&Assigne{Name: "hoge"}, &RefVar{Name: "fuga"}, &RefVar{Name: "piyo"}},
-					},
-				},
-			},
-		},
-		{
-			"cast 5",
-			`
-void func(int a)
-{
-    hoge = (unsigned char)10;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{{Name: "a"}},
-						Statements: []Statement{&Assigne{Name: "hoge"}},
 					},
 				},
 			},
@@ -2031,6 +1925,28 @@ void func(void)
 				},
 			},
 		},
+		{
+			"assigne 6",
+			`
+char global_arr[(char)1000];
+
+void func(void)
+{
+    char local_arr[(99)+(1)];
+}
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "global_arr"},
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&VariableDef{Name: "local_arr"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
@@ -2103,6 +2019,17 @@ extern int (* p_f)(void);
 			},
 		},
 		{
+			"variable decl 4",
+			`
+extern struct StType st_var;
+`,
+			&Module{
+				[]Statement{
+					&VariableDecl{Name: "st_var"},
+				},
+			},
+		},
+		{
 			"local variable decl 1",
 			`
 void func(void)
@@ -2119,6 +2046,214 @@ void func(void)
 						},
 					},
 				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestTypedef
+func TestTypedef(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"typedef 1",
+			`
+typedef unsigned char __uint8_t;
+`,
+			&Module{
+				[]Statement{},
+			},
+		},
+		{
+			"typedef 2",
+			`
+typedef union {
+ char __mbstate8[128];
+ long long _mbstateL;
+} __mbstate_t;
+`,
+			&Module{
+				[]Statement{},
+			},
+		},
+		{
+			"typedef 3",
+			`
+typedef union {
+    t v;
+    struct {
+        t2 x;
+        t2 y;
+    }
+
+} HOGE;
+`,
+			&Module{
+				[]Statement{},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestCast
+func TestCast(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"cast 1",
+			`
+void func(int a)
+{
+    hoge = (char)10;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 2",
+			`
+void func(int a)
+{
+    hoge = (char)fuga;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}, &RefVar{Name: "fuga"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 3",
+			`
+void func(int a)
+{
+    hoge = (char)(fuga);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}, &RefVar{Name: "fuga"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 4",
+			`
+void func(int a)
+{
+    hoge = (char)(fuga + piyo);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}, &RefVar{Name: "fuga"}, &RefVar{Name: "piyo"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 5",
+			`
+void func(int a)
+{
+    hoge = (unsigned char)10;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{{Name: "a"}},
+						Statements: []Statement{&Assigne{Name: "hoge"}},
+					},
+				},
+			},
+		},
+		{
+			"cast 6",
+			`
+void func(void)
+{
+    hoge = (char *)"strings";
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{&Assigne{Name: "hoge"}},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestPragma
+func TestPragma(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"pragma 1",
+			`
+#pragma hoge xxxxxxxxxx
+`,
+			&Module{
+				[]Statement{},
 			},
 		},
 	}
