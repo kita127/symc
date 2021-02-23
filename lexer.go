@@ -521,7 +521,6 @@ func (t *Token) isTypeToken() bool {
 	case word:
 	case asterisk:
 	case keyConst:
-	case keyAttribute:
 	case keyVoid:
 	case keyStruct:
 	case keyUnion:

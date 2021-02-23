@@ -763,7 +763,7 @@ func (p *Parser) parsePrototypeFPointerVar() []Statement {
 func (p *Parser) parseFunctionDef() []Statement {
 	// lparen or eof の手前まで pos を進める
 	n := p.peekToken()
-	for n.isTypeToken() {
+	for n.isTypeToken() || n.isToken(keyAttribute) {
 		p.pos++
 		if p.curToken().tokenType == keyAttribute {
 			p.skipParen()
