@@ -1904,6 +1904,17 @@ int heapsort_b(void *__base, size_t __nel, size_t __width,
 				},
 			},
 		},
+		{
+			"test gcc 8",
+			`
+extern long timezone __asm("_" "timezone" );
+`,
+			&Module{
+				[]Statement{
+					&VariableDecl{Name: "timezone"},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

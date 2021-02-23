@@ -339,6 +339,7 @@ func (p *Parser) parseNormalVarDef() []Statement {
 		if !p.curToken().isToken(semicolon) &&
 			!p.curToken().isToken(comma) &&
 			!p.curToken().isToken(assign) &&
+			!p.curToken().isToken(keyAsm) &&
 			!p.curToken().isToken(lbracket) {
 			p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
 			return nil
@@ -365,11 +366,27 @@ func (p *Parser) parseNormalVarDef() []Statement {
 			// 初期化子あり
 			p.pos++
 			p.parseInitialValue()
+		} else if p.curToken().isToken(keyAsm) {
+			if p.parseAsm() == nil {
+				return nil
+			}
 		}
 
 		ss = append(ss, &VariableDef{Name: id})
 	}
 	return ss
+}
+
+//parseAsm
+func (p *Parser) parseAsm() []Statement {
+	if !p.curToken().isToken(keyAsm) {
+		p.updateErrLog(fmt.Sprintf("parseAsm:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+	p.skipParen()
+
+	return []Statement{}
 }
 
 // checkExists2word
