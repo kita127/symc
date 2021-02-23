@@ -756,11 +756,24 @@ func (p *Parser) parsePrototypeFPointerVar() []Statement {
 
 	if p.curToken().isToken(comma) || p.curToken().isToken(rparen) {
 		return []Statement{}
+	} else if p.curToken().isToken(keyAttribute) {
+		return p.parseAttribute()
 	} else {
 		p.updateErrLog(fmt.Sprintf("parsePrototypeFPointerVar_6:token[%s]", p.curToken().literal))
 		return nil
 	}
 
+}
+
+// parseAttribute
+func (p *Parser) parseAttribute() []Statement {
+	if !p.curToken().isToken(keyAttribute) {
+		p.updateErrLog(fmt.Sprintf("parseAttribute:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+	p.skipParen()
+	return []Statement{}
 }
 
 // parseFunctionDef
