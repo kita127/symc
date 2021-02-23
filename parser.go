@@ -252,9 +252,13 @@ func (p *Parser) parseStatement() []Statement {
 			return []Statement{&InvalidStatement{Contents: p.errLog, Tk: p.curToken(), Remain: p.tokens[p.pos:]}}
 		}
 	case keyUnion:
-		p.skipStructureLike()
+		if p.skipStructureLike() == nil {
+			return nil
+		}
 	case keyStruct:
-		p.skipStructureLike()
+		if p.skipStructureLike() == nil {
+			return nil
+		}
 	case keyAttribute:
 		p.pos++
 		p.skipParen()
@@ -1502,10 +1506,61 @@ func (p *Parser) progUntilPrev(tkType int) {
 	}
 }
 
-func (p *Parser) skipStructureLike() {
-	p.progUntil(rbrace)
-	p.progUntil(semicolon)
+// skipStructureLike
+// 失敗した時は構文解析のパーサと同様 nil を返す
+func (p *Parser) skipStructureLike() []Statement {
+
+	for {
+		if p.curToken().isToken(eof) ||
+			p.curToken().isToken(semicolon) ||
+			p.curToken().isToken(lbrace) {
+			break
+		}
+		p.pos++
+	}
+
+	switch p.curToken().tokenType {
+	case eof:
+		return nil
+	case semicolon:
+		p.pos++
+	case lbrace:
+		if p.skipBrace() == nil {
+			return nil
+		}
+		if !p.curToken().isToken(semicolon) {
+			return nil
+		}
+		// semicolon
+		p.pos++
+	default:
+		return nil
+	}
+
+	return []Statement{}
+}
+
+// skipBrace
+func (p *Parser) skipBrace() []Statement {
+	if !p.curToken().isToken(lbrace) {
+		return nil
+	}
 	p.pos++
+
+	for {
+		if p.curToken().isToken(rbrace) {
+			p.pos++
+			return []Statement{}
+		} else if p.curToken().isToken(lbrace) {
+			xs := p.skipBrace()
+			if xs == nil {
+				return nil
+			}
+		} else if p.curToken().isToken(eof) {
+			return nil
+		}
+		p.pos++
+	}
 }
 
 func (p *Parser) skipParen() {
