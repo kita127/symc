@@ -525,6 +525,8 @@ func (t *Token) isTypeToken() bool {
 	case keyVoid:
 	case keyStruct:
 	case keyUnion:
+	case caret:
+		// clang でコンパイルした場合型の種類に^が含まれる？
 	default:
 		return false
 	}

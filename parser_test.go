@@ -2448,6 +2448,17 @@ int fprintf(FILE * restrict, const char * restrict, ...);
 				},
 			},
 		},
+		{
+			"test gcc 5",
+			`
+int oden(void (^ _Nonnull)(void)) __attribute__((availability(macosx,introduced=11.2)));
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "oden"},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
