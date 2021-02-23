@@ -509,7 +509,10 @@ func (p *Parser) parseFuncPointerVarDefSub() []Statement {
 
 // parseVariableDecl
 func (p *Parser) parseVariableDecl() []Statement {
-	// extern
+	if !p.curToken().isToken(keyExtern) {
+		p.updateErrLog(fmt.Sprintf("parseVariableDecl:token[%s]", p.curToken().literal))
+		return nil
+	}
 	p.pos++
 
 	ss := p.parseVariableDef()
@@ -520,16 +523,22 @@ func (p *Parser) parseVariableDecl() []Statement {
 
 	// next
 
-	if len(ss) != 1 {
+	if len(ss) < 1 {
 		p.updateErrLog(fmt.Sprintf("parseVariableDecl:token[%s]", p.curToken().literal))
 		return nil
 	}
-	defv, ok := ss[0].(*VariableDef)
-	if !ok {
-		p.updateErrLog(fmt.Sprintf("parseVariableDecl:token[%s]", p.curToken().literal))
-		return nil
+
+	ts := []Statement{}
+	for _, s := range ss {
+		defv, ok := s.(*VariableDef)
+		if !ok {
+			p.updateErrLog(fmt.Sprintf("parseVariableDecl:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ts = append(ts, &VariableDecl{Name: defv.Name})
 	}
-	return []Statement{&VariableDecl{Name: defv.Name}}
+
+	return ts
 }
 
 // parsePrototypeDecl

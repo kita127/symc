@@ -1143,6 +1143,19 @@ extern struct StType st_var;
 			},
 		},
 		{
+			"variable decl 5",
+			`
+extern int optind, opterr, optopt;
+`,
+			&Module{
+				[]Statement{
+					&VariableDecl{Name: "optind"},
+					&VariableDecl{Name: "opterr"},
+					&VariableDecl{Name: "optopt"},
+				},
+			},
+		},
+		{
 			"local variable decl 1",
 			`
 void func(void)
