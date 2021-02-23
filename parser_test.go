@@ -517,141 +517,6 @@ void func()
 			},
 		},
 		{
-			"call expression 1",
-			`
-void func()
-{
-    hoge();
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&CallFunc{
-								Name: "hoge",
-								Args: []Statement{},
-							},
-						}},
-				},
-			},
-		},
-		{
-			"call expression 2",
-			`
-void func()
-{
-    hoge(100);
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&CallFunc{Name: "hoge",
-								Args: []Statement{},
-							},
-						}},
-				},
-			},
-		},
-		{
-			"call expression 3",
-			`
-void func()
-{
-    hoge(a);
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&CallFunc{Name: "hoge",
-								Args: []Statement{&RefVar{Name: "a"}},
-							},
-						}},
-				},
-			},
-		},
-		{
-			"call expression 4",
-			`
-void func()
-{
-    hoge(a, b, 100);
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&CallFunc{Name: "hoge",
-								Args: []Statement{
-									&RefVar{Name: "a"},
-									&RefVar{Name: "b"},
-								},
-							},
-						}},
-				},
-			},
-		},
-		{
-			"call expression 5",
-			`
-void func()
-{
-    hoge(a, fuga(piyo(1, b), 2));
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&CallFunc{Name: "hoge",
-								Args: []Statement{
-									&RefVar{Name: "a"},
-									&CallFunc{Name: "fuga",
-										Args: []Statement{
-											&CallFunc{Name: "piyo",
-												Args: []Statement{&RefVar{Name: "b"}},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			"call expression 6",
-			`
-void func()
-{
-    _read(0, "A", 1);
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&CallFunc{Name: "_read",
-								Args: []Statement{},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
 			"character 1",
 			`
 void func(void)
@@ -1093,157 +958,6 @@ func TestStatements(t *testing.T) {
 		src     string
 		expect  *Module
 	}{
-		{
-			"if 1",
-			`
-void func(void)
-{
-    if (1){
-    }
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{},
-						Statements: []Statement{},
-					},
-				},
-			},
-		},
-		{
-			"if 2",
-			`
-void func(void)
-{
-    if (hoge == 0){
-    }
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&RefVar{Name: "hoge"},
-						},
-					},
-				},
-			},
-		},
-		{
-			"if 3",
-			`
-void func(void)
-{
-    if ( hoge == 0){
-        fuga = a + (1 - 2);
-    }
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&RefVar{Name: "hoge"},
-							&Assigne{Name: "fuga"},
-							&RefVar{Name: "a"},
-						},
-					},
-				},
-			},
-		},
-		{
-			"if 4",
-			`
-void func(void)
-{
-    if (1)
-        hoge;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&RefVar{Name: "hoge"},
-						},
-					},
-				},
-			},
-		},
-		{
-			"if 5",
-			`
-void func(void)
-{
- if (flag)
-  return 1;
- else
-  return 0;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&RefVar{Name: "flag"},
-						},
-					},
-				},
-			},
-		},
-		{
-			"if 6",
-			`
-void func(void)
-{
-   if (a >= 0 || (b >= c && (char)d != '\n')){}
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&RefVar{Name: "a"},
-							&RefVar{Name: "b"},
-							&RefVar{Name: "c"},
-							&RefVar{Name: "d"},
-						},
-					},
-				},
-			},
-		},
-		{
-			"if 7",
-			`
-void func(void)
-{
-   if (condition1){
-
-   }else if (condition2){
-
-   }else{
-
-   }
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&RefVar{Name: "condition1"},
-							&RefVar{Name: "condition2"},
-						},
-					},
-				},
-			},
-		},
 		{
 			"for 1",
 			`
@@ -2005,6 +1719,23 @@ void func(void)
 				},
 			},
 		},
+		{
+			"cast 6",
+			`
+void func(void)
+{
+    (const void *)xxx;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{&RefVar{Name: "xxx"}},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
@@ -2475,11 +2206,357 @@ int heapsort_b(void *__base, size_t __nel, size_t __width __attribute__((__noesc
 			`
 int heapsort_b(void *__base, size_t __nel, size_t __width,
      int (^ _Nonnull __compar)(const void *, const void *) __attribute__((__noescape__)))
-     __attribute__((availability(macosx,introduced=10.6)));
+     __attribute__((availability(macosx,introduced=31.7)));
 `,
 			&Module{
 				[]Statement{
 					&PrototypeDecl{Name: "heapsort_b"},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestIf
+func TestIf(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"if 1",
+			`
+void func(void)
+{
+    if (1){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
+		{
+			"if 2",
+			`
+void func(void)
+{
+    if (hoge == 0){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "hoge"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"if 3",
+			`
+void func(void)
+{
+    if ( hoge == 0){
+        fuga = a + (1 - 2);
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "hoge"},
+							&Assigne{Name: "fuga"},
+							&RefVar{Name: "a"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"if 4",
+			`
+void func(void)
+{
+    if (1)
+        hoge;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "hoge"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"if 5",
+			`
+void func(void)
+{
+ if (flag)
+  return 1;
+ else
+  return 0;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "flag"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"if 6",
+			`
+void func(void)
+{
+   if (a >= 0 || (b >= c && (char)d != '\n')){}
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "a"},
+							&RefVar{Name: "b"},
+							&RefVar{Name: "c"},
+							&RefVar{Name: "d"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"if 7",
+			`
+void func(void)
+{
+   if (condition1){
+
+   }else if (condition2){
+
+   }else{
+
+   }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "condition1"},
+							&RefVar{Name: "condition2"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestCallExpression
+func TestCallExpression(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"call expression 1",
+			`
+void func()
+{
+    hoge();
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{
+								Name: "hoge",
+								Args: []Statement{},
+							},
+						}},
+				},
+			},
+		},
+		{
+			"call expression 2",
+			`
+void func()
+{
+    hoge(100);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "hoge",
+								Args: []Statement{},
+							},
+						}},
+				},
+			},
+		},
+		{
+			"call expression 3",
+			`
+void func()
+{
+    hoge(a);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "hoge",
+								Args: []Statement{&RefVar{Name: "a"}},
+							},
+						}},
+				},
+			},
+		},
+		{
+			"call expression 4",
+			`
+void func()
+{
+    hoge(a, b, 100);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "hoge",
+								Args: []Statement{
+									&RefVar{Name: "a"},
+									&RefVar{Name: "b"},
+								},
+							},
+						}},
+				},
+			},
+		},
+		{
+			"call expression 5",
+			`
+void func()
+{
+    hoge(a, fuga(piyo(1, b), 2));
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "hoge",
+								Args: []Statement{
+									&RefVar{Name: "a"},
+									&CallFunc{Name: "fuga",
+										Args: []Statement{
+											&CallFunc{Name: "piyo",
+												Args: []Statement{&RefVar{Name: "b"}},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			"call expression 6",
+			`
+void func()
+{
+    _read(0, "A", 1);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "_read",
+								Args: []Statement{},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			"call expression 7",
+			`
+void func()
+{
+    __darwin_check_fd_set(_fd, (const void *) _p);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "__darwin_check_fd_set",
+								Args: []Statement{&RefVar{Name: "_fd"}, &RefVar{Name: "_p"}}},
+						},
+					},
 				},
 			},
 		},

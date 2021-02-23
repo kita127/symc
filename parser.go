@@ -1350,6 +1350,7 @@ func (p *Parser) parseExpression() []Statement {
 	return ss
 }
 
+// parseCallFunc
 func (p *Parser) parseCallFunc() []Statement {
 	id := p.curToken().literal
 	p.pos++
@@ -1394,7 +1395,7 @@ func (p *Parser) parseCast() []Statement {
 	}
 	p.pos++
 	for p.curToken().tokenType != rparen {
-		if !p.curToken().isToken(word) && !p.curToken().isToken(asterisk) {
+		if !p.curToken().isTypeToken() {
 			p.updateErrLog(fmt.Sprintf("parseCast:token[%s]", p.curToken().literal))
 			return nil
 		}
