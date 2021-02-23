@@ -2335,6 +2335,18 @@ void(*signal(int, void (*)(int)))(int);
 				},
 			},
 		},
+		{
+			"prototype dec 7",
+			`
+int yakitori(void (* _Nonnull)(void));
+
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "yakitori"},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

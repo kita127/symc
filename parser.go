@@ -572,14 +572,14 @@ func (p *Parser) parsePrototypeDeclSub() []Statement {
 
 	if p.curToken().tokenType != lparen {
 		// ( でなければプロトタイプ宣言ではない
-		p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub:not lparen:token[%s]", p.curToken().literal))
 		return nil
 	}
 
 	p.pos--
 
 	if !p.curToken().isTypeToken() {
-		p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub_2:token[%s]", p.curToken().literal))
 		return nil
 	}
 
@@ -593,15 +593,15 @@ func (p *Parser) parsePrototypeDeclSub() []Statement {
 	// void(*signal(int, void (*)(int)))(int);
 	// プロトタイプパラメータは lparen から解析開始するためこの位置で前回のポジションを記憶する
 	prePos := p.pos
-	p.pos++
-	xs := p.parsePrototypeDeclSub()
+	xs := p.parsePrototypeParameter()
 	if xs == nil {
 		p.pos = prePos
-		xs = p.parsePrototypeParameter()
+		p.pos++
+		xs = p.parsePrototypeDeclSub()
 	}
 
 	if xs == nil {
-		p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub_3:token[%s]", p.curToken().literal))
 		return nil
 	}
 
@@ -610,13 +610,13 @@ func (p *Parser) parsePrototypeDeclSub() []Statement {
 		if v, ok := xs[0].(*PrototypeDecl); ok {
 			id = v.Name
 			if !p.curToken().isToken(rparen) {
-				p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub:token[%s]", p.curToken().literal))
+				p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub_4:token[%s]", p.curToken().literal))
 				return nil
 			}
 			p.pos++
 			xs = p.parsePrototypeParameter()
 			if xs == nil {
-				p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub:token[%s]", p.curToken().literal))
+				p.updateErrLog(fmt.Sprintf("parsePrototypeDeclSub_5:token[%s]", p.curToken().literal))
 				return nil
 			}
 		}
@@ -630,6 +630,9 @@ func (p *Parser) parsePrototypeDeclSub() []Statement {
 // 構文解析のみ行い成功か失敗かを返すのみ
 func (p *Parser) parsePrototypeParameter() []Statement {
 	// lparen
+	if !p.curToken().isToken(lparen) {
+		return nil
+	}
 	p.pos++
 
 	for {
