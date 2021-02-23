@@ -2751,6 +2751,7 @@ void func()
 void func()
 {
     a = ~a;
+    b = !b;
 }
 `,
 			&Module{
@@ -2760,6 +2761,8 @@ void func()
 						Statements: []Statement{
 							&Assigne{Name: "a"},
 							&RefVar{Name: "a"},
+							&Assigne{Name: "b"},
+							&RefVar{Name: "b"},
 						},
 					},
 				},

@@ -581,6 +581,7 @@ func (t *Token) isPrefixExpression() bool {
 	case increment:
 	case decrement:
 	case tilde:
+	case bang:
 	default:
 		return false
 	}
