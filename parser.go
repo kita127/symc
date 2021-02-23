@@ -762,15 +762,13 @@ func (p *Parser) parsePrototypeFPointerVar() []Statement {
 // parseFunctionDef
 func (p *Parser) parseFunctionDef() []Statement {
 	// lparen or eof の手前まで pos を進める
-	n := p.peekToken()
-	for n.isTypeToken() || n.isToken(keyAttribute) {
+	for p.peekToken().isTypeToken() || p.peekToken().isToken(keyAttribute) {
 		p.pos++
-		if p.curToken().tokenType == keyAttribute {
+		if p.curToken().isToken(keyAttribute) {
 			p.skipParen()
 		}
-		n = p.peekToken()
 	}
-	if n.tokenType != lparen {
+	if !p.peekToken().isToken(lparen) {
 		p.updateErrLog(fmt.Sprintf("parseFunctionDef:token[%s]", p.curToken().literal))
 		return nil
 	}
