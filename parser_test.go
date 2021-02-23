@@ -194,329 +194,6 @@ void func(int a, ...){}
 			},
 		},
 		{
-			"expression 1",
-			`
-void func()
-{
-    var1 = a1 +  b1;
-    var2 = a2 -  b2;
-    var3 = a3 *  b3;
-    var4 = a4 /  b4;
-    var5 = a5 |  b5;
-    var6 = a6 &  b6;
-    var7 = a7 || b7;
-    var8 = a8 && b8;
-    var9 = a9 > b9;
-    var10 = a10 & b10;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							// +
-							&Assigne{Name: "var1"},
-							&RefVar{Name: "a1"},
-							&RefVar{Name: "b1"},
-							// -
-							&Assigne{Name: "var2"},
-							&RefVar{Name: "a2"},
-							&RefVar{Name: "b2"},
-							// *
-							&Assigne{Name: "var3"},
-							&RefVar{Name: "a3"},
-							&RefVar{Name: "b3"},
-							// /
-							&Assigne{Name: "var4"},
-							&RefVar{Name: "a4"},
-							&RefVar{Name: "b4"},
-							// |
-							&Assigne{Name: "var5"},
-							&RefVar{Name: "a5"},
-							&RefVar{Name: "b5"},
-							// &
-							&Assigne{Name: "var6"},
-							&RefVar{Name: "a6"},
-							&RefVar{Name: "b6"},
-							// ||
-							&Assigne{Name: "var7"},
-							&RefVar{Name: "a7"},
-							&RefVar{Name: "b7"},
-							// &&
-							&Assigne{Name: "var8"},
-							&RefVar{Name: "a8"},
-							&RefVar{Name: "b8"},
-							// >
-							&Assigne{Name: "var9"},
-							&RefVar{Name: "a9"},
-							&RefVar{Name: "b9"},
-							// %
-							&Assigne{Name: "var10"},
-							&RefVar{Name: "a10"},
-							&RefVar{Name: "b10"},
-						}},
-				},
-			},
-		},
-		{
-			"expression 2",
-			`
-void func()
-{
-    var1 = a1 <<  b1;
-    var2 = a2 >>  b2;
-    var3 = a3 ^ b3;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							// <<
-							&Assigne{Name: "var1"},
-							&RefVar{Name: "a1"},
-							&RefVar{Name: "b1"},
-							// >>
-							&Assigne{Name: "var2"},
-							&RefVar{Name: "a2"},
-							&RefVar{Name: "b2"},
-							// ^
-							&Assigne{Name: "var3"},
-							&RefVar{Name: "a3"},
-							&RefVar{Name: "b3"},
-						}},
-				},
-			},
-		},
-		{
-			"expression 3",
-			`
-void func()
-{
-    var1 += a1;
-    var2 -= a2;
-    var3 /= a3;
-    var4 *= a4;
-    var5 |= a5;
-    var6 &= a6;
-    var7 <<= a7;
-    var8 >>= a8;
-    var9 ~= a9;
-    var10 ^= a10;
-    var11 %= a11;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							// +=
-							&Assigne{Name: "var1"},
-							&RefVar{Name: "a1"},
-							// -=
-							&Assigne{Name: "var2"},
-							&RefVar{Name: "a2"},
-							// /=
-							&Assigne{Name: "var3"},
-							&RefVar{Name: "a3"},
-							// *=
-							&Assigne{Name: "var4"},
-							&RefVar{Name: "a4"},
-							// |=
-							&Assigne{Name: "var5"},
-							&RefVar{Name: "a5"},
-							// &=
-							&Assigne{Name: "var6"},
-							&RefVar{Name: "a6"},
-							// <<=
-							&Assigne{Name: "var7"},
-							&RefVar{Name: "a7"},
-							// >>=
-							&Assigne{Name: "var8"},
-							&RefVar{Name: "a8"},
-							// ~=
-							&Assigne{Name: "var9"},
-							&RefVar{Name: "a9"},
-							// ^=
-							&Assigne{Name: "var10"},
-							&RefVar{Name: "a10"},
-							// %=
-							&Assigne{Name: "var11"},
-							&RefVar{Name: "a11"},
-						}},
-				},
-			},
-		},
-		{
-			"expression 4",
-			`
-void func()
-{
-    var1 = a1 + b1 + c1;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							// +=
-							&Assigne{Name: "var1"},
-							&RefVar{Name: "a1"},
-							&RefVar{Name: "b1"},
-							&RefVar{Name: "c1"},
-						}},
-				},
-			},
-		},
-		{
-			"expression 5",
-			`
-void func()
-{
-    var1 = (a1);
-    var2 = (a2 + b2);
-    var3 = ((a3 + b3) + c3);
-    var4 = (a4 + (b4 + c4));
-    var5 = ((a5 + b5) + (c5 + d5));
-    var6 = (((a6 + b6) - c6) + (d6 + e6));
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							// 1
-							&Assigne{Name: "var1"},
-							&RefVar{Name: "a1"},
-							// 2
-							&Assigne{Name: "var2"},
-							&RefVar{Name: "a2"},
-							&RefVar{Name: "b2"},
-							// 3
-							&Assigne{Name: "var3"},
-							&RefVar{Name: "a3"},
-							&RefVar{Name: "b3"},
-							&RefVar{Name: "c3"},
-							// 4
-							&Assigne{Name: "var4"},
-							&RefVar{Name: "a4"},
-							&RefVar{Name: "b4"},
-							&RefVar{Name: "c4"},
-							// 5
-							&Assigne{Name: "var5"},
-							&RefVar{Name: "a5"},
-							&RefVar{Name: "b5"},
-							&RefVar{Name: "c5"},
-							&RefVar{Name: "d5"},
-							// 6
-							&Assigne{Name: "var6"},
-							&RefVar{Name: "a6"},
-							&RefVar{Name: "b6"},
-							&RefVar{Name: "c6"},
-							&RefVar{Name: "d6"},
-							&RefVar{Name: "e6"},
-						}},
-				},
-			},
-		},
-		{
-			"expression 6",
-			`
-void func()
-{
-    --a;
-    ++b;
-    c--;
-    d++;
-    e++ + --f;
-    ++g - h--;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&RefVar{Name: "a"},
-							&RefVar{Name: "b"},
-							&RefVar{Name: "c"},
-							&RefVar{Name: "d"},
-							&RefVar{Name: "e"},
-							&RefVar{Name: "f"},
-							&RefVar{Name: "g"},
-							&RefVar{Name: "h"},
-						},
-					},
-				},
-			},
-		},
-		{
-			"expression 7",
-			`
-void func()
-{
-    &hoge;
-    (unsigned char)fuga;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&RefVar{Name: "hoge"},
-							&RefVar{Name: "fuga"},
-						},
-					},
-				},
-			},
-		},
-		{
-			"expression 8",
-			`
-void func()
-{
-    ;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{},
-						Statements: []Statement{},
-					},
-				},
-			},
-		},
-		{
-			"expression 9",
-			`
-void func()
-{
-    a == b;
-    c != d;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&RefVar{Name: "a"},
-							&RefVar{Name: "b"},
-							&RefVar{Name: "c"},
-							&RefVar{Name: "d"},
-						},
-					},
-				},
-			},
-		},
-		{
 			"character 1",
 			`
 void func(void)
@@ -2555,6 +2232,377 @@ void func()
 						Statements: []Statement{
 							&CallFunc{Name: "__darwin_check_fd_set",
 								Args: []Statement{&RefVar{Name: "_fd"}, &RefVar{Name: "_p"}}},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestExpression
+func TestExpression(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"expression 1",
+			`
+void func()
+{
+    var1 = a1 +  b1;
+    var2 = a2 -  b2;
+    var3 = a3 *  b3;
+    var4 = a4 /  b4;
+    var5 = a5 |  b5;
+    var6 = a6 &  b6;
+    var7 = a7 || b7;
+    var8 = a8 && b8;
+    var9 = a9 > b9;
+    var10 = a10 & b10;
+    var11 = a11 % b11;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// +
+							&Assigne{Name: "var1"},
+							&RefVar{Name: "a1"},
+							&RefVar{Name: "b1"},
+							// -
+							&Assigne{Name: "var2"},
+							&RefVar{Name: "a2"},
+							&RefVar{Name: "b2"},
+							// *
+							&Assigne{Name: "var3"},
+							&RefVar{Name: "a3"},
+							&RefVar{Name: "b3"},
+							// /
+							&Assigne{Name: "var4"},
+							&RefVar{Name: "a4"},
+							&RefVar{Name: "b4"},
+							// |
+							&Assigne{Name: "var5"},
+							&RefVar{Name: "a5"},
+							&RefVar{Name: "b5"},
+							// &
+							&Assigne{Name: "var6"},
+							&RefVar{Name: "a6"},
+							&RefVar{Name: "b6"},
+							// ||
+							&Assigne{Name: "var7"},
+							&RefVar{Name: "a7"},
+							&RefVar{Name: "b7"},
+							// &&
+							&Assigne{Name: "var8"},
+							&RefVar{Name: "a8"},
+							&RefVar{Name: "b8"},
+							// >
+							&Assigne{Name: "var9"},
+							&RefVar{Name: "a9"},
+							&RefVar{Name: "b9"},
+							// &
+							&Assigne{Name: "var10"},
+							&RefVar{Name: "a10"},
+							&RefVar{Name: "b10"},
+							// %
+							&Assigne{Name: "var11"},
+							&RefVar{Name: "a11"},
+							&RefVar{Name: "b11"},
+						}},
+				},
+			},
+		},
+		{
+			"expression 2",
+			`
+void func()
+{
+    var1 = a1 <<  b1;
+    var2 = a2 >>  b2;
+    var3 = a3 ^ b3;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// <<
+							&Assigne{Name: "var1"},
+							&RefVar{Name: "a1"},
+							&RefVar{Name: "b1"},
+							// >>
+							&Assigne{Name: "var2"},
+							&RefVar{Name: "a2"},
+							&RefVar{Name: "b2"},
+							// ^
+							&Assigne{Name: "var3"},
+							&RefVar{Name: "a3"},
+							&RefVar{Name: "b3"},
+						}},
+				},
+			},
+		},
+		{
+			"expression 3",
+			`
+void func()
+{
+    var1 += a1;
+    var2 -= a2;
+    var3 /= a3;
+    var4 *= a4;
+    var5 |= a5;
+    var6 &= a6;
+    var7 <<= a7;
+    var8 >>= a8;
+    var9 ~= a9;
+    var10 ^= a10;
+    var11 %= a11;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// +=
+							&Assigne{Name: "var1"},
+							&RefVar{Name: "a1"},
+							// -=
+							&Assigne{Name: "var2"},
+							&RefVar{Name: "a2"},
+							// /=
+							&Assigne{Name: "var3"},
+							&RefVar{Name: "a3"},
+							// *=
+							&Assigne{Name: "var4"},
+							&RefVar{Name: "a4"},
+							// |=
+							&Assigne{Name: "var5"},
+							&RefVar{Name: "a5"},
+							// &=
+							&Assigne{Name: "var6"},
+							&RefVar{Name: "a6"},
+							// <<=
+							&Assigne{Name: "var7"},
+							&RefVar{Name: "a7"},
+							// >>=
+							&Assigne{Name: "var8"},
+							&RefVar{Name: "a8"},
+							// ~=
+							&Assigne{Name: "var9"},
+							&RefVar{Name: "a9"},
+							// ^=
+							&Assigne{Name: "var10"},
+							&RefVar{Name: "a10"},
+							// %=
+							&Assigne{Name: "var11"},
+							&RefVar{Name: "a11"},
+						}},
+				},
+			},
+		},
+		{
+			"expression 4",
+			`
+void func()
+{
+    var1 = a1 + b1 + c1;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// +=
+							&Assigne{Name: "var1"},
+							&RefVar{Name: "a1"},
+							&RefVar{Name: "b1"},
+							&RefVar{Name: "c1"},
+						}},
+				},
+			},
+		},
+		{
+			"expression 5",
+			`
+void func()
+{
+    var1 = (a1);
+    var2 = (a2 + b2);
+    var3 = ((a3 + b3) + c3);
+    var4 = (a4 + (b4 + c4));
+    var5 = ((a5 + b5) + (c5 + d5));
+    var6 = (((a6 + b6) - c6) + (d6 + e6));
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							// 1
+							&Assigne{Name: "var1"},
+							&RefVar{Name: "a1"},
+							// 2
+							&Assigne{Name: "var2"},
+							&RefVar{Name: "a2"},
+							&RefVar{Name: "b2"},
+							// 3
+							&Assigne{Name: "var3"},
+							&RefVar{Name: "a3"},
+							&RefVar{Name: "b3"},
+							&RefVar{Name: "c3"},
+							// 4
+							&Assigne{Name: "var4"},
+							&RefVar{Name: "a4"},
+							&RefVar{Name: "b4"},
+							&RefVar{Name: "c4"},
+							// 5
+							&Assigne{Name: "var5"},
+							&RefVar{Name: "a5"},
+							&RefVar{Name: "b5"},
+							&RefVar{Name: "c5"},
+							&RefVar{Name: "d5"},
+							// 6
+							&Assigne{Name: "var6"},
+							&RefVar{Name: "a6"},
+							&RefVar{Name: "b6"},
+							&RefVar{Name: "c6"},
+							&RefVar{Name: "d6"},
+							&RefVar{Name: "e6"},
+						}},
+				},
+			},
+		},
+		{
+			"expression 6",
+			`
+void func()
+{
+    --a;
+    ++b;
+    c--;
+    d++;
+    e++ + --f;
+    ++g - h--;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "a"},
+							&RefVar{Name: "b"},
+							&RefVar{Name: "c"},
+							&RefVar{Name: "d"},
+							&RefVar{Name: "e"},
+							&RefVar{Name: "f"},
+							&RefVar{Name: "g"},
+							&RefVar{Name: "h"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"expression 7",
+			`
+void func()
+{
+    &hoge;
+    (unsigned char)fuga;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "hoge"},
+							&RefVar{Name: "fuga"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"expression 8",
+			`
+void func()
+{
+    ;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
+		{
+			"expression 9",
+			`
+void func()
+{
+    a == b;
+    c != d;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "a"},
+							&RefVar{Name: "b"},
+							&RefVar{Name: "c"},
+							&RefVar{Name: "d"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"expression 10",
+			`
+void func()
+{
+    ((unsigned long)_fd % (sizeof(__int32_t) * 8));
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "_fd"},
+							&CallFunc{Name: "sizeof", Args: []Statement{
+								&RefVar{Name: "__int32_t"},
+							},
+							},
 						},
 					},
 				},
