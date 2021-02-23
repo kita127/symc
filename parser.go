@@ -240,7 +240,9 @@ func (p *Parser) parseStatement() []Statement {
 	ss := []Statement{}
 	switch p.curToken().tokenType {
 	case keyTypedef:
-		p.skipTypedef()
+		if p.skipStructureLike() == nil {
+			return nil
+		}
 	case keyExtern:
 		prePos := p.pos
 		ss = p.parsePrototypeDecl()
@@ -1511,20 +1513,6 @@ func (p *Parser) parseParameter() []*VariableDef {
 	}
 }
 
-func (p *Parser) skipTypedef() {
-
-	for p.curToken().tokenType != semicolon && p.curToken().tokenType != eof {
-		if p.curToken().tokenType == lbrace {
-			// { の場合は } まで進める
-			p.progUntil(rbrace)
-		} else {
-			p.pos++
-		}
-	}
-	p.pos++
-	// next
-}
-
 func (p *Parser) peekToken() *Token {
 	// 現在位置が EOF
 	if p.curToken().tokenType == eof {
@@ -1574,6 +1562,9 @@ func (p *Parser) skipStructureLike() []Statement {
 	case lbrace:
 		if p.skipBrace() == nil {
 			return nil
+		}
+		if p.curToken().isToken(word) {
+			p.pos++
 		}
 		if !p.curToken().isToken(semicolon) {
 			return nil

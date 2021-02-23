@@ -1231,6 +1231,40 @@ typedef union {
 				[]Statement{},
 			},
 		},
+		{
+			"typedef 4",
+			`
+typedef struct {
+    int kind;
+    File *file;
+    int line;
+    int column;
+    _Bool space;
+    _Bool bol;
+    int count;
+    Set *hideset;
+    union {
+
+        int id;
+
+        struct {
+            char *sval;
+            int slen;
+            int c;
+            int enc;
+        };
+
+        struct {
+            _Bool is_vararg;
+            int position;
+        };
+    };
+} Token;
+`,
+			&Module{
+				[]Statement{},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
@@ -1765,6 +1799,17 @@ int yakitori(void (* _Nonnull)(void));
 			&Module{
 				[]Statement{
 					&PrototypeDecl{Name: "yakitori"},
+				},
+			},
+		},
+		{
+			"prototype dec 8",
+			`
+int nanosleep(const struct timespec *__rqtp, struct timespec *__rmtp) __asm("_" "nanosleep" );
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "nanosleep"},
 				},
 			},
 		},
