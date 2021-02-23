@@ -2459,17 +2459,17 @@ int oden(void (^ _Nonnull)(void)) __attribute__((availability(macosx,introduced=
 				},
 			},
 		},
-//		{
-//			"test gcc 6",
-//			`
-//int heapsort_b(void *__base, size_t __nel, size_t __width __attribute__((__noescape__)));
-//`,
-//			&Module{
-//				[]Statement{
-//					&PrototypeDecl{Name: "heapsort"},
-//				},
-//			},
-//		},
+		{
+			"test gcc 6",
+			`
+int heapsort_b(void *__base, size_t __nel, size_t __width __attribute__((__noescape__)));
+`,
+			&Module{
+				[]Statement{
+					&PrototypeDecl{Name: "heapsort_b"},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
