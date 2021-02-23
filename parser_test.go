@@ -2366,8 +2366,7 @@ void func()
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							&CallFunc{Name: "fprintf",
-								Args: []Statement{
-								},
+								Args: []Statement{},
 							},
 						},
 					},
@@ -2781,6 +2780,25 @@ void func()
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{},
 						Statements: []Statement{},
+					},
+				},
+			},
+		},
+		{
+			"expression 13",
+			`
+void func()
+{
+    a = -1;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "a"},
+						},
 					},
 				},
 			},

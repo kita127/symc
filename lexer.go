@@ -578,6 +578,7 @@ func (t *Token) isOperator() bool {
 
 func (t *Token) isPrefixExpression() bool {
 	switch t.tokenType {
+	case minus:
 	case increment:
 	case decrement:
 	case tilde:
