@@ -1359,9 +1359,12 @@ func (p *Parser) parseExpression() []Statement {
 			return nil
 		}
 		p.pos++
-	case float:
-		fallthrough
 	case str:
+		// 文字列が連続する場合がある
+		for p.curToken().isToken(str) {
+			p.pos++
+		}
+	case float:
 		fallthrough
 	case letter:
 		fallthrough
@@ -1394,6 +1397,7 @@ func (p *Parser) parseCallFunc() []Statement {
 	id := p.curToken().literal
 	p.pos++
 	if p.curToken().tokenType != lparen {
+		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
 		return nil
 	}
 	p.pos++
@@ -1409,6 +1413,7 @@ func (p *Parser) parseCallFunc() []Statement {
 	for {
 		ts := p.parseExpression()
 		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseCallFunc_2:token[%s]", p.curToken().literal))
 			return nil
 		}
 		ss = append(ss, ts...)
@@ -1419,6 +1424,7 @@ func (p *Parser) parseCallFunc() []Statement {
 			p.pos++
 			break
 		} else {
+			p.updateErrLog(fmt.Sprintf("parseCallFunc_3:token[%s]", p.curToken().literal))
 			return nil
 		}
 	}
