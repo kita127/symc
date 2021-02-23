@@ -710,9 +710,7 @@ func (p *Parser) parsePrototypeParamVar() []Statement {
 	if p.curToken().isToken(comma) || p.curToken().isToken(rparen) {
 		return []Statement{}
 	} else if p.curToken().isToken(keyAttribute) {
-		p.pos++
-		p.skipParen()
-		return []Statement{}
+		return p.parseAttribute()
 	} else {
 		p.updateErrLog(fmt.Sprintf("parsePrototypeParamVar_3:token[%s]", p.curToken().literal))
 		return nil
