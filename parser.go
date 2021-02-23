@@ -259,6 +259,10 @@ func (p *Parser) parseStatement() []Statement {
 		if p.skipStructureLike() == nil {
 			return nil
 		}
+	case keyEnum:
+		if p.skipStructureLike() == nil {
+			return nil
+		}
 	case keyAttribute:
 		p.pos++
 		p.skipParen()

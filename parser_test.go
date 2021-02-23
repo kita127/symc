@@ -2665,6 +2665,48 @@ void func()
 	}
 }
 
+// TestEnum
+func TestEnum(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"enum 1",
+			`
+enum {
+    TIME,
+    PLACE,
+    NUMBER,
+    FUGA,
+    INU,
+    NEKO,
+    HIYOKO,
+
+    PAN_DA,
+    CHIHUAHUA,
+    TORI,
+    TMACRO_PARAM,
+};
+`,
+			&Module{
+				[]Statement{},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
 // TestTmp
 func TestTmp(t *testing.T) {
 	testTbl := []struct {
