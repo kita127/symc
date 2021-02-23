@@ -2608,6 +2608,26 @@ void func()
 				},
 			},
 		},
+		{
+			"expression 11",
+			`
+void func()
+{
+    a = ~a;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "a"},
+							&RefVar{Name: "a"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
