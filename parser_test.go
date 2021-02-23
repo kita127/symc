@@ -2697,6 +2697,23 @@ void func()
 				},
 			},
 		},
+		{
+			"expression 12",
+			`
+void func()
+{
+    &((Vector){});
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

@@ -1352,6 +1352,13 @@ func (p *Parser) parseExpression() []Statement {
 			return nil
 		}
 
+	case lbrace:
+		p.pos++
+		if !p.curToken().isToken(rbrace) {
+			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+			return nil
+		}
+		p.pos++
 	case float:
 		fallthrough
 	case str:
