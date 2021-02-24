@@ -1166,12 +1166,28 @@ func (p *Parser) parseForStatement() []Statement {
 		}
 	}
 
-	ts := p.parseBlockStatement()
-	if ts == nil {
-		p.updateErrLog(fmt.Sprintf("parseForStatement:token[%s]", p.curToken().literal))
-		return nil
+	if p.curToken().isToken(lbrace) {
+		// ブロックの場合
+		ts := p.parseBlockStatement()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseForStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
+	} else {
+		// １行命令の場合
+		ts := p.parseExpression()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseForStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		if !p.curToken().isToken(semicolon) {
+			p.updateErrLog(fmt.Sprintf("parseForStatement:token[%s]", p.curToken().literal))
+			return nil
+		}
+		p.pos++
+		ss = append(ss, ts...)
 	}
-	ss = append(ss, ts...)
 
 	return ss
 }

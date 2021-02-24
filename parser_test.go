@@ -703,6 +703,35 @@ void func(void)
 			},
 		},
 		{
+			"for 4",
+			`
+void func(void)
+{
+    for (i = 0; i < len; i++)
+        buf_write(b, s[i]);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "i"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "len"},
+							&RefVar{Name: "i"},
+							&CallFunc{Name: "buf_write", Args: []Statement{
+								&RefVar{Name: "b"},
+								&RefVar{Name: "s"},
+								&RefVar{Name: "i"},
+							},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			"break 1",
 			`
 void func(void)
