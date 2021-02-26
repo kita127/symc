@@ -2342,6 +2342,29 @@ void func()
 				},
 			},
 		},
+		{
+			"call expression 10",
+			`
+void func()
+{
+    macro->fn(tok);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "macro->fn",
+								Args: []Statement{
+									&RefVar{Name: "tok"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

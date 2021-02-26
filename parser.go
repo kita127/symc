@@ -1444,8 +1444,11 @@ func (p *Parser) parseExpression() []Statement {
 
 // parseCallFunc
 func (p *Parser) parseCallFunc() []Statement {
-	id := p.curToken().literal
-	p.pos++
+	if !p.curToken().isToken(word) {
+		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
+		return nil
+	}
+	id := p.fetchID()
 	if p.curToken().tokenType != lparen {
 		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
 		return nil
