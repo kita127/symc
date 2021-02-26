@@ -1180,7 +1180,12 @@ func (p *Parser) parseForStatement() []Statement {
 	p.pos++
 
 	for {
-		ts := p.parseExpression()
+		prePos := p.pos
+		ts := p.parseVariableDef()
+		if ts == nil {
+			p.pos = prePos
+			ts = p.parseExpression()
+		}
 		if ts == nil {
 			p.updateErrLog(fmt.Sprintf("parseForStatement:token[%s]", p.curToken().literal))
 			return nil

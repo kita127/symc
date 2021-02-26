@@ -655,102 +655,6 @@ func TestStatements(t *testing.T) {
 		expect  *Module
 	}{
 		{
-			"for 1",
-			`
-void func(void)
-{
-    for (i = 0; i < 10; i++){
-    }
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&Assigne{Name: "i"},
-							&RefVar{Name: "i"},
-							&RefVar{Name: "i"},
-						},
-					},
-				},
-			},
-		},
-		{
-			"for 2",
-			`
-void func(void)
-{
-    for (;;){
-    }
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{},
-						Statements: []Statement{},
-					},
-				},
-			},
-		},
-		{
-			"for 3",
-			`
-void func(void)
-{
-    for (i = 0; i < 10; i++){
-        arrVar[i] = i * x;
-    }
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&Assigne{Name: "i"},
-							&RefVar{Name: "i"},
-							&RefVar{Name: "i"},
-							&Assigne{Name: "arrVar"},
-							&RefVar{Name: "i"},
-							&RefVar{Name: "i"},
-							&RefVar{Name: "x"},
-						},
-					},
-				},
-			},
-		},
-		{
-			"for 4",
-			`
-void func(void)
-{
-    for (i = 0; i < len; i++)
-        buf_write(b, s[i]);
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&Assigne{Name: "i"},
-							&RefVar{Name: "i"},
-							&RefVar{Name: "len"},
-							&RefVar{Name: "i"},
-							&CallFunc{Name: "buf_write", Args: []Statement{
-								&RefVar{Name: "b"},
-								&RefVar{Name: "s"},
-								&RefVar{Name: "i"},
-							},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
 			"break 1",
 			`
 void func(void)
@@ -2985,6 +2889,148 @@ void func()
 					&FunctionDef{Name: "func",
 						Params:     []*VariableDef{},
 						Statements: []Statement{},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestForStatement
+func TestForStatement(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"for 1",
+			`
+void func(void)
+{
+    for (i = 0; i < 10; i++){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "i"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "i"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"for 2",
+			`
+void func(void)
+{
+    for (;;){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
+		{
+			"for 3",
+			`
+void func(void)
+{
+    for (i = 0; i < 10; i++){
+        arrVar[i] = i * x;
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "i"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "i"},
+							&Assigne{Name: "arrVar"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "x"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"for 4",
+			`
+void func(void)
+{
+    for (i = 0; i < len; i++)
+        buf_write(b, s[i]);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "i"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "len"},
+							&RefVar{Name: "i"},
+							&CallFunc{Name: "buf_write", Args: []Statement{
+								&RefVar{Name: "b"},
+								&RefVar{Name: "s"},
+								&RefVar{Name: "i"},
+							},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			"for 5",
+			`
+void func(void)
+{
+    for (int i = vec_len(tokens) - 1; i >= 0; i--){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&VariableDef{Name: "i"},
+							&CallFunc{Name: "vec_len", Args: []Statement{
+								&RefVar{Name: "tokens"},
+							},
+							},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "i"},
+						},
 					},
 				},
 			},
