@@ -890,6 +890,84 @@ void func(void)
 				},
 			},
 		},
+		{
+			"switch 4",
+			`
+void func(void)
+{
+    switch (macro->kind) {
+    case MACRO_OBJ:
+        Set *hideset = set_add(tok->hideset, name);
+        Vector *tokens = subst(macro, ((void *)0), hideset);
+        return read_expand();
+    case MACRO_FUNC:
+        Vector *args = read_args(tok, macro);
+        expect(')');
+    case MACRO_SPECIAL:
+        macro->fn(tok);
+        return read_expand();
+    default:
+        errorf("cpp.c" ":" "360", ((void *)0), "internal error");
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "macro->kind"},
+							&VariableDef{Name: "hideset"},
+							&CallFunc{
+								Name: "set_add",
+								Args: []Statement{
+									&RefVar{Name: "tok->hideset"},
+									&RefVar{Name: "name"},
+								},
+							},
+							&VariableDef{Name: "tokens"},
+							&CallFunc{
+								Name: "subst",
+								Args: []Statement{
+									&RefVar{Name: "macro"},
+									&RefVar{Name: "hideset"},
+								},
+							},
+							&CallFunc{
+								Name: "read_expand",
+								Args: []Statement{},
+							},
+							&VariableDef{Name: "args"},
+							&CallFunc{
+								Name: "read_args",
+								Args: []Statement{
+									&RefVar{Name: "tok"},
+									&RefVar{Name: "macro"},
+								},
+							},
+							&CallFunc{
+								Name: "expect",
+								Args: []Statement{},
+							},
+							&CallFunc{
+								Name: "macro->fn",
+								Args: []Statement{
+									&RefVar{Name: "tok"},
+								},
+							},
+							&CallFunc{
+								Name: "read_expand",
+								Args: []Statement{},
+							},
+							&CallFunc{
+								Name: "errorf",
+								Args: []Statement{},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

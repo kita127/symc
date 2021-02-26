@@ -1027,7 +1027,10 @@ func (p *Parser) parseDoWhileStatement() []Statement {
 
 // parseCaseStatement
 func (p *Parser) parseCaseStatement() []Statement {
-	// case
+	if !p.curToken().isToken(keyCase) {
+		p.updateErrLog(fmt.Sprintf("parseCaseStatement:token[%s]", p.curToken().literal))
+		return nil
+	}
 	p.pos++
 
 	xs := p.parseValue()
@@ -1049,6 +1052,8 @@ func (p *Parser) parseCaseStatement() []Statement {
 func (p *Parser) parseValue() []Statement {
 	ss := []Statement{}
 	switch p.curToken().tokenType {
+	case word:
+		fallthrough
 	case float:
 		fallthrough
 	case letter:
