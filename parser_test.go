@@ -2921,6 +2921,43 @@ void func()
 	}
 }
 
+// TestContinue
+func TestContinue(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"continue 1",
+			`
+void func()
+{
+    continue;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params:     []*VariableDef{},
+						Statements: []Statement{},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
 // TestTmp
 func TestTmp(t *testing.T) {
 	testTbl := []struct {
