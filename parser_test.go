@@ -441,6 +441,25 @@ int hoge[2][3][4] = {
 			},
 		},
 		{
+			"variable definition 12",
+			`
+char func(void) {
+    Buffer *b = make_buffer();
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&VariableDef{Name: "b"},
+							&CallFunc{Name: "make_buffer", Args: []Statement{}},
+						},
+					},
+				},
+			},
+		},
+		{
 			"function pointer def 1",
 			`
 void (* p_f)();

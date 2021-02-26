@@ -368,17 +368,24 @@ func (p *Parser) parseNormalVarDef() []Statement {
 			p.pos++
 		}
 
+		ss = append(ss, &VariableDef{Name: id})
+
 		if p.curToken().isToken(assign) {
 			// 初期化子あり
 			p.pos++
-			p.parseInitialValue()
+			is := p.parseInitialValue()
+			if is == nil {
+				p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
+				return nil
+			}
+			ss = append(ss, is...)
 		} else if p.curToken().isToken(keyAsm) {
 			if p.parseAsm() == nil {
+				p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
 				return nil
 			}
 		}
 
-		ss = append(ss, &VariableDef{Name: id})
 	}
 	return ss
 }
@@ -416,19 +423,18 @@ func (p *Parser) parseInitialValue() []Statement {
 
 	if p.curToken().isToken(lbrace) {
 		// 配列の初期化子
-		xs := p.parseArrValue()
-		if xs == nil {
+		if p.parseArrValue() == nil {
 			p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
 			return nil
 		}
 	}
 
-	xs := p.parseExpression()
-	if xs == nil {
+	ss := p.parseExpression()
+	if ss == nil {
 		p.updateErrLog(fmt.Sprintf("parseVariableDef:token[%s]", p.curToken().literal))
 		return nil
 	}
-	return []Statement{}
+	return ss
 }
 
 // parseArrValue
