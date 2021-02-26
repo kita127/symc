@@ -2957,6 +2957,35 @@ void func()
 				},
 			},
 		},
+		{
+			"ternary op 2",
+			`
+void func()
+{
+    char *dir = file->name ? dirname(strdup(file->name)) : ".";
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&VariableDef{Name: "dir"},
+							&RefVar{Name: "file->name"},
+							&CallFunc{Name: "dirname", Args: []Statement{
+								&CallFunc{
+									Name: "strdup",
+									Args: []Statement{
+										&RefVar{Name: "file->name"},
+									},
+								},
+							},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
@@ -3162,13 +3191,29 @@ func TestGoto(t *testing.T) {
 void func(void)
 {
     goto err;
+
+    err:
+        errorf("cpp.c" ":" "711", token_pos(hash), "cannot find header file: %s", filename);
 }
 `,
 			&Module{
 				[]Statement{
 					&FunctionDef{Name: "func",
-						Params:     []*VariableDef{},
-						Statements: []Statement{},
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{
+								Name: "errorf",
+								Args: []Statement{
+									&CallFunc{
+										Name: "token_pos",
+										Args: []Statement{
+											&RefVar{Name: "hash"},
+										},
+									},
+									&RefVar{Name: "filename"},
+								},
+							},
+						},
 					},
 				},
 			},

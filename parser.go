@@ -972,7 +972,11 @@ func (p *Parser) parseInnerStatement() []Statement {
 		p.pos++
 	default:
 		prevPos := p.pos
-		ts := p.parseVariableDef()
+		ts := p.parseLabel()
+		if ts == nil {
+			p.pos = prevPos
+			ts = p.parseVariableDef()
+		}
 		if ts == nil {
 			p.pos = prevPos
 			// other statement
@@ -985,6 +989,21 @@ func (p *Parser) parseInnerStatement() []Statement {
 		ss = append(ss, ts...)
 	}
 	return ss
+}
+
+// parseLabel
+func (p *Parser) parseLabel() []Statement {
+	if !p.curToken().isToken(word) {
+		p.updateErrLog(fmt.Sprintf("parseLabel:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+	if !p.curToken().isToken(colon) {
+		p.updateErrLog(fmt.Sprintf("parseLabel:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+	return []Statement{}
 }
 
 // parseDoWhileStatement
