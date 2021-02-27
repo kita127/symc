@@ -784,6 +784,28 @@ void func(void)
 			},
 		},
 		{
+			"while 5",
+			`
+void func(void)
+{
+    while (*p)
+        while(x)
+            ;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "p"},
+							&RefVar{Name: "x"},
+						},
+					},
+				},
+			},
+		},
+		{
 			"do while 1",
 			`
 void func(void)
@@ -2235,6 +2257,28 @@ void func(void)
 				},
 			},
 		},
+		{
+			"if 9",
+			`
+void func(void)
+{
+   if (condition1)
+        if (condition2)
+            ;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "condition1"},
+							&RefVar{Name: "condition2"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
@@ -3243,6 +3287,39 @@ void func(void)
 							&RefVar{Name: "i"},
 							&RefVar{Name: "j"},
 							&Assigne{Name: "a"},
+							&RefVar{Name: "j"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"for 7",
+			`
+void func(void)
+{
+    for (int i = vec_len(tokens) - 1; i >= 0; i--)
+        for (int j = 0; j < i; j++)
+            ;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&VariableDef{Name: "i"},
+							&CallFunc{
+								Name: "vec_len",
+								Args: []Statement{
+									&RefVar{Name: "tokens"},
+								},
+							},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "i"},
+							&VariableDef{Name: "j"},
+							&RefVar{Name: "j"},
+							&RefVar{Name: "i"},
 							&RefVar{Name: "j"},
 						},
 					},
