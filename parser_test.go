@@ -2186,6 +2186,28 @@ void func(void)
 				},
 			},
 		},
+		{
+			"if 8",
+			`
+void func(void)
+{
+   if (condition1)
+        if (condition2)
+            return;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "condition1"},
+							&RefVar{Name: "condition2"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
@@ -3160,6 +3182,41 @@ void func(void)
 							},
 							&RefVar{Name: "i"},
 							&RefVar{Name: "i"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"for 6",
+			`
+void func(void)
+{
+    for (int i = vec_len(tokens) - 1; i >= 0; i--)
+        for (int j = 0; j < i; j++)
+            a += j;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&VariableDef{Name: "i"},
+							&CallFunc{
+								Name: "vec_len",
+								Args: []Statement{
+									&RefVar{Name: "tokens"},
+								},
+							},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "i"},
+							&VariableDef{Name: "j"},
+							&RefVar{Name: "j"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "j"},
+							&Assigne{Name: "a"},
+							&RefVar{Name: "j"},
 						},
 					},
 				},
