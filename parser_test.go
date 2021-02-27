@@ -757,6 +757,33 @@ void func(void)
 			},
 		},
 		{
+			"while 4",
+			`
+void func(void)
+{
+    while (*p)
+        while(x)
+            print(b, *p++);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "p"},
+							&RefVar{Name: "x"},
+							&CallFunc{Name: "print", Args: []Statement{
+								&RefVar{Name: "b"},
+								&RefVar{Name: "p"},
+							},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			"do while 1",
 			`
 void func(void)

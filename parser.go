@@ -1185,16 +1185,11 @@ func (p *Parser) parseWhileStatement() []Statement {
 		}
 	} else {
 		// １行命令の場合
-		ts = p.parseExpression()
+		ts = p.parseInnerStatement()
 		if ts == nil {
 			p.updateErrLog(fmt.Sprintf("parseForStatement:token[%s]", p.curToken().literal))
 			return nil
 		}
-		if !p.curToken().isToken(semicolon) {
-			p.updateErrLog(fmt.Sprintf("parseForStatement:token[%s]", p.curToken().literal))
-			return nil
-		}
-		p.pos++
 	}
 
 	ss = append(ss, ts...)
