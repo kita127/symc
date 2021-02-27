@@ -207,9 +207,22 @@ func NewParser(l *Lexer) *Parser {
 	return &Parser{lexer: l, tokens: tks, pos: 0, prevPos: 0}
 }
 
+// Parse
 func (p *Parser) Parse() *Module {
+	p.trimComment()
 	ast := p.parseModule()
 	return ast
+}
+
+// trimComment
+func (p *Parser) trimComment() {
+	trimedTokens := []*Token{}
+	for _, t := range p.tokens {
+		if !t.isToken(comment) {
+			trimedTokens = append(trimedTokens, t)
+		}
+	}
+	p.tokens = trimedTokens
 }
 
 func (p *Parser) parseModule() *Module {

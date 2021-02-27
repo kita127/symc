@@ -3392,6 +3392,83 @@ void func(void)
 	}
 }
 
+// TestComment
+func TestComment(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"comment 1",
+			`
+void func(void)
+{
+    switch (tok->kind) {
+        case HOGE:
+            return x;
+        case FUGA:
+            switch (tok->id) {
+
+# 1 "./piyopiyo.inc" 1
+
+case OP_ARROW: return "->";
+case OP_A_ADD: return "+=";
+case OP_A_AND: return "&=";
+            }
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "tok->kind"},
+							&RefVar{Name: "x"},
+							&RefVar{Name: "tok->id"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"comment 2",
+			`
+void func(void)
+{
+    for
+# 1 "./piyopiyo.inc" 1
+    (i = 0; i < 10; i++){
+    }
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "i"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "i"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
 // TestTmp
 func TestTmp(t *testing.T) {
 	testTbl := []struct {
