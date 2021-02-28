@@ -488,6 +488,23 @@ Node **buf = malloc(len * sizeof(Node *));
 			},
 		},
 		{
+			"variable definition 15",
+			`
+void **v = calloc(newsize, sizeof(void *));
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "v"},
+					&CallFunc{
+						Name: "calloc",
+						Args: []Statement{
+							&RefVar{Name: "newsize"},
+						},
+					},
+				},
+			},
+		},
+		{
 			"function pointer def 1",
 			`
 void (* p_f)();
@@ -1230,6 +1247,28 @@ void func(void)
 						Statements: []Statement{
 							&Assigne{Name: "p"},
 							&RefVar{Name: "v"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"assigne 9",
+			`
+void func(void)
+{
+    k[j] = m->key[i];
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "k"},
+							&RefVar{Name: "j"},
+							&RefVar{Name: "m->key"},
+							&RefVar{Name: "i"},
 						},
 					},
 				},

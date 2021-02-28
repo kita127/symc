@@ -427,7 +427,7 @@ func (p *Parser) checkExists2word() bool {
 
 	wordCnt := 0
 	for p.curToken().isTypeToken() {
-		if p.curToken().isToken(word) {
+		if p.curToken().isToken(word) || p.curToken().isToken(keyVoid) {
 			wordCnt++
 		}
 		p.pos++
