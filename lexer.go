@@ -400,7 +400,7 @@ func (l *Lexer) readString() *Token {
 
 	// 次の " を探す
 	for next = l.pos + 1; next < len(l.input); next++ {
-        // エスケープシーケンス考慮
+		// エスケープシーケンス考慮
 		if l.input[next] == '\\' && l.input[next+1] == '\\' {
 			next++
 		} else if l.input[next] == '\\' && l.input[next+1] == '"' {
@@ -588,6 +588,7 @@ func (t *Token) isPrefixExpression() bool {
 	case decrement:
 	case tilde:
 	case bang:
+	case asterisk:
 	default:
 		return false
 	}

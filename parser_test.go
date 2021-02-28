@@ -1164,6 +1164,26 @@ void func(void)
 				},
 			},
 		},
+		{
+			"assigne 7",
+			`
+void func(void)
+{
+    v = ***p;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "v"},
+							&RefVar{Name: "p"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

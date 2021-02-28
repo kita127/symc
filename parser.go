@@ -1413,9 +1413,6 @@ func (p *Parser) parseExpression() []Statement {
 			return nil
 		}
 		ss = append(ss, ls...)
-	case asterisk:
-		p.pos++
-		fallthrough
 	case word:
 		prePos := p.pos
 		ls := p.parseCallFunc()
