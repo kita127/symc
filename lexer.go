@@ -589,6 +589,7 @@ func (t *Token) isPrefixExpression() bool {
 	case tilde:
 	case bang:
 	case asterisk:
+	case ampersand:
 	default:
 		return false
 	}

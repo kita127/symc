@@ -1169,6 +1169,7 @@ void func(void)
 			`
 void func(void)
 {
+    v = *p;
     v = ***p;
 }
 `,
@@ -1179,6 +1180,28 @@ void func(void)
 						Statements: []Statement{
 							&Assigne{Name: "v"},
 							&RefVar{Name: "p"},
+							&Assigne{Name: "v"},
+							&RefVar{Name: "p"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"assigne 8",
+			`
+void func(void)
+{
+    p = &v;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "p"},
+							&RefVar{Name: "v"},
 						},
 					},
 				},

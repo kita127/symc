@@ -1405,14 +1405,6 @@ func (p *Parser) parseExpression() []Statement {
 			// rparen
 			p.pos++
 		}
-	case ampersand:
-		p.pos++
-		ls := p.parseExpression()
-		if ls == nil {
-			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
-			return nil
-		}
-		ss = append(ss, ls...)
 	case word:
 		prePos := p.pos
 		ls := p.parseCallFunc()
