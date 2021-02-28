@@ -471,11 +471,19 @@ char func(void) {
 			`
 int hoge = sizeof(int);
 int fuga = sizeof(arr)/sizeof(&arr[0]);
+Node **buf = malloc(len * sizeof(Node *));
 `,
 			&Module{
 				[]Statement{
 					&VariableDef{Name: "hoge"},
 					&VariableDef{Name: "fuga"},
+					&VariableDef{Name: "buf"},
+					&CallFunc{
+						Name: "malloc",
+						Args: []Statement{
+							&RefVar{Name: "len"},
+						},
+					},
 				},
 			},
 		},
