@@ -1379,6 +1379,14 @@ func (p *Parser) parseExpression() []Statement {
 	if p.curToken().isPrefixExpression() {
 		// 前置式
 		p.pos++
+
+		ts := p.parseExpression()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
+		return ss
 	}
 
 	switch p.curToken().tokenType {

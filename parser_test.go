@@ -3040,6 +3040,25 @@ void func()
 				},
 			},
 		},
+		{
+			"expression 14",
+			`
+void func()
+{
+    ++++++a;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "a"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
