@@ -2091,6 +2091,53 @@ extern long timezone __asm("_" "timezone" );
 				},
 			},
 		},
+		{
+			"test gcc 9",
+			`
+static void push_xmm(int reg) {
+    int save_hook __attribute__((unused, cleanup(pop_function)));
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "push_xmm",
+						Params: []*VariableDef{
+							{Name: "reg"},
+						},
+						Statements: []Statement{
+							&VariableDef{Name: "save_hook"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"test gcc 10",
+			`
+static void push_xmm(int reg) {
+    int save_hook __attribute__((unused, cleanup(pop_function))); if (dumpstack) vec_push(functions, (void *)__func__);;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "push_xmm",
+						Params: []*VariableDef{
+							{Name: "reg"},
+						},
+						Statements: []Statement{
+							&VariableDef{Name: "save_hook"},
+							&RefVar{Name: "dumpstack"},
+							&CallFunc{Name: "vec_push",
+								Args: []Statement{
+									&RefVar{Name: "functions"},
+									&RefVar{Name: "__func__"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

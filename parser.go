@@ -359,6 +359,7 @@ func (p *Parser) parseNormalVarDef() []Statement {
 			!p.curToken().isToken(comma) &&
 			!p.curToken().isToken(assign) &&
 			!p.curToken().isToken(keyAsm) &&
+			!p.curToken().isToken(keyAttribute) &&
 			!p.curToken().isToken(lbracket) {
 			p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
 			return nil
@@ -394,6 +395,11 @@ func (p *Parser) parseNormalVarDef() []Statement {
 			ss = append(ss, is...)
 		} else if p.curToken().isToken(keyAsm) {
 			if p.parseAsm() == nil {
+				p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
+				return nil
+			}
+		} else if p.curToken().isToken(keyAttribute) {
+			if p.parseAttribute() == nil {
 				p.updateErrLog(fmt.Sprintf("parseNormalVarDef:token[%s]", p.curToken().literal))
 				return nil
 			}
