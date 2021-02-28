@@ -3046,6 +3046,8 @@ void func()
 void func()
 {
     ++++++a;
+    b--------;
+    --++c++--;
 }
 `,
 			&Module{
@@ -3054,6 +3056,8 @@ void func()
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							&RefVar{Name: "a"},
+							&RefVar{Name: "b"},
+							&RefVar{Name: "c"},
 						},
 					},
 				},
