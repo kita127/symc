@@ -445,6 +445,7 @@ int hoge[2][3][4] = {
 			`
 char func(void) {
     Buffer *b = make_buffer();
+    int len = vec_len(inits);
 }
 `,
 			&Module{
@@ -454,6 +455,12 @@ char func(void) {
 						Statements: []Statement{
 							&VariableDef{Name: "b"},
 							&CallFunc{Name: "make_buffer", Args: []Statement{}},
+							&VariableDef{Name: "len"},
+							&CallFunc{Name: "vec_len",
+								Args: []Statement{
+									&RefVar{Name: "inits"},
+								},
+							},
 						},
 					},
 				},
