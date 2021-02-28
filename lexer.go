@@ -442,14 +442,30 @@ func (l *Lexer) readLetter() *Token {
 	var s []byte
 	c := l.input[l.pos]
 	if c == '\\' {
+		s = l.getEscC()
+		l.pos++
+	} else {
 		s = append(s, c)
 		l.pos++
-		c = l.input[l.pos]
+		l.pos++
 	}
-	s = append(s, c)
-	l.pos++
-	l.pos++
 	return &Token{tokenType: letter, literal: string(s)}
+}
+
+func (l *Lexer) getEscC() []byte {
+	res := []byte{}
+	res = append(res, l.input[l.pos])
+	l.pos++
+	if l.input[l.pos] >= '0' && l.input[l.pos] <= '9' {
+		res = append(res, l.input[l.pos])
+		l.pos++
+		res = append(res, l.input[l.pos])
+		l.pos++
+	}
+	res = append(res, l.input[l.pos])
+	l.pos++
+
+	return res
 }
 
 func (l *Lexer) newIllegal() *Token {
