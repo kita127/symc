@@ -3022,10 +3022,6 @@ void func()
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							&RefVar{Name: "_fd"},
-							&CallFunc{Name: "sizeof", Args: []Statement{
-								&RefVar{Name: "__int32_t"},
-							},
-							},
 						},
 					},
 				},

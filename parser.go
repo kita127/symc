@@ -1451,6 +1451,12 @@ func (p *Parser) parseExpression() []Statement {
 			return nil
 		}
 		p.pos++
+	case keySizeof:
+		ts := p.parseSizeof()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+			return nil
+		}
 	case str:
 		// 文字列が連続する場合がある
 		for p.curToken().isToken(str) {
@@ -1482,6 +1488,22 @@ func (p *Parser) parseExpression() []Statement {
 	}
 
 	return ss
+}
+
+// parseSizeof
+func (p *Parser) parseSizeof() []Statement {
+	if !p.curToken().isToken(keySizeof) {
+		p.updateErrLog(fmt.Sprintf("parseSizeof:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.pos++
+	if !p.curToken().isToken(lparen) {
+		p.updateErrLog(fmt.Sprintf("parseSizeof:token[%s]", p.curToken().literal))
+		return nil
+	}
+	p.skipParen()
+
+	return []Statement{}
 }
 
 // parseCallFunc

@@ -880,6 +880,22 @@ int func(int a) {
 			},
 		},
 		{
+			"test20",
+			`
+            sizeof
+`,
+			[]*Token{
+				{
+					keySizeof,
+					"sizeof",
+				},
+				{
+					eof,
+					"eof",
+				},
+			},
+		},
+		{
 			"test gcc 1",
 			`__asm`,
 			[]*Token{
