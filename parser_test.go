@@ -1806,6 +1806,33 @@ void func()
 				},
 			},
 		},
+		{
+			"function def 14",
+			`
+static void pop_function(void *ignore) {
+    if (dumpstack)
+        vec_pop(functions);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "pop_function",
+						Params: []*VariableDef{
+							{Name: "ignore"},
+						},
+						Statements: []Statement{
+							&RefVar{"dumpstack"},
+							&CallFunc{
+								Name: "vec_pop",
+								Args: []Statement{
+									&RefVar{Name: "functions"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

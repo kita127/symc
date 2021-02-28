@@ -1572,13 +1572,22 @@ func (p *Parser) parseParameter() []*VariableDef {
 		p.pos++
 		// next
 		return ss
-	} else if p.curToken().tokenType == keyVoid {
+	} else if p.curToken().isToken(keyVoid) {
 		// void
-		p.pos++
-		// rparen
-		p.pos++
-		// next
-		return ss
+		if p.peekToken().isToken(asterisk) {
+			// void *
+			// 通常のパラメータのパースをする
+		} else {
+			p.pos++
+			// rparen
+			if !p.curToken().isToken(rparen) {
+				p.updateErrLog(fmt.Sprintf("parseParameter:token[%s]", p.curToken().literal))
+				return nil
+			}
+			p.pos++
+			// next
+			return ss
+		}
 	}
 
 	for {
