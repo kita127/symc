@@ -441,7 +441,7 @@ int hoge[2][3][4] = {
 			},
 		},
 		{
-			"variable definition 12",
+			"variable definition 13",
 			`
 char func(void) {
     Buffer *b = make_buffer();
@@ -463,6 +463,19 @@ char func(void) {
 							},
 						},
 					},
+				},
+			},
+		},
+		{
+			"variable definition 14",
+			`
+int hoge = sizeof(int);
+int fuga = sizeof(arr)/sizeof(&arr[0]);
+`,
+			&Module{
+				[]Statement{
+					&VariableDef{Name: "hoge"},
+					&VariableDef{Name: "fuga"},
 				},
 			},
 		},
