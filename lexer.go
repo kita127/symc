@@ -457,13 +457,14 @@ func (l *Lexer) getEscC() []byte {
 	res = append(res, l.input[l.pos])
 	l.pos++
 	if l.input[l.pos] >= '0' && l.input[l.pos] <= '9' {
-		res = append(res, l.input[l.pos])
-		l.pos++
+		for l.input[l.pos] >= '0' && l.input[l.pos] <= '9' {
+			res = append(res, l.input[l.pos])
+			l.pos++
+		}
+	} else {
 		res = append(res, l.input[l.pos])
 		l.pos++
 	}
-	res = append(res, l.input[l.pos])
-	l.pos++
 
 	return res
 }
