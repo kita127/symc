@@ -3672,6 +3672,68 @@ void func(void)
 	}
 }
 
+// TestStVar
+func TestStVar(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"st var 1",
+			`
+void func(void)
+{
+    s.v;
+    p->v;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "s"},
+							&RefVar{Name: "p"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"st var 2",
+			`
+void func(void)
+{
+    s.v = 100;
+    p->v = 100;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "s"},
+							&Assigne{Name: "p"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
 // TestTmp
 func TestTmp(t *testing.T) {
 	testTbl := []struct {

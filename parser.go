@@ -1473,7 +1473,21 @@ func (p *Parser) parseExpression() []Statement {
 		return nil
 	}
 
+CHECK:
+
 	if p.curToken().isOperator() {
+		if p.curToken().isToken(period) || p.curToken().isToken(arrow) {
+			// 構造体のアクセス
+			p.pos++
+			if xs := p.parseRefVar(); xs == nil {
+				p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+				return nil
+			}
+
+			// 再度中置演算子の判定
+			goto CHECK
+		}
+
 		if p.curToken().isToken(assign) || p.curToken().isCompoundOp() {
 			// 代入式の場合は対象の識別子を Assigne 型に変更
 			ss[p.leftVarInfo.idIndex] = &Assigne{p.leftVarInfo.idName}
@@ -1581,7 +1595,8 @@ func (p *Parser) parseRefVar() []Statement {
 		p.updateErrLog(fmt.Sprintf("parseRefVar:token[%s]", p.curToken().literal))
 		return nil
 	}
-	n := p.fetchID()
+	n := p.curToken().literal
+	p.pos++
 
 	return []Statement{&RefVar{Name: n}}
 }
