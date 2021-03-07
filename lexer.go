@@ -560,7 +560,6 @@ func (t *Token) isTypeToken() bool {
 
 func (t *Token) isOperator() bool {
 	switch t.tokenType {
-	case lparen:
 	case assign:
 	case plus:
 	case minus:
@@ -619,6 +618,7 @@ func (t *Token) isPrefixExpression() bool {
 
 func (t *Token) isPostExpression() bool {
 	switch t.tokenType {
+	case lparen:
 	case increment:
 	case decrement:
 	default:

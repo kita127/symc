@@ -1473,15 +1473,7 @@ func (p *Parser) parseExpression() []Statement {
 
 	// 後置演算式
 	if p.curToken().isPostExpression() {
-		p.pos++
-	}
-
-	// 中置演算式
-	if p.curToken().isOperator() {
-		if p.curToken().isToken(assign) || p.curToken().isCompoundOp() {
-			// 代入式の場合は対象の識別子を Assigne 型に変更
-			ss[p.leftVarInfo.idIndex] = &Assigne{p.leftVarInfo.idName}
-		} else if p.curToken().isToken(lparen) {
+		if p.curToken().isToken(lparen) {
 			// 関数コール
 			p.pos++
 			as := []Statement{}
@@ -1514,12 +1506,18 @@ func (p *Parser) parseExpression() []Statement {
 				}
 			}
 
-			// rparen
-			p.pos++
-
 			ss[p.leftVarInfo.idIndex] = &CallFunc{Name: p.leftVarInfo.idName, Args: as}
+			// p.pos++
+		}
+		p.pos++
+	}
 
-			goto END
+	// 中置演算式
+	if p.curToken().isOperator() {
+		if p.curToken().isToken(assign) || p.curToken().isCompoundOp() {
+			// 代入式の場合は対象の識別子を Assigne 型に変更
+			ss[p.leftVarInfo.idIndex] = &Assigne{p.leftVarInfo.idName}
+		} else if p.curToken().isToken(lparen) {
 		}
 		p.pos++
 		r := p.parseExpression()
@@ -1529,8 +1527,6 @@ func (p *Parser) parseExpression() []Statement {
 		}
 		ss = append(ss, r...)
 	}
-
-END:
 
 	return ss
 }
