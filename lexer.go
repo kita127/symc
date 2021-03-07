@@ -618,6 +618,7 @@ func (t *Token) isPrefixExpression() bool {
 
 func (t *Token) isPostExpression() bool {
 	switch t.tokenType {
+	case lparen:
 	case increment:
 	case decrement:
 	default:

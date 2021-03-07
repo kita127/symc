@@ -2713,6 +2713,110 @@ void func()
 				},
 			},
 		},
+		{
+			"call expression 11",
+			`
+void func()
+{
+    hoge = cfunc() + a;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "hoge"},
+							&CallFunc{Name: "cfunc",
+								Args: []Statement{},
+							},
+							&RefVar{Name: "a"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"call expression 12",
+			`
+void func()
+{
+    afunc(bfunc());
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&CallFunc{Name: "afunc",
+								Args: []Statement{
+									&CallFunc{Name: "bfunc",
+										Args: []Statement{},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			"call expression 13",
+			`
+void func()
+{
+    char *dir = callFunc(a, b);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&VariableDef{Name: "dir"},
+							&CallFunc{Name: "callFunc",
+								Args: []Statement{
+									&RefVar{Name: "a"},
+									&RefVar{Name: "b"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			"call expression 14",
+			`
+void func()
+{
+    char *dir = callFunc(a, b) + callFunc(c, d);
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&VariableDef{Name: "dir"},
+							&CallFunc{Name: "callFunc",
+								Args: []Statement{
+									&RefVar{Name: "a"},
+									&RefVar{Name: "b"},
+								},
+							},
+							&CallFunc{Name: "callFunc",
+								Args: []Statement{
+									&RefVar{Name: "c"},
+									&RefVar{Name: "d"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

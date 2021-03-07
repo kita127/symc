@@ -1406,26 +1406,17 @@ func (p *Parser) parseExpression() []Statement {
 			p.pos++
 		}
 	case word:
-		prePos := p.pos
-		ls := p.parseCallFunc()
-		if ls == nil {
-			p.pos = prePos
-			ls = p.parseIdentifire()
-			ss = append(ss, ls...)
-
-			// RefVar の場合あとで assigne に変更する時のためにインデックスと変数名を記憶する
-			if refv, ok := ss[len(ss)-1].(*RefVar); ok {
-				p.leftVarInfo.idIndex = len(ss) - 1
-				p.leftVarInfo.idName = refv.Name
-			}
-
-		} else {
-			ss = append(ss, ls...)
-		}
-
+		ls := p.parseIdentifire()
 		if ls == nil {
 			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
 			return nil
+		}
+		ss = append(ss, ls...)
+
+		// RefVar の場合あとで assigne に変更する時のためにインデックスと変数名を記憶する
+		if refv, ok := ss[len(ss)-1].(*RefVar); ok {
+			p.leftVarInfo.idIndex = len(ss) - 1
+			p.leftVarInfo.idName = refv.Name
 		}
 
 	case lbrace:
@@ -1482,6 +1473,42 @@ func (p *Parser) parseExpression() []Statement {
 
 	// 後置演算式
 	if p.curToken().isPostExpression() {
+		if p.curToken().isToken(lparen) {
+			// 関数コール
+			p.pos++
+			as := []Statement{}
+
+			if !p.curToken().isToken(rparen) {
+				// 引数あり
+				for {
+
+					// leftVarInfo 上書き防止
+					idIndex := p.leftVarInfo.idIndex
+					idName := p.leftVarInfo.idName
+					xs := p.parseExpression()
+					p.leftVarInfo.idIndex = idIndex
+					p.leftVarInfo.idName = idName
+
+					if xs == nil {
+						p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+						return nil
+					}
+					as = append(as, xs...)
+
+					if p.curToken().isToken(rparen) {
+						break
+					} else if p.curToken().isToken(comma) {
+						p.pos++
+					} else {
+						p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+						return nil
+					}
+				}
+			}
+
+			ss[p.leftVarInfo.idIndex] = &CallFunc{Name: p.leftVarInfo.idName, Args: as}
+			// p.pos++
+		}
 		p.pos++
 	}
 
@@ -1490,6 +1517,7 @@ func (p *Parser) parseExpression() []Statement {
 		if p.curToken().isToken(assign) || p.curToken().isCompoundOp() {
 			// 代入式の場合は対象の識別子を Assigne 型に変更
 			ss[p.leftVarInfo.idIndex] = &Assigne{p.leftVarInfo.idName}
+		} else if p.curToken().isToken(lparen) {
 		}
 		p.pos++
 		r := p.parseExpression()
@@ -1549,106 +1577,6 @@ func (p *Parser) parseSizeof() []Statement {
 	p.skipParen()
 
 	return []Statement{}
-}
-
-// parseRefVar
-func (p *Parser) parseRefVar() []Statement {
-	ss := []Statement{}
-	if p.curToken().tokenType != word {
-		p.updateErrLog(fmt.Sprintf("parseRefVar:token[%s]", p.curToken().literal))
-		return nil
-	}
-	id := p.curToken().literal
-	p.pos++
-
-	ss = append(ss, &RefVar{Name: id})
-
-	// 構造体アクセスか配列
-	for p.curToken().isToken(lbracket) ||
-		p.curToken().isToken(period) ||
-		p.curToken().isToken(arrow) {
-
-		if p.curToken().isToken(lbracket) {
-			// 配列
-			ts := p.parseBracket()
-			if ts == nil {
-				p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
-				return nil
-			}
-			ss = append(ss, ts...)
-		} else {
-			// 構造体のアクセス
-			p.pos++
-			if xs := p.parseIdentifire(); xs == nil {
-				p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
-				return nil
-			}
-		}
-	}
-
-	return ss
-}
-
-// parseCallFunc
-func (p *Parser) parseCallFunc() []Statement {
-	ss := []Statement{}
-	if !p.curToken().isToken(word) {
-		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
-		return nil
-	}
-	ts := p.parseRefVar()
-	if ts == nil {
-		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
-		return nil
-	}
-	if len(ts) < 1 {
-		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
-		return nil
-	}
-	refv, ok := ts[0].(*RefVar)
-	if !ok {
-		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
-		return nil
-	}
-	id := refv.Name
-
-	if p.curToken().tokenType != lparen {
-		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
-		return nil
-	}
-	p.pos++
-
-	as := []Statement{}
-
-	if p.curToken().tokenType == rparen {
-		// 引数なし
-		p.pos++
-		return []Statement{&CallFunc{Name: id, Args: as}}
-	}
-
-	for {
-		ts := p.parseExpression()
-		if ts == nil {
-			p.updateErrLog(fmt.Sprintf("parseCallFunc_2:token[%s]", p.curToken().literal))
-			return nil
-		}
-		as = append(as, ts...)
-
-		if p.curToken().tokenType == comma {
-			p.pos++
-		} else if p.curToken().tokenType == rparen {
-			p.pos++
-			break
-		} else {
-			p.updateErrLog(fmt.Sprintf("parseCallFunc_3:token[%s]", p.curToken().literal))
-			return nil
-		}
-	}
-
-	ss = append(ss, &CallFunc{Name: id, Args: as})
-	ss = append(ss, ts[1:]...)
-
-	return ss
 }
 
 // parseCast
