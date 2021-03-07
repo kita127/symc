@@ -3721,6 +3721,56 @@ void func(void)
 				},
 			},
 		},
+		{
+			"st var 3",
+			`
+void func(void)
+{
+    s.v.v2.v3;
+    p->v->v2->v3;
+    s.v.v2.v3 = 100;
+    p->v->v2->v3 = 100;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "s"},
+							&RefVar{Name: "p"},
+							&Assigne{Name: "s"},
+							&Assigne{Name: "p"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"st var 4",
+			`
+void func(void)
+{
+    (*p).v;
+    (&s)->v;
+    (*p).v = 100;
+    (&s)->v = 100;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "p"},
+							&RefVar{Name: "s"},
+							&Assigne{Name: "p"},
+							&Assigne{Name: "s"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
