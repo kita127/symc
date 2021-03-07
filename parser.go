@@ -1421,14 +1421,11 @@ func (p *Parser) parseExpression() []Statement {
 
 			for p.curToken().isToken(lbracket) {
 				// 配列の場合
-				p.pos++
-				// leftVarInfo 上書き防止
-				idIndex := p.leftVarInfo.idIndex
-				idName := p.leftVarInfo.idName
-				ts := p.parseExpression()
-				p.leftVarInfo.idIndex = idIndex
-				p.leftVarInfo.idName = idName
-				p.pos++
+				ts := p.parseBracket()
+				if ts == nil {
+					p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+					return nil
+				}
 				ss = append(ss, ts...)
 			}
 

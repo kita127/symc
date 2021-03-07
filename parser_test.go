@@ -3805,6 +3805,7 @@ void func(void)
 			`
 void func(void)
 {
+    h[i] = 0;
     s.x[i] = a;
     s.y[i][j] = b;
     s.z[i][j][k] = c;
@@ -3815,6 +3816,8 @@ void func(void)
 					&FunctionDef{Name: "func",
 						Params: []*VariableDef{},
 						Statements: []Statement{
+							&Assigne{Name: "h"},
+							&RefVar{Name: "i"},
 							&Assigne{Name: "s"},
 							&RefVar{Name: "i"},
 							&RefVar{Name: "a"},
