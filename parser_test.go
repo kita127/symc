@@ -3866,6 +3866,30 @@ void func(void)
 				},
 			},
 		},
+		{
+			"st var 8",
+			`
+void func(void)
+{
+    *(s.x[a]->y[b].z[c][d]) = hhh;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "s"},
+							&RefVar{Name: "a"},
+							&RefVar{Name: "b"},
+							&RefVar{Name: "c"},
+							&RefVar{Name: "d"},
+							&RefVar{Name: "hhh"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
