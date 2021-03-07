@@ -1413,7 +1413,7 @@ func (p *Parser) parseExpression() []Statement {
 		}
 		ss = append(ss, ls...)
 
-		// RefVar の場合あとで assigne に変更する時のためにインデックスと変数名を記憶する
+		// RefVar の場合あとで assigne や callfunc に変更する時のためにインデックスと変数名を記憶する
 		if refv, ok := ss[len(ss)-1].(*RefVar); ok {
 			p.leftVarInfo.idIndex = len(ss) - 1
 			p.leftVarInfo.idName = refv.Name
