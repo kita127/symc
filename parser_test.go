@@ -2682,6 +2682,8 @@ void func()
 void func()
 {
     macro->fn(tok);
+    macro[i](tok);
+    macro->fn[i](tok);
 }
 `,
 			&Module{
@@ -2694,6 +2696,18 @@ void func()
 									&RefVar{Name: "tok"},
 								},
 							},
+							&CallFunc{Name: "macro",
+								Args: []Statement{
+									&RefVar{Name: "tok"},
+								},
+							},
+							&RefVar{Name: "i"},
+							&CallFunc{Name: "macro",
+								Args: []Statement{
+									&RefVar{Name: "tok"},
+								},
+							},
+							&RefVar{Name: "i"},
 						},
 					},
 				},

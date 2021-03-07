@@ -1591,6 +1591,7 @@ func (p *Parser) parseRefVar() []Statement {
 
 // parseCallFunc
 func (p *Parser) parseCallFunc() []Statement {
+	ss := []Statement{}
 	if !p.curToken().isToken(word) {
 		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
 		return nil
@@ -1600,7 +1601,7 @@ func (p *Parser) parseCallFunc() []Statement {
 		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
 		return nil
 	}
-	if len(ts) != 1 {
+	if len(ts) < 1 {
 		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
 		return nil
 	}
@@ -1617,12 +1618,12 @@ func (p *Parser) parseCallFunc() []Statement {
 	}
 	p.pos++
 
-	ss := []Statement{}
+	as := []Statement{}
 
 	if p.curToken().tokenType == rparen {
 		// 引数なし
 		p.pos++
-		return []Statement{&CallFunc{Name: id, Args: ss}}
+		return []Statement{&CallFunc{Name: id, Args: as}}
 	}
 
 	for {
@@ -1631,7 +1632,7 @@ func (p *Parser) parseCallFunc() []Statement {
 			p.updateErrLog(fmt.Sprintf("parseCallFunc_2:token[%s]", p.curToken().literal))
 			return nil
 		}
-		ss = append(ss, ts...)
+		as = append(as, ts...)
 
 		if p.curToken().tokenType == comma {
 			p.pos++
@@ -1644,7 +1645,10 @@ func (p *Parser) parseCallFunc() []Statement {
 		}
 	}
 
-	return []Statement{&CallFunc{Name: id, Args: ss}}
+	ss = append(ss, &CallFunc{Name: id, Args: as})
+	ss = append(ss, ts[1:]...)
+
+	return ss
 }
 
 // parseCast
