@@ -1460,29 +1460,30 @@ func (p *Parser) parseExpression() []Statement {
 		return nil
 	}
 
-HOGE:
+	// 構造体アクセスか配列
+	for p.curToken().isToken(lbracket) ||
+		p.curToken().isToken(period) ||
+		p.curToken().isToken(arrow) {
 
-	if p.curToken().isToken(lbracket) {
-		// 配列の場合
-		ts := p.parseBracket()
-		if ts == nil {
-			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
-			return nil
+		if p.curToken().isToken(lbracket) {
+			// 配列
+			ts := p.parseBracket()
+			if ts == nil {
+				p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+				return nil
+			}
+			ss = append(ss, ts...)
+		} else {
+			// 構造体のアクセス
+			p.pos++
+			if xs := p.parseRefVar(); xs == nil {
+				p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+				return nil
+			}
 		}
-		ss = append(ss, ts...)
-
-		goto HOGE
-
-	} else if p.curToken().isToken(period) || p.curToken().isToken(arrow) {
-		// 構造体のアクセス
-		p.pos++
-		if xs := p.parseRefVar(); xs == nil {
-			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
-			return nil
-		}
-		goto HOGE
 	}
 
+	// 中置演算式
 	if p.curToken().isOperator() {
 		if p.curToken().isToken(assign) || p.curToken().isCompoundOp() {
 			// 代入式の場合は対象の識別子を Assigne 型に変更
