@@ -2689,7 +2689,7 @@ void func()
 					&FunctionDef{Name: "func",
 						Params: []*VariableDef{},
 						Statements: []Statement{
-							&CallFunc{Name: "macro->fn",
+							&CallFunc{Name: "macro",
 								Args: []Statement{
 									&RefVar{Name: "tok"},
 								},

@@ -1410,7 +1410,7 @@ func (p *Parser) parseExpression() []Statement {
 		ls := p.parseCallFunc()
 		if ls == nil {
 			p.pos = prePos
-			ls = p.parseRefVar()
+			ls = p.parseIdentifire()
 			ss = append(ss, ls...)
 
 			// RefVar の場合あとで assigne に変更する時のためにインデックスと変数名を記憶する
@@ -1473,7 +1473,7 @@ func (p *Parser) parseExpression() []Statement {
 		} else {
 			// 構造体のアクセス
 			p.pos++
-			if xs := p.parseRefVar(); xs == nil {
+			if xs := p.parseIdentifire(); xs == nil {
 				p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
 				return nil
 			}
@@ -1551,13 +1551,66 @@ func (p *Parser) parseSizeof() []Statement {
 	return []Statement{}
 }
 
+// parseRefVar
+func (p *Parser) parseRefVar() []Statement {
+	ss := []Statement{}
+	if p.curToken().tokenType != word {
+		p.updateErrLog(fmt.Sprintf("parseRefVar:token[%s]", p.curToken().literal))
+		return nil
+	}
+	id := p.curToken().literal
+	p.pos++
+
+	ss = append(ss, &RefVar{Name: id})
+
+	// 構造体アクセスか配列
+	for p.curToken().isToken(lbracket) ||
+		p.curToken().isToken(period) ||
+		p.curToken().isToken(arrow) {
+
+		if p.curToken().isToken(lbracket) {
+			// 配列
+			ts := p.parseBracket()
+			if ts == nil {
+				p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+				return nil
+			}
+			ss = append(ss, ts...)
+		} else {
+			// 構造体のアクセス
+			p.pos++
+			if xs := p.parseIdentifire(); xs == nil {
+				p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+				return nil
+			}
+		}
+	}
+
+	return ss
+}
+
 // parseCallFunc
 func (p *Parser) parseCallFunc() []Statement {
 	if !p.curToken().isToken(word) {
 		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
 		return nil
 	}
-	id := p.fetchID()
+	ts := p.parseRefVar()
+	if ts == nil {
+		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
+		return nil
+	}
+	if len(ts) != 1 {
+		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
+		return nil
+	}
+	refv, ok := ts[0].(*RefVar)
+	if !ok {
+		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
+		return nil
+	}
+	id := refv.Name
+
 	if p.curToken().tokenType != lparen {
 		p.updateErrLog(fmt.Sprintf("parseCallFunc_1:token[%s]", p.curToken().literal))
 		return nil
@@ -1620,10 +1673,10 @@ func (p *Parser) parseCast() []Statement {
 	return ss
 }
 
-// parseRefVar
-func (p *Parser) parseRefVar() []Statement {
+// parseIdentifire
+func (p *Parser) parseIdentifire() []Statement {
 	if p.curToken().tokenType != word {
-		p.updateErrLog(fmt.Sprintf("parseRefVar:token[%s]", p.curToken().literal))
+		p.updateErrLog(fmt.Sprintf("parseIdentifire:token[%s]", p.curToken().literal))
 		return nil
 	}
 	n := p.curToken().literal
