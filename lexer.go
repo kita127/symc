@@ -560,6 +560,7 @@ func (t *Token) isTypeToken() bool {
 
 func (t *Token) isOperator() bool {
 	switch t.tokenType {
+	case lparen:
 	case assign:
 	case plus:
 	case minus:

@@ -1406,26 +1406,17 @@ func (p *Parser) parseExpression() []Statement {
 			p.pos++
 		}
 	case word:
-		prePos := p.pos
-		ls := p.parseCallFunc()
-		if ls == nil {
-			p.pos = prePos
-			ls = p.parseIdentifire()
-			ss = append(ss, ls...)
-
-			// RefVar の場合あとで assigne に変更する時のためにインデックスと変数名を記憶する
-			if refv, ok := ss[len(ss)-1].(*RefVar); ok {
-				p.leftVarInfo.idIndex = len(ss) - 1
-				p.leftVarInfo.idName = refv.Name
-			}
-
-		} else {
-			ss = append(ss, ls...)
-		}
-
+		ls := p.parseIdentifire()
 		if ls == nil {
 			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
 			return nil
+		}
+		ss = append(ss, ls...)
+
+		// RefVar の場合あとで assigne に変更する時のためにインデックスと変数名を記憶する
+		if refv, ok := ss[len(ss)-1].(*RefVar); ok {
+			p.leftVarInfo.idIndex = len(ss) - 1
+			p.leftVarInfo.idName = refv.Name
 		}
 
 	case lbrace:
@@ -1490,6 +1481,45 @@ func (p *Parser) parseExpression() []Statement {
 		if p.curToken().isToken(assign) || p.curToken().isCompoundOp() {
 			// 代入式の場合は対象の識別子を Assigne 型に変更
 			ss[p.leftVarInfo.idIndex] = &Assigne{p.leftVarInfo.idName}
+		} else if p.curToken().isToken(lparen) {
+			// 関数コール
+			p.pos++
+			as := []Statement{}
+
+			if !p.curToken().isToken(rparen) {
+				// 引数あり
+				for {
+
+					// leftVarInfo 上書き防止
+					idIndex := p.leftVarInfo.idIndex
+					idName := p.leftVarInfo.idName
+					xs := p.parseExpression()
+					p.leftVarInfo.idIndex = idIndex
+					p.leftVarInfo.idName = idName
+
+					if xs == nil {
+						p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+						return nil
+					}
+					as = append(as, xs...)
+
+					if p.curToken().isToken(rparen) {
+						break
+					} else if p.curToken().isToken(comma) {
+						p.pos++
+					} else {
+						p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+						return nil
+					}
+				}
+			}
+
+			// rparen
+			p.pos++
+
+			ss[p.leftVarInfo.idIndex] = &CallFunc{Name: p.leftVarInfo.idName, Args: as}
+
+			goto END
 		}
 		p.pos++
 		r := p.parseExpression()
@@ -1499,6 +1529,8 @@ func (p *Parser) parseExpression() []Statement {
 		}
 		ss = append(ss, r...)
 	}
+
+END:
 
 	return ss
 }
