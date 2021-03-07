@@ -215,27 +215,6 @@ void func(void)
 			},
 		},
 		{
-			"access struct var 1",
-			`
-void func(void)
-{
-    hoge.a1 = 'A';
-    fuga->b1 = 100;
-}
-`,
-			&Module{
-				[]Statement{
-					&FunctionDef{Name: "func",
-						Params: []*VariableDef{},
-						Statements: []Statement{
-							&Assigne{Name: "hoge.a1"},
-							&Assigne{Name: "fuga->b1"},
-						},
-					},
-				},
-			},
-		},
-		{
 			"return 1",
 			`
 void f_xxx(void)
@@ -622,12 +601,12 @@ int muruchi_piyomi(char *s) {
 						Statements: []Statement{
 							&VariableDef{Name: "purin"},
 							&VariableDef{Name: "p"},
-							&Assigne{Name: "purin.aaa"},
-							&Assigne{Name: "purin.bbb.xxx"},
+							&Assigne{Name: "purin"},
+							&Assigne{Name: "purin"},
 							&Assigne{Name: "p"},
 							&RefVar{Name: "purin"},
-							&Assigne{Name: "p->aaa"},
-							&RefVar{Name: "purin.aaa"},
+							&Assigne{Name: "p"},
+							&RefVar{Name: "purin"},
 						}},
 				},
 			},
@@ -647,11 +626,11 @@ void hoge(void){
 					&FunctionDef{Name: "hoge",
 						Params: []*VariableDef{},
 						Statements: []Statement{
-							&RefVar{Name: "_p->_w"},
-							&RefVar{Name: "_p->_w"},
-							&RefVar{Name: "_p->_lbfsize"},
+							&RefVar{Name: "_p"},
+							&RefVar{Name: "_p"},
+							&RefVar{Name: "_p"},
 							&RefVar{Name: "_c"},
-							&Assigne{Name: "_p->_p"},
+							&Assigne{Name: "_p"},
 							&RefVar{Name: "_c"},
 							&CallFunc{
 								Name: "__swbuf",
@@ -1010,12 +989,12 @@ void func(void)
 					&FunctionDef{Name: "func",
 						Params: []*VariableDef{},
 						Statements: []Statement{
-							&RefVar{Name: "macro->kind"},
+							&RefVar{Name: "macro"},
 							&VariableDef{Name: "hideset"},
 							&CallFunc{
 								Name: "set_add",
 								Args: []Statement{
-									&RefVar{Name: "tok->hideset"},
+									&RefVar{Name: "tok"},
 									&RefVar{Name: "name"},
 								},
 							},
@@ -1044,7 +1023,7 @@ void func(void)
 								Args: []Statement{},
 							},
 							&CallFunc{
-								Name: "macro->fn",
+								Name: "macro",
 								Args: []Statement{
 									&RefVar{Name: "tok"},
 								},
@@ -1180,7 +1159,7 @@ void func(void)
 					&FunctionDef{Name: "func",
 						Params: []*VariableDef{},
 						Statements: []Statement{
-							&Assigne{"_p->_p"},
+							&Assigne{"_p"},
 							&RefVar{"_c"},
 						},
 					},
@@ -1267,7 +1246,7 @@ void func(void)
 						Statements: []Statement{
 							&Assigne{Name: "k"},
 							&RefVar{Name: "j"},
-							&RefVar{Name: "m->key"},
+							&RefVar{Name: "m"},
 							&RefVar{Name: "i"},
 						},
 					},
@@ -2710,7 +2689,7 @@ void func()
 					&FunctionDef{Name: "func",
 						Params: []*VariableDef{},
 						Statements: []Statement{
-							&CallFunc{Name: "macro->fn",
+							&CallFunc{Name: "macro",
 								Args: []Statement{
 									&RefVar{Name: "tok"},
 								},
@@ -3267,12 +3246,12 @@ void func()
 						Params: []*VariableDef{},
 						Statements: []Statement{
 							&VariableDef{Name: "dir"},
-							&RefVar{Name: "file->name"},
+							&RefVar{Name: "file"},
 							&CallFunc{Name: "dirname", Args: []Statement{
 								&CallFunc{
 									Name: "strdup",
 									Args: []Statement{
-										&RefVar{Name: "file->name"},
+										&RefVar{Name: "file"},
 									},
 								},
 							},
@@ -3627,9 +3606,9 @@ case OP_A_AND: return "&=";
 					&FunctionDef{Name: "func",
 						Params: []*VariableDef{},
 						Statements: []Statement{
-							&RefVar{Name: "tok->kind"},
+							&RefVar{Name: "tok"},
 							&RefVar{Name: "x"},
-							&RefVar{Name: "tok->id"},
+							&RefVar{Name: "tok"},
 						},
 					},
 				},
@@ -3654,6 +3633,284 @@ void func(void)
 							&Assigne{Name: "i"},
 							&RefVar{Name: "i"},
 							&RefVar{Name: "i"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestStVar
+func TestStVar(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"st var 1",
+			`
+void func(void)
+{
+    s.v;
+    p->v;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "s"},
+							&RefVar{Name: "p"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"st var 2",
+			`
+void func(void)
+{
+    s.v = 100;
+    p->v = 100;
+    hoge.a1 = 'A';
+    fuga->b1 = 100;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "s"},
+							&Assigne{Name: "p"},
+							&Assigne{Name: "hoge"},
+							&Assigne{Name: "fuga"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"st var 3",
+			`
+void func(void)
+{
+    s.v.v2.v3;
+    p->v->v2->v3;
+    s.v.v2.v3 = 100;
+    p->v->v2->v3 = 100;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "s"},
+							&RefVar{Name: "p"},
+							&Assigne{Name: "s"},
+							&Assigne{Name: "p"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"st var 4",
+			`
+void func(void)
+{
+    (*p).v;
+    (&s)->v;
+    (*p).v = 100;
+    (&s)->v = 100;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "p"},
+							&RefVar{Name: "s"},
+							&Assigne{Name: "p"},
+							&Assigne{Name: "s"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"st var 5",
+			`
+void func(void)
+{
+    s.x[i];
+    s.y[i][j];
+    s.z[i][j][k];
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&RefVar{Name: "s"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "s"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "j"},
+							&RefVar{Name: "s"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "j"},
+							&RefVar{Name: "k"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"st var 6",
+			`
+void func(void)
+{
+    h[i] = 0;
+    s.x[i] = a;
+    s.y[i][j] = b;
+    s.z[i][j][k] = c;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "h"},
+							&RefVar{Name: "i"},
+							&Assigne{Name: "s"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "a"},
+							&Assigne{Name: "s"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "j"},
+							&RefVar{Name: "b"},
+							&Assigne{Name: "s"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "j"},
+							&RefVar{Name: "k"},
+							&RefVar{Name: "c"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"st var 7",
+			`
+void func(void)
+{
+    &(s.v) = b;
+    *(p->v) = b;
+    (s.v)[a] = b;
+    (p->v)[a] = b;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "s"},
+							&RefVar{Name: "b"},
+							&Assigne{Name: "p"},
+							&RefVar{Name: "b"},
+							&Assigne{Name: "s"},
+							&RefVar{Name: "a"},
+							&RefVar{Name: "b"},
+							&Assigne{Name: "p"},
+							&RefVar{Name: "a"},
+							&RefVar{Name: "b"},
+						},
+					},
+				},
+			},
+		},
+		{
+			"st var 8",
+			`
+void func(void)
+{
+    *(s.x[a]->y[b].z[c][d]) = hhh;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "s"},
+							&RefVar{Name: "a"},
+							&RefVar{Name: "b"},
+							&RefVar{Name: "c"},
+							&RefVar{Name: "d"},
+							&RefVar{Name: "hhh"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range testTbl {
+		t.Logf("%s", tt.comment)
+		l := NewLexer(tt.src)
+		p := NewParser(l)
+		got := p.Parse()
+		if !reflect.DeepEqual(got, tt.expect) {
+			t.Errorf("\ngot=   %v\nexpect=%v\n", got, tt.expect)
+		}
+	}
+}
+
+// TestPostExpression
+func TestPostExpression(t *testing.T) {
+	testTbl := []struct {
+		comment string
+		src     string
+		expect  *Module
+	}{
+		{
+			"post expression 1",
+			`
+void func(void)
+{
+    s.x++ = a;
+    p->x++ = b;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "s"},
+							&RefVar{Name: "a"},
+							&Assigne{Name: "p"},
+							&RefVar{Name: "b"},
 						},
 					},
 				},
