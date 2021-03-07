@@ -128,14 +128,14 @@ void HariMain(void) {
     init_keyboard();
 
     init_palette();
-    init_screen(binfo->vram, binfo->scrnx, binfo->scrny);
-    mx = (binfo->scrnx - 16) / 2;
-    my = (binfo->scrny - 28 - 16) / 2;
+    init_screen(binfo, binfo, binfo);
+    mx = (binfo - 16) / 2;
+    my = (binfo - 28 - 16) / 2;
     init_mouse_cursor8(mcursor, (14));
-    putblock8_8(binfo->vram, binfo->scrnx, 16, 16, mx, my, mcursor, 16);
+    putblock8_8(binfo, binfo, 16, 16, mx, my, mcursor, 16);
 
     mysprintf(s, "(%d, %d)", mx, my);
-    putfonts8_asc(binfo->vram, binfo->scrnx, 0, 0, (7), s);
+    putfonts8_asc(binfo, binfo, 0, 0, (7), s);
 
     enable_mouse();
 
@@ -148,15 +148,15 @@ void HariMain(void) {
                 data = fifo8_get(&keyfifo);
                 io_sti();
                 mysprintf(s, "%x", data);
-                boxfill8(binfo->vram, binfo->scrnx, (14), 0, 16, 15, 31);
-                putfonts8_asc(binfo->vram, binfo->scrnx, 0, 16, (7), s);
+                boxfill8(binfo, binfo, (14), 0, 16, 15, 31);
+                putfonts8_asc(binfo, binfo, 0, 16, (7), s);
             } else if (fifo8_data_count(&mousefifo) != 0) {
                 data = fifo8_get(&mousefifo);
                 io_sti();
                 mysprintf(s, "%x", data);
-                boxfill8(binfo->vram, binfo->scrnx, (14), 32, 16, 47,
+                boxfill8(binfo, binfo, (14), 32, 16, 47,
                          31);
-                putfonts8_asc(binfo->vram, binfo->scrnx, 32, 16, (7),
+                putfonts8_asc(binfo, binfo, 32, 16, (7),
                               s);
             }
         }
@@ -240,15 +240,15 @@ FUNC HariMain() {
     io_out8()
     init_keyboard()
     init_palette()
-    init_screen(binfo->vram, binfo->scrnx, binfo->scrny)
+    init_screen(binfo, binfo, binfo)
     ASSIGNE mx
-    binfo->scrnx
+    binfo
     ASSIGNE my
-    binfo->scrny
+    binfo
     init_mouse_cursor8(mcursor)
-    putblock8_8(binfo->vram, binfo->scrnx, mx, my, mcursor)
+    putblock8_8(binfo, binfo, mx, my, mcursor)
     mysprintf(s, mx, my)
-    putfonts8_asc(binfo->vram, binfo->scrnx, s)
+    putfonts8_asc(binfo, binfo, s)
     enable_mouse()
     io_cli()
     fifo8_data_count(keyfifo)
@@ -259,15 +259,15 @@ FUNC HariMain() {
     fifo8_get(keyfifo)
     io_sti()
     mysprintf(s, data)
-    boxfill8(binfo->vram, binfo->scrnx)
-    putfonts8_asc(binfo->vram, binfo->scrnx, s)
+    boxfill8(binfo, binfo)
+    putfonts8_asc(binfo, binfo, s)
     fifo8_data_count(mousefifo)
     ASSIGNE data
     fifo8_get(mousefifo)
     io_sti()
     mysprintf(s, data)
-    boxfill8(binfo->vram, binfo->scrnx)
-    putfonts8_asc(binfo->vram, binfo->scrnx, s)
+    boxfill8(binfo, binfo)
+    putfonts8_asc(binfo, binfo, s)
 }
 
 FUNC wait_KBC_sendready() {

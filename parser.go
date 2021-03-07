@@ -1419,9 +1419,6 @@ func (p *Parser) parseExpression() []Statement {
 				p.leftVarInfo.idName = refv.Name
 			}
 
-			if p.curToken().isPostExpression() {
-				p.pos++
-			}
 		} else {
 			ss = append(ss, ls...)
 		}
@@ -1481,6 +1478,11 @@ func (p *Parser) parseExpression() []Statement {
 				return nil
 			}
 		}
+	}
+
+	// 後置演算式
+	if p.curToken().isPostExpression() {
+		p.pos++
 	}
 
 	// 中置演算式
