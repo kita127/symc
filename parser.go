@@ -1460,7 +1460,7 @@ func (p *Parser) parseExpression() []Statement {
 		return nil
 	}
 
-	for p.curToken().isToken(lbracket) {
+	if p.curToken().isToken(lbracket) {
 		// 配列の場合
 		ts := p.parseBracket()
 		if ts == nil {
