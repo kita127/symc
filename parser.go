@@ -1484,6 +1484,16 @@ CHECK:
 				return nil
 			}
 
+			if p.curToken().isToken(lbracket) {
+				// 配列あり
+				xs := p.parseBracket()
+				if xs == nil {
+					p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+					return nil
+				}
+				ss = append(ss, xs...)
+			}
+
 			// 再度中置演算子の判定
 			goto CHECK
 		}
@@ -1499,6 +1509,32 @@ CHECK:
 			return nil
 		}
 		ss = append(ss, r...)
+	}
+
+	return ss
+}
+
+// parseBracket
+func (p *Parser) parseBracket() []Statement {
+	ss := []Statement{}
+	if !p.curToken().isToken(lbracket) {
+		p.updateErrLog(fmt.Sprintf("parseBracket:token[%s]", p.curToken().literal))
+		return nil
+	}
+	for p.curToken().isToken(lbracket) {
+		p.pos++
+		// leftVarInfo 上書き防止
+		ts := p.parseExpression()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseBracket:token[%s]", p.curToken().literal))
+			return nil
+		}
+		if !p.curToken().isToken(rbracket) {
+			p.updateErrLog(fmt.Sprintf("parseBracket:token[%s]", p.curToken().literal))
+			return nil
+		}
+		p.pos++
+		ss = append(ss, ts...)
 	}
 
 	return ss
