@@ -3800,6 +3800,38 @@ void func(void)
 				},
 			},
 		},
+		{
+			"st var 6",
+			`
+void func(void)
+{
+    s.x[i] = a;
+    s.y[i][j] = b;
+    s.z[i][j][k] = c;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "s"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "a"},
+							&Assigne{Name: "s"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "j"},
+							&RefVar{Name: "b"},
+							&Assigne{Name: "s"},
+							&RefVar{Name: "i"},
+							&RefVar{Name: "j"},
+							&RefVar{Name: "k"},
+							&RefVar{Name: "c"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {

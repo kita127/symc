@@ -1523,8 +1523,14 @@ func (p *Parser) parseBracket() []Statement {
 	}
 	for p.curToken().isToken(lbracket) {
 		p.pos++
+
 		// leftVarInfo 上書き防止
+		idIndex := p.leftVarInfo.idIndex
+		idName := p.leftVarInfo.idName
 		ts := p.parseExpression()
+		p.leftVarInfo.idIndex = idIndex
+		p.leftVarInfo.idName = idName
+
 		if ts == nil {
 			p.updateErrLog(fmt.Sprintf("parseBracket:token[%s]", p.curToken().literal))
 			return nil
