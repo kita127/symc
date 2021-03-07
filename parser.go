@@ -1460,6 +1460,8 @@ func (p *Parser) parseExpression() []Statement {
 		return nil
 	}
 
+HOGE:
+
 	if p.curToken().isToken(lbracket) {
 		// 配列の場合
 		ts := p.parseBracket()
@@ -1468,33 +1470,20 @@ func (p *Parser) parseExpression() []Statement {
 			return nil
 		}
 		ss = append(ss, ts...)
+
+		goto HOGE
+
+	} else if p.curToken().isToken(period) || p.curToken().isToken(arrow) {
+		// 構造体のアクセス
+		p.pos++
+		if xs := p.parseRefVar(); xs == nil {
+			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+			return nil
+		}
+		goto HOGE
 	}
 
-CHECK:
-
 	if p.curToken().isOperator() {
-		if p.curToken().isToken(period) || p.curToken().isToken(arrow) {
-			// 構造体のアクセス
-			p.pos++
-			if xs := p.parseRefVar(); xs == nil {
-				p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
-				return nil
-			}
-
-			if p.curToken().isToken(lbracket) {
-				// 配列あり
-				xs := p.parseBracket()
-				if xs == nil {
-					p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
-					return nil
-				}
-				ss = append(ss, xs...)
-			}
-
-			// 再度中置演算子の判定
-			goto CHECK
-		}
-
 		if p.curToken().isToken(assign) || p.curToken().isCompoundOp() {
 			// 代入式の場合は対象の識別子を Assigne 型に変更
 			ss[p.leftVarInfo.idIndex] = &Assigne{p.leftVarInfo.idName}
@@ -1518,7 +1507,7 @@ func (p *Parser) parseBracket() []Statement {
 		p.updateErrLog(fmt.Sprintf("parseBracket:token[%s]", p.curToken().literal))
 		return nil
 	}
-	for p.curToken().isToken(lbracket) {
+	if p.curToken().isToken(lbracket) {
 		p.pos++
 
 		// leftVarInfo 上書き防止

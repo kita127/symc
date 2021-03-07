@@ -584,8 +584,6 @@ func (t *Token) isOperator() bool {
 	case and:
 	case percent:
 	case colon:
-	case period:
-	case arrow:
 	case plusAssigne:
 	case minusAssigne:
 	case asteriskAssigne:
