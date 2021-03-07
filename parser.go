@@ -1419,16 +1419,6 @@ func (p *Parser) parseExpression() []Statement {
 				p.leftVarInfo.idName = refv.Name
 			}
 
-			for p.curToken().isToken(lbracket) {
-				// 配列の場合
-				ts := p.parseBracket()
-				if ts == nil {
-					p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
-					return nil
-				}
-				ss = append(ss, ts...)
-			}
-
 			if p.curToken().isPostExpression() {
 				p.pos++
 			}
@@ -1468,6 +1458,16 @@ func (p *Parser) parseExpression() []Statement {
 	default:
 		p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
 		return nil
+	}
+
+	for p.curToken().isToken(lbracket) {
+		// 配列の場合
+		ts := p.parseBracket()
+		if ts == nil {
+			p.updateErrLog(fmt.Sprintf("parseExpression:token[%s]", p.curToken().literal))
+			return nil
+		}
+		ss = append(ss, ts...)
 	}
 
 CHECK:

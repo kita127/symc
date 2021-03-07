@@ -3835,6 +3835,37 @@ void func(void)
 				},
 			},
 		},
+		{
+			"st var 7",
+			`
+void func(void)
+{
+    &(s.v) = b;
+    *(p->v) = b;
+    (s.v)[a] = b;
+    (p->v)[a] = b;
+}
+`,
+			&Module{
+				[]Statement{
+					&FunctionDef{Name: "func",
+						Params: []*VariableDef{},
+						Statements: []Statement{
+							&Assigne{Name: "s"},
+							&RefVar{Name: "b"},
+							&Assigne{Name: "p"},
+							&RefVar{Name: "b"},
+							&Assigne{Name: "s"},
+							&RefVar{Name: "a"},
+							&RefVar{Name: "b"},
+							&Assigne{Name: "p"},
+							&RefVar{Name: "a"},
+							&RefVar{Name: "b"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tt := range testTbl {
